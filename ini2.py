@@ -29,11 +29,48 @@ reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
 @client.command(pass_context=True)
 async def wholesome(ctx):
     wholesome_submissions = reddit.subreddit('wholesomeanimemes').hot()
-    post_to_pick = random.randint(1, 20)
+    post_to_pick = random.randint(1, 50)
     for i in range(0, post_to_pick):
         submission = next(x for x in wholesome_submissions if not x.stickied)
 
     await client.send_message(ctx.message.channel, submission.url)
+
+
+@client.command(pass_context=True)
+async def kitsune(ctx):
+    kitsune_submissions = reddit.subreddit('kitsunemimi').hot()
+    post_to_pick = random.randint(1, 50)
+    for i in range(0, post_to_pick):
+        submission = next(x for x in kitsune_submissions if not x.stickied)
+    if not submission.over_18:
+
+        await client.send_message(ctx.message.channel, submission.url)
+
+
+@client.command(pass_context=True)
+async def bunny(ctx):
+    bunny_submissions = reddit.subreddit('Usagimimi').hot()
+    post_to_pick = random.randint(1, 50)
+    for i in range(0, post_to_pick):
+        submission = next(x for x in bunny_submissions if not x.stickied)
+    if not submission.over_18:
+
+        await client.send_message(ctx.message.channel, submission.url)
+
+
+@client.command(pass_context=True)
+async def neko(ctx):
+    neko_submissions = reddit.subreddit('nekomimi').hot()
+    post_to_pick = random.randint(1, 100)
+    for i in range(0, post_to_pick):
+        submission = next(x for x in neko_submissions if not x.stickied)
+    if not submission.over_18:
+
+        await client.send_message(ctx.message.channel, submission.url)
+
+
+
+
 
 
 @client.command()
@@ -43,14 +80,5 @@ async def test2(*args):
         output += word
         output += ' '
     await client.say(output)
-
-
-@client.event
-async def on_message(message):
-    author = message.author
-    content = message.content
-    channel = message.channel
-    print('{}: {}: {}'.format(author, channel, content))
-
 
 client.run(TOKEN)
