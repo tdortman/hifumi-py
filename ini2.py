@@ -57,7 +57,7 @@ wholesome_cache = []
 
 
 @client.command(pass_context=True)
-async def wholesome(ctx):
+async def wholesomeanimemes(ctx):
     if not wholesome_cache:
         wholesome_submissions = reddit.subreddit('wholesomeanimemes').hot()
         submission = next(x for x in wholesome_submissions)
@@ -73,10 +73,7 @@ async def wholesome(ctx):
     embed.set_image(url=random.choice(wholesome_cache))
     await client.send_message(ctx.message.channel, embed=embed)
 
-
 bunny_cache = []
-
-
 @client.command(pass_context=True)
 async def bunny(ctx):
     if not bunny_cache:
@@ -96,8 +93,6 @@ async def bunny(ctx):
 
 
 neko_cache = []
-
-
 @client.command(pass_context=True)
 async def neko(ctx):
     channel = client.get_channel("478572251252391957")
@@ -152,8 +147,9 @@ async def animegirl(ctx):
                 animegirl_cache.append(submission.url)
 
         await client.send_message(ctx.message.channel, 'Results found: {}'.format(len(animegirl_cache)))
+        
 
-    embed = discord.Embed(title="", description=None, color=3553599)
+    embed = discord.Embed(title="Look at this cute girl uwu", description="And Annie is a super duper cutie :3", color=3553599)
     embed.set_image(url=random.choice(animegirl_cache))
     await client.send_message(ctx.message.channel, embed=embed)
 
