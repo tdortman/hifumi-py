@@ -112,8 +112,6 @@ async def neko(ctx):
 
 
 thighs_cache = []
-
-
 @client.command(pass_context=True)
 async def thicc(ctx):
     channel = client.get_channel("478572251252391957")
@@ -133,23 +131,27 @@ async def thicc(ctx):
 
 
 animegirl_cache = []
-
-
 @client.command(pass_context=True)
 async def animegirl(ctx):
+    global submission
     if not animegirl_cache:
         animegirl_submissions = reddit.subreddit('animegirls').hot()
+        animegirl_title = reddit.submission("animegirls").title()
         submission = next(x for x in animegirl_submissions)
+        submission.title = next(x for x in animegirl_title)
 
         for i in range(50):
             submission = next(x for x in animegirl_submissions)
             if not submission.over_18:
                 animegirl_cache.append(submission.url)
+            if submission.title:
+                animegirl_cache.append(submission.title)
+
 
         await client.send_message(ctx.message.channel, 'Results found: {}'.format(len(animegirl_cache)))
         
 
-    embed = discord.Embed(title="Look at this cute girl uwu", description="And Annie is a super duper cutie :3", color=3553599)
+    embed = discord.Embed(title=random.choice(animegirl_cache), description="Annie is a cutie btw :3", color=3553599)
     embed.set_image(url=random.choice(animegirl_cache))
     await client.send_message(ctx.message.channel, embed=embed)
 
