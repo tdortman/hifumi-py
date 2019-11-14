@@ -33,64 +33,105 @@ reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
                                 'Chrome/78.0.3904.87 Safari/537.36')
 
 kitsune_cache = []
-
-
 @client.command(pass_context=True)
 async def kitsune(ctx):
     if not kitsune_cache:
         kitsune_submissions = reddit.subreddit('kitsunemimi').hot()
-        submission = next(x for x in kitsune_submissions if not x.stickied)
 
         for i in range(50):
-            submission = next(x for x in kitsune_submissions if not x.stickied)
+            submission = next(x for x in kitsune_submissions)
             if not submission.over_18:
-                kitsune_cache.append(submission.url)
+                kitsune_cache.append((submission.url, submission.title))
+
+        kitsune_submissions = reddit.subreddit("kitsunemimi").top("all")
+
+        for i in range(100):
+            submission = next(x for x in kitsune_submissions)
+            if not submission.over_18:
+                kitsune_cache.append((submission.url, submission.title))
 
         await client.send_message(ctx.message.channel, 'Results found: {}'.format(len(kitsune_cache)))
 
-    embed = discord.Embed(title="", description=None, color=3553599)
-    embed.set_image(url=random.choice(kitsune_cache))
+    picture, name = random.choice(kitsune_cache)
+
+    try:
+        title, desc = name.split('[')
+        desc = '[' + desc
+    except ValueError:
+        title = name
+        desc = None
+
+    embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
+    embed.set_image(url=picture)
     await client.send_message(ctx.message.channel, embed=embed)
 
 
 wholesome_cache = []
-
-
 @client.command(pass_context=True)
-async def wholesomeanimemes(ctx):
+async def wholesome(ctx):
     if not wholesome_cache:
         wholesome_submissions = reddit.subreddit('wholesomeanimemes').hot()
-        submission = next(x for x in wholesome_submissions)
 
         for i in range(50):
             submission = next(x for x in wholesome_submissions)
             if not submission.over_18:
-                wholesome_cache.append(submission.url)
+                wholesome_cache.append((submission.url, submission.title))
+
+        wholesome_submissions = reddit.subreddit("wholesomeanimemes").top("all")
+
+        for i in range(100):
+            submission = next(x for x in wholesome_submissions)
+            if not submission.over_18:
+                wholesome_cache.append((submission.url, submission.title))
 
         await client.send_message(ctx.message.channel, 'Results found: {}'.format(len(wholesome_cache)))
 
-    embed = discord.Embed(title="", description=None, color=3553599)
-    embed.set_image(url=random.choice(wholesome_cache))
+    picture, name = random.choice(wholesome_cache)
+
+    try:
+        title, desc = name.split('[')
+        desc = '[' + desc
+    except ValueError:
+        title = name
+        desc = None
+
+    embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
+    embed.set_image(url=picture)
     await client.send_message(ctx.message.channel, embed=embed)
+
 
 bunny_cache = []
 @client.command(pass_context=True)
 async def bunny(ctx):
     if not bunny_cache:
-        bunny_submissions = reddit.subreddit('Usagimimi').hot()
-        submission = next(x for x in bunny_submissions)
+        bunny_submissions = reddit.subreddit('usagimimi').hot()
 
-        for i in range(98):
+        for i in range(50):
             submission = next(x for x in bunny_submissions)
             if not submission.over_18:
-                bunny_cache.append(submission.url)
+                bunny_cache.append((submission.url, submission.title))
+
+        bunny_submissions = reddit.subreddit("usagimimi").top("all")
+
+        for i in range(100):
+            submission = next(x for x in bunny_submissions)
+            if not submission.over_18:
+                animegirl_cache.append((submission.url, submission.title))
 
         await client.send_message(ctx.message.channel, 'Results found: {}'.format(len(bunny_cache)))
 
-    embed = discord.Embed(title="", description=None, color=3553599)
-    embed.set_image(url=random.choice(bunny_cache))
-    await client.send_message(ctx.message.channel, embed=embed)
+    picture, name = random.choice(bunny_cache)
 
+    try:
+        title, desc = name.split('[')
+        desc = '[' + desc
+    except ValueError:
+        title = name
+        desc = None
+
+    embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
+    embed.set_image(url=picture)
+    await client.send_message(ctx.message.channel, embed=embed)
 
 neko_cache = []
 @client.command(pass_context=True)
@@ -98,16 +139,31 @@ async def neko(ctx):
     channel = client.get_channel("478572251252391957")
     if not neko_cache:
         neko_submissions = reddit.subreddit('nekomimi').hot()
-        submission = next(x for x in neko_submissions)
 
         for i in range(50):
             submission = next(x for x in neko_submissions)
             if submission.over_18:
-                neko_cache.append(submission.url)
+                neko_cache.append((submission.url, submission.title))
+
+        neko_submissions = reddit.subreddit("nekomimi").top("all")
+
+        for i in range(100):
+            submission = next(x for x in neko_submissions)
+            if submission.over_18:
+                neko_cache.append((submission.url, submission.title))
+
         await client.send_message(channel, 'Results found: {}'.format(len(neko_cache)))
 
-    embed = discord.Embed(title="", description=None, color=3553599)
-    embed.set_image(url=random.choice(neko_cache))
+    picture, name = random.choice(neko_cache)
+    try:
+        title, desc = name.split('[')
+        desc = '[' + desc
+    except ValueError:
+        title = name
+        desc = None
+
+    embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
+    embed.set_image(url=picture)
     await client.send_message(channel, embed=embed)
 
 
@@ -117,42 +173,66 @@ async def thicc(ctx):
     channel = client.get_channel("478572251252391957")
     if not thighs_cache:
         thighs_submissions = reddit.subreddit('thighdeology').hot()
-        submission = next(x for x in thighs_submissions)
 
         for i in range(50):
             submission = next(x for x in thighs_submissions)
             if submission.over_18:
-                thighs_cache.append(submission.url)
-        await client.send_message(channel, 'Results found: {}'.format(len(thighs_cache)))
+                thighs_cache.append((submission.url, submission.title))
 
-    embed = discord.Embed(title="", description=None, color=3553599)
-    embed.set_image(url=random.choice(thighs_cache))
+        thighs_submissions = reddit.subreddit("thighdeology").top("all")
+
+        for i in range(100):
+            submission = next(x for x in thighs_submissions)
+            if not submission.over_18:
+                thighs_cache.append((submission.url, submission.title))
+
+        await client.send_message(ctx.message.channel, 'Results found: {}'.format(len(thighs_cache)))
+
+    picture, name = random.choice(thighs_cache)
+
+    try:
+        title, desc = name.split('[')
+        desc = '[' + desc
+    except ValueError:
+        title = name
+        desc = None
+
+    embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
+    embed.set_image(url=picture)
     await client.send_message(channel, embed=embed)
 
 
 animegirl_cache = []
 @client.command(pass_context=True)
 async def animegirl(ctx):
-    global submission
     if not animegirl_cache:
         animegirl_submissions = reddit.subreddit('animegirls').hot()
-        animegirl_title = reddit.submission("animegirls").title()
-        submission = next(x for x in animegirl_submissions)
-        submission.title = next(x for x in animegirl_title)
 
         for i in range(50):
             submission = next(x for x in animegirl_submissions)
             if not submission.over_18:
-                animegirl_cache.append(submission.url)
-            if submission.title:
-                animegirl_cache.append(submission.title)
+                animegirl_cache.append((submission.url, submission.title))
 
+        animegirl_submissions = reddit.subreddit("animegirls").top("all")
+
+        for i in range(100):
+            submission = next(x for x in animegirl_submissions)
+            if not submission.over_18:
+                animegirl_cache.append((submission.url, submission.title))
 
         await client.send_message(ctx.message.channel, 'Results found: {}'.format(len(animegirl_cache)))
-        
 
-    embed = discord.Embed(title=random.choice(animegirl_cache), description="Annie is a cutie btw :3", color=3553599)
-    embed.set_image(url=random.choice(animegirl_cache))
+    picture, name = random.choice(animegirl_cache)
+
+    try:
+        title, desc = name.split('[')
+        desc = '[' + desc
+    except ValueError:
+        title = name
+        desc = None
+
+    embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
+    embed.set_image(url=picture)
     await client.send_message(ctx.message.channel, embed=embed)
 
 
