@@ -68,7 +68,7 @@ async def kitsune(ctx):
     embed.set_image(url=picture)
     await ctx.channel.send(embed=embed)
 
-
+.
 wholesome_cache = []
 @bot.command()
 async def wholesome(ctx):
