@@ -5,29 +5,27 @@ import random
 
 TOKEN = 'NjQxNDA5MzMwODg4ODM1MDgz.XcLHRQ.PvhkvwlbL0ZNU_cCccDxaiOnlCA'
 
-client = commands.Bot(command_prefix='?')
+bot = commands.Bot(command_prefix='?')
 
 
-@client.event
+@bot.event
 async def on_ready():
     print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
+    print(bot.user.name)
+    print(bot.user.id)
     print('------')
-    #await client.change_presence(game=discord.Game(name="with Miku"))
-    await client.change_presence(game=discord.Game(name="Annie be cute", type=3))
+    # await bot.change_presence(game=discord.Game(name="with Miku"))
 
 
+@bot.command()
+async def test(ctx):
+    await ctx.channel.send('Learning Python is fun uwu')
 
-@client.command()
-async def test():
-    await client.say('Learning Python is fun uwu')
 
-
-@client.command
-async def cuddle():
-    await client.say("*Timmy goes up to <@207505077013839883> and cuddles tightly, "
-                     "trying his best to comfort her*")
+@bot.command()
+async def cuddle(ctx):
+    await ctx.channel.send("*Timmy goes up to <@207505077013839883> and cuddles tightly, "
+                           "trying his best to comfort her*")
 
 
 reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
@@ -36,7 +34,9 @@ reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
                                 'Chrome/78.0.3904.87 Safari/537.36')
 
 kitsune_cache = []
-@client.command(pass_context=True)
+
+
+@bot.command()
 async def kitsune(ctx):
     if not kitsune_cache:
         kitsune_submissions = reddit.subreddit('kitsunemimi').hot()
@@ -53,7 +53,7 @@ async def kitsune(ctx):
             if not submission.over_18:
                 kitsune_cache.append((submission.url, submission.title))
 
-        await client.send_message(ctx.message.channel, 'Results found: {}'.format(len(kitsune_cache)))
+        await ctx.channel.send('Results found: {}'.format(len(kitsune_cache)))
 
     picture, name = random.choice(kitsune_cache)
 
@@ -66,11 +66,11 @@ async def kitsune(ctx):
 
     embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
     embed.set_image(url=picture)
-    await client.send_message(ctx.message.channel, embed=embed)
+    await ctx.channel.send(embed=embed)
 
 
 wholesome_cache = []
-@client.command(pass_context=True)
+@bot.command()
 async def wholesome(ctx):
     if not wholesome_cache:
         wholesome_submissions = reddit.subreddit('wholesomeanimemes').hot()
@@ -87,7 +87,7 @@ async def wholesome(ctx):
             if not submission.over_18:
                 wholesome_cache.append((submission.url, submission.title))
 
-        await client.send_message(ctx.message.channel, 'Results found: {}'.format(len(wholesome_cache)))
+        await ctx.channel.send('Results found: {}'.format(len(wholesome_cache)))
 
     picture, name = random.choice(wholesome_cache)
 
@@ -100,11 +100,11 @@ async def wholesome(ctx):
 
     embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
     embed.set_image(url=picture)
-    await client.send_message(ctx.message.channel, embed=embed)
+    await ctx.channel.send(embed=embed)
 
 
 bunny_cache = []
-@client.command(pass_context=True)
+@bot.command()
 async def bunny(ctx):
     if not bunny_cache:
         bunny_submissions = reddit.subreddit('usagimimi').hot()
@@ -121,7 +121,7 @@ async def bunny(ctx):
             if not submission.over_18:
                 animegirl_cache.append((submission.url, submission.title))
 
-        await client.send_message(ctx.message.channel, 'Results found: {}'.format(len(bunny_cache)))
+        await ctx.channel.send('Results found: {}'.format(len(bunny_cache)))
 
     picture, name = random.choice(bunny_cache)
 
@@ -134,12 +134,13 @@ async def bunny(ctx):
 
     embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
     embed.set_image(url=picture)
-    await client.send_message(ctx.message.channel, embed=embed)
+    await ctx.channel.send(embed=embed)
+
 
 neko_cache = []
-@client.command(pass_context=True)
-async def neko(ctx):
-    channel = client.get_channel("478572251252391957")
+@bot.command()
+async def neko():
+    channel = bot.get_channel(478572251252391957)
     if not neko_cache:
         neko_submissions = reddit.subreddit('nekomimi').hot()
 
@@ -155,7 +156,7 @@ async def neko(ctx):
             if submission.over_18:
                 neko_cache.append((submission.url, submission.title))
 
-        await client.send_message(channel, 'Results found: {}'.format(len(neko_cache)))
+        await channel.send('Results found: {}'.format(len(neko_cache)))
 
     picture, name = random.choice(neko_cache)
     try:
@@ -167,13 +168,13 @@ async def neko(ctx):
 
     embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
     embed.set_image(url=picture)
-    await client.send_message(channel, embed=embed)
+    await channel.send(embed=embed)
 
 
 thighs_cache = []
-@client.command(pass_context=True)
-async def thicc(ctx):
-    channel = client.get_channel("478572251252391957")
+@bot.command()
+async def thicc():
+    channel = bot.get_channel(478572251252391957)
     if not thighs_cache:
         thighs_submissions = reddit.subreddit('thighdeology').hot()
 
@@ -189,7 +190,7 @@ async def thicc(ctx):
             if not submission.over_18:
                 thighs_cache.append((submission.url, submission.title))
 
-        await client.send_message(ctx.message.channel, 'Results found: {}'.format(len(thighs_cache)))
+        await channel.send('Results found: {}'.format(len(thighs_cache)))
 
     picture, name = random.choice(thighs_cache)
 
@@ -202,11 +203,11 @@ async def thicc(ctx):
 
     embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
     embed.set_image(url=picture)
-    await client.send_message(channel, embed=embed)
+    await channel.send(embed=embed)
 
 
 animegirl_cache = []
-@client.command(pass_context=True)
+@bot.command(pass_context=True)
 async def animegirl(ctx):
     if not animegirl_cache:
         animegirl_submissions = reddit.subreddit('animegirls').hot()
@@ -223,7 +224,7 @@ async def animegirl(ctx):
             if not submission.over_18:
                 animegirl_cache.append((submission.url, submission.title))
 
-        await client.send_message(ctx.message.channel, 'Results found: {}'.format(len(animegirl_cache)))
+        await ctx.channel.send('Results found: {}'.format(len(animegirl_cache)))
 
     picture, name = random.choice(animegirl_cache)
 
@@ -236,17 +237,16 @@ async def animegirl(ctx):
 
     embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
     embed.set_image(url=picture)
-    await client.send_message(ctx.message.channel, embed=embed)
+    await ctx.channel.send(embed=embed)
 
 
-@client.command(name='numguess',
-                brief='Guess a number between 1 and 100',
-                pass_context=True)
+@bot.command(name='numguess',
+             brief='Guess a number between 1 and 100')
 async def numguess(ctx):
     number = random.randint(1, 100)
     turns = 5
-    await client.send_message(ctx.message.channel, "Welcome! Time to guess some numbers! You have 5 tries. I'll think"
-                                                   " of a number between 1 and 100.")
+    await ctx.channel.send("Welcome! Time to guess some numbers! You have 5 tries. I'll think"
+                           " of a number between 1 and 100.")
 
     def check(author):
         def inner_check(message):
@@ -261,35 +261,33 @@ async def numguess(ctx):
         return inner_check
 
     while turns != 0:
-        await client.send_message(ctx.message.channel, "Go try your luck and take a guess!")
-        msg = await client.wait_for_message(check=check, timeout=60)
+        await ctx.channel.send("Go try your luck and take a guess!")
+        msg = await bot.wait_for(ctx.message, check=check, timeout=60)
         guess = int(msg.content)
 
         if guess > number and turns != 0:
-            await client.send_message(ctx.message.channel,
-                                      f"Woah there, this is way too high! Maybe try and guess a lower number next time."
-                                      f" You still have {turns - 1} guesses left")
+            await ctx.channel.send(f"Woah there, this is way too high! Maybe try and guess a lower number next time."
+                                   f" You still have {turns - 1} guesses left")
             turns -= 1
         elif guess < number and turns != 0:
-            await client.send_message(ctx.message.channel,
-                                      f"Awww, too bad! Might wanna go higher next time! You have {turns - 1} "
-                                      f"guesses left!")
+            await ctx.channel.send(f"Awww, too bad! Might wanna go higher next time! You have {turns - 1} "
+                                   f"guesses left!")
             turns -= 1
         if guess == number:
-            await client.send_message(ctx.message.channel, f"Yes!! You guessed right! I'm so proud of you!!")
+            await ctx.channel.send(f"Yes!! You guessed right! I'm so proud of you!!")
+
             break
         if turns == 0 and guess != number:
-            await client.send_message(ctx.message.channel,
-                                      f"Maybe next time! In case you wondered, my number was {number}!")
+            await ctx.channel.send(f"Maybe next time! In case you wondered, my number was {number}!")
 
 
-@client.command()
+@bot.command()
 async def test2(*args):
     output = ''
     for word in args:
         output += word
         output += ' '
-    await client.say(output)
+    await channel.send(output)
 
 
-client.run(TOKEN)
+bot.run(TOKEN)
