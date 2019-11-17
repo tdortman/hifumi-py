@@ -5,7 +5,7 @@ import random
 
 TOKEN = 'NjQxNDA5MzMwODg4ODM1MDgz.XcLHRQ.PvhkvwlbL0ZNU_cCccDxaiOnlCA'
 
-bot = commands.Bot(command_prefix='?')
+bot = commands.Bot(command_prefix='h!')
 
 
 @bot.event
@@ -14,7 +14,7 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    # await bot.change_presence(game=discord.Game(name="with Miku"))
+    # await bot.change_presence("with Miku")
 
 
 @bot.command()
@@ -68,7 +68,6 @@ async def kitsune(ctx):
     embed.set_image(url=picture)
     await ctx.channel.send(embed=embed)
 
-.
 wholesome_cache = []
 @bot.command()
 async def wholesome(ctx):
@@ -109,7 +108,7 @@ async def bunny(ctx):
     if not bunny_cache:
         bunny_submissions = reddit.subreddit('usagimimi').hot()
 
-        for i in range(50):
+        for i in range(100):
             submission = next(x for x in bunny_submissions)
             if not submission.over_18:
                 bunny_cache.append((submission.url, submission.title))
