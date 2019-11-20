@@ -68,7 +68,10 @@ async def kitsune(ctx):
     embed.set_image(url=picture)
     await ctx.channel.send(embed=embed)
 
+
 wholesome_cache = []
+
+
 @bot.command()
 async def wholesome(ctx):
     if not wholesome_cache:
@@ -103,6 +106,8 @@ async def wholesome(ctx):
 
 
 bunny_cache = []
+
+
 @bot.command()
 async def bunny(ctx):
     if not bunny_cache:
@@ -137,6 +142,8 @@ async def bunny(ctx):
 
 
 neko_cache = []
+
+
 @bot.command(pass_context=True)
 async def neko(ctx):
     channel = bot.get_channel(478572251252391957)
@@ -171,6 +178,8 @@ async def neko(ctx):
 
 
 thighs_cache = []
+
+
 @bot.command(pass_context=True)
 async def thicc(ctx):
     channel = bot.get_channel(478572251252391957)
@@ -206,6 +215,8 @@ async def thicc(ctx):
 
 
 animegirl_cache = []
+
+
 @bot.command(pass_context=True)
 async def animegirl(ctx):
     if not animegirl_cache:
@@ -239,6 +250,13 @@ async def animegirl(ctx):
     await ctx.channel.send(embed=embed)
 
 
+async def get_user_tag(message):
+    sid = message.guild.id
+    cid = message.channel.id
+    uid = message.author.id
+    return '{}&{}&{}'.format(sid, cid, uid)
+
+
 @bot.command(name='numguess',
              brief='Guess a number between 1 and 100')
 async def numguess(ctx):
@@ -246,22 +264,16 @@ async def numguess(ctx):
     turns = 5
     await ctx.channel.send("Welcome! Time to guess some numbers! You have 5 tries. I'll think"
                            " of a number between 1 and 100.")
-
-    def check(author):
-        def inner_check(message):
-            if message.author != author:
-                return False
-            try:
-                int(message.content)
-                return True
-            except ValueError:
-                return False
-
-        return inner_check
+    numguess_users = []
+    numguess_round = {}
+    tag = await get_user_tag(ctx.message)
+    if tag not in numguess_users:
+        numguess_users.append(tag)
+        turns = numguess_round[tag]
 
     while turns != 0:
         await ctx.channel.send("Go try your luck and take a guess!")
-        msg = await bot.wait_for("message", check=check, timeout=60)
+        msg = await bot.wait_for("message", timeout=60)
         guess = int(msg.content)
 
         if guess > number and turns != 0:
