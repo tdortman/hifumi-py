@@ -137,8 +137,8 @@ async def bunny(ctx):
 
 
 neko_cache = []
-@bot.command()
-async def neko():
+@bot.command(pass_context=True)
+async def neko(ctx):
     channel = bot.get_channel(478572251252391957)
     if not neko_cache:
         neko_submissions = reddit.subreddit('nekomimi').hot()
@@ -171,8 +171,8 @@ async def neko():
 
 
 thighs_cache = []
-@bot.command()
-async def thicc():
+@bot.command(pass_context=True)
+async def thicc(ctx):
     channel = bot.get_channel(478572251252391957)
     if not thighs_cache:
         thighs_submissions = reddit.subreddit('thighdeology').hot()
@@ -261,7 +261,7 @@ async def numguess(ctx):
 
     while turns != 0:
         await ctx.channel.send("Go try your luck and take a guess!")
-        msg = await bot.wait_for(ctx.message, check=check, timeout=60)
+        msg = await bot.wait_for("message", check=check, timeout=60)
         guess = int(msg.content)
 
         if guess > number and turns != 0:
@@ -274,10 +274,13 @@ async def numguess(ctx):
             turns -= 1
         if guess == number:
             await ctx.channel.send(f"Yes!! You guessed right! I'm so proud of you!!")
-
+            break
+        if guess == number and turns == 5:
+            await ctx.channel.send("YOU'RE SO GOOD!!!! FIRST TRY!!")
             break
         if turns == 0 and guess != number:
             await ctx.channel.send(f"Maybe next time! In case you wondered, my number was {number}!")
+            break
 
 
 @bot.command()
