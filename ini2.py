@@ -55,6 +55,35 @@ async def cipher(ctx, message, key):
         await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
 
 
+@bot.command()
+async def avatar(ctx, member: discord.Member):
+    embed = discord.Embed(title="", description="", color=0xce3a9b)
+    embed.set_image(url=f"{member.avatar_url}")
+    await ctx.send(embed=embed)
+
+
+@bot.command()
+async def qr(ctx, message):
+    m = message
+    now = datetime.datetime.now()
+    current_time = now.strftime("%Y%m%d%H%M%S")
+
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_M,
+        box_size=5,
+        border=0,
+    )
+    qr.add_data(m)
+    qr.make(fit=True)
+
+    file_name = '{0}.png'.format(current_time[2:])
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    img.save(r'C:\Users\TIMBOLA\Desktop\HifuBot\hifumi_qr_code\{0}'.format(file_name))
+    with open(r'C:\Users\TIMBOLA\Desktop\HifuBot\hifumi_qr_code\{0}'.format(file_name), 'rb') as picture:
+        await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
+
 
 @bot.command()
 async def test(ctx):
@@ -234,7 +263,7 @@ async def thicc(ctx):
 
         for i in range(100):
             submission = next(x for x in thighs_submissions)
-            if not submission.over_18:
+            if submission.over_18:
                 thighs_cache.append((submission.url, submission.title))
 
         await channel.send('Results found: {}'.format(len(thighs_cache)))
@@ -291,11 +320,11 @@ async def animegirl(ctx):
 
 @bot.command(name='numguess',
              brief='Guess a number between 1 and 100')
-async def numguess(ctx):
+async def numguess(message):
     number = random.randint(1, 100)
     turns = 5
-    await ctx.channel.send("Welcome! Time to guess some numbers! You have 5 tries. I'll think"
-                           " of a number between 1 and 100.")
+    await message.channel.send("Welcome! Time to guess some numbers! You have 5 tries. I'll think"
+                               " of a number between 1 and 100.")
 
     def check(author):
         def inner_check(message):
@@ -310,26 +339,27 @@ async def numguess(ctx):
         return inner_check
 
     while turns != 0:
-        await ctx.channel.send("Go try your luck and take a guess!")
+        await message.channel.send("Go try your luck and take a guess!")
         msg = await bot.wait_for("message", check=check, timeout=60)
         guess = int(msg.content)
 
         if guess > number and turns != 0:
-            await ctx.channel.send(f"Woah there, this is way too high! Maybe try and guess a lower number next time."
-                                   f" You still have {turns - 1} guesses left")
+            await message.channel.send(
+                f"Woah there, this is way too high! Maybe try and guess a lower number next time."
+                f" You still have {turns - 1} guesses left")
             turns -= 1
         elif guess < number and turns != 0:
-            await ctx.channel.send(f"Awww, too bad! Might wanna go higher next time! You have {turns - 1} "
-                                   f"guesses left!")
+            await message.channel.send(f"Awww, too bad! Might wanna go higher next time! You have {turns - 1} "
+                                       f"guesses left!")
             turns -= 1
         if guess == number:
-            await ctx.channel.send(f"Yes!! You guessed right! I'm so proud of you!!")
+            await message.channel.send(f"Yes!! You guessed right! I'm so proud of you!!")
             break
         if guess == number and turns == 5:
-            await ctx.channel.send("YOU'RE SO GOOD!!!! FIRST TRY!!")
+            await message.channel.send("YOU'RE SO GOOD!!!! FIRST TRY!!")
             break
         if turns == 0 and guess != number:
-            await ctx.channel.send(f"Maybe next time! In case you wondered, my number was {number}!")
+            await message.channel.send(f"Maybe next time! In case you wondered, my number was {number}!")
             break
 
 
