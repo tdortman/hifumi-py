@@ -6,6 +6,7 @@ import base64
 import datetime
 from PIL import Image, ImageDraw
 import math
+import qrcode
 
 TOKEN = 'NjQxNDA5MzMwODg4ODM1MDgz.XcLHRQ.PvhkvwlbL0ZNU_cCccDxaiOnlCA'
 
@@ -20,72 +21,44 @@ async def on_ready():
     print('------')
     # await bot.change_presence("with Miku")
 
+
 @bot.command()
-async def cipher(ctx, message):
-        source = str(message)[7:]
-        now = datetime.datetime.now()
-        current_time = now.strftime("%Y%m%d%H%M%S")
+async def cipher(ctx, message, key):
+    now = datetime.datetime.now()
+    current_time = now.strftime("%Y%m%d%H%M%S")
+    source = message
+    caesar = ""
+    num = int(key)
+    for i in range(len(source)):
+        if source[i].isupper():
+            caesar += chr(((ord(source[i]) - 65 + num) % 26) + 65)
+        elif source[i].islower():
+            caesar += chr(((ord(source[i]) - 97 + num) % 26) + 97)
+        else:
+            caesar += source[i]
+        caesar = caesar.replace("_", " ")
 
-        debug = False
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_M,
+        box_size=5,
+        border=0,
+    )
+    qr.add_data(caesar)
+    qr.make(fit=True)
 
-        change, caesar = 55, ''
-        for i in range(len(source)):
-            char = ord(source[i])
-            if 65 <= char <= 90:
-                char += change
-                while char > 90:
-                    char -= 26
-                while char < 65:
-                    char += 26
-            elif 97 <= char <= 122:
-                char += change
-                while char > 122:
-                    char -= 26
-                while char < 97:
-                    char += 26
-            caesar += chr(char)
+    file_name = '{0}.png'.format(current_time[2:])
+    img = qr.make_image(fill_color="black", back_color="white")
 
-        base1 = base64.b64encode(caesar.encode('ascii')).decode('ascii')
-        base2 = base64.b64encode(base1.encode('ascii')).decode('ascii')
-
-        binary = ''.join('{0:08b}'.format(ord(x), 'b') for x in base2)
-
-        a = binary
-
-        count = int(math.sqrt(len(a))) + 1
-        cl = len(a)
-        much = (count ** 2) - cl
-        a = a + '0' * much
-
-        img = Image.new('RGB', (count, count), 'black')
-        pixels = img.load()
-
-        k = int(0)
-
-        for i in range(count):
-            for j in range(count):
-                if str(a[k]) == '0':
-                    pixels[j, i] = (0, 0, 0)
-                else:
-                    pixels[j, i] = (255, 255, 255)
-                k += 1
-
-        file_name = '{0}{1}_{2}.png'.format(current_time[2:], change % 26, count)
-
-
-        img.save(r'C:\Users\timdo\Desktop\HifuBot\hifumi_cipher_images\{0}'.format(file_name))
-        with open(r'C:\Users\timdo\Desktop\HifuBot\hifumi_cipher_images\{0}'.format(file_name), 'rb') as picture:
-            await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
-
-
+    img.save(r'C:\Users\TIMBOLA\Desktop\HifuBot\hifumi_cipher_images\{0}'.format(file_name))
+    with open(r'C:\Users\TIMBOLA\Desktop\HifuBot\hifumi_cipher_images\{0}'.format(file_name), 'rb') as picture:
+        await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
 
 
 
 @bot.command()
 async def test(ctx):
     await ctx.channel.send('Learning Python is fun uwu')
-
-
 
 
 @bot.command()
@@ -134,7 +107,10 @@ async def kitsune(ctx):
     embed.set_image(url=picture)
     await ctx.channel.send(embed=embed)
 
+
 wholesome_cache = []
+
+
 @bot.command()
 async def wholesome(ctx):
     if not wholesome_cache:
@@ -169,6 +145,8 @@ async def wholesome(ctx):
 
 
 bunny_cache = []
+
+
 @bot.command()
 async def bunny(ctx):
     if not bunny_cache:
@@ -203,6 +181,8 @@ async def bunny(ctx):
 
 
 neko_cache = []
+
+
 @bot.command(pass_context=True)
 async def neko(ctx):
     channel = bot.get_channel(478572251252391957)
@@ -237,6 +217,8 @@ async def neko(ctx):
 
 
 thighs_cache = []
+
+
 @bot.command(pass_context=True)
 async def thicc(ctx):
     channel = bot.get_channel(478572251252391957)
@@ -272,6 +254,8 @@ async def thicc(ctx):
 
 
 animegirl_cache = []
+
+
 @bot.command(pass_context=True)
 async def animegirl(ctx):
     if not animegirl_cache:
