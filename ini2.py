@@ -7,6 +7,11 @@ import datetime
 from PIL import Image, ImageDraw
 import math
 import qrcode
+import requests
+from bs4 import BeautifulSoup
+import urbandict
+from random import choice
+
 
 TOKEN = 'NjQxNDA5MzMwODg4ODM1MDgz.XcLHRQ.PvhkvwlbL0ZNU_cCccDxaiOnlCA'
 
@@ -20,6 +25,17 @@ async def on_ready():
     print(bot.user.id)
     print('------')
     # await bot.change_presence("with Miku")
+
+
+@bot.command()
+async def urban(ctx, message):
+    urban_list = []
+    term = message
+    word = urbandict.define(term)
+    urban_list.append(word[0])
+    embed = discord.Embed(title=urban_list[0]["word"], description=urban_list[0]["def"], color=0xce3a9b)
+
+    await ctx.channel.send(embed=embed)
 
 
 @bot.command()
