@@ -2,6 +2,10 @@ from discord.ext import commands
 import discord
 import praw
 import random
+import base64
+import datetime
+from PIL import Image, ImageDraw
+import math
 
 TOKEN = 'NjQxNDA5MzMwODg4ODM1MDgz.XcLHRQ.PvhkvwlbL0ZNU_cCccDxaiOnlCA'
 
@@ -16,17 +20,72 @@ async def on_ready():
     print('------')
     # await bot.change_presence("with Miku")
 
+@bot.command()
+async def cipher(ctx, message):
+        source = str(message)[7:]
+        now = datetime.datetime.now()
+        current_time = now.strftime("%Y%m%d%H%M%S")
+
+        debug = False
+
+        change, caesar = 55, ''
+        for i in range(len(source)):
+            char = ord(source[i])
+            if 65 <= char <= 90:
+                char += change
+                while char > 90:
+                    char -= 26
+                while char < 65:
+                    char += 26
+            elif 97 <= char <= 122:
+                char += change
+                while char > 122:
+                    char -= 26
+                while char < 97:
+                    char += 26
+            caesar += chr(char)
+
+        base1 = base64.b64encode(caesar.encode('ascii')).decode('ascii')
+        base2 = base64.b64encode(base1.encode('ascii')).decode('ascii')
+
+        binary = ''.join('{0:08b}'.format(ord(x), 'b') for x in base2)
+
+        a = binary
+
+        count = int(math.sqrt(len(a))) + 1
+        cl = len(a)
+        much = (count ** 2) - cl
+        a = a + '0' * much
+
+        img = Image.new('RGB', (count, count), 'black')
+        pixels = img.load()
+
+        k = int(0)
+
+        for i in range(count):
+            for j in range(count):
+                if str(a[k]) == '0':
+                    pixels[j, i] = (0, 0, 0)
+                else:
+                    pixels[j, i] = (255, 255, 255)
+                k += 1
+
+        file_name = '{0}{1}_{2}.png'.format(current_time[2:], change % 26, count)
+
+
+        img.save(r'C:\Users\timdo\Desktop\HifuBot\hifumi_cipher_images\{0}'.format(file_name))
+        with open(r'C:\Users\timdo\Desktop\HifuBot\hifumi_cipher_images\{0}'.format(file_name), 'rb') as picture:
+            await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
+
+
+
+
 
 @bot.command()
 async def test(ctx):
     await ctx.channel.send('Learning Python is fun uwu')
 
-@bot.command()
-async def cipher(ctx):
-    m = await ctx.channel.send("Please enter your message:\n")
-    key = await ctx.channel.send("Please enter the key:\n")
-    return ''.join([chr(((ord(char) - 65 + key) % 26) + 65) if char.isupper() else chr(
-        ((ord(char) - 97 + key) % 26) + 97) if char.islower() else char for char in m])
+
 
 
 @bot.command()
