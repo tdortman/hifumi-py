@@ -21,6 +21,13 @@ async def on_ready():
 async def test(ctx):
     await ctx.channel.send('Learning Python is fun uwu')
 
+@bot.command()
+async def cipher(ctx):
+    m = await ctx.channel.send("Please enter your message:\n")
+    key = await ctx.channel.send("Please enter the key:\n")
+    return ''.join([chr(((ord(char) - 65 + key) % 26) + 65) if char.isupper() else chr(
+        ((ord(char) - 97 + key) % 26) + 97) if char.islower() else char for char in m])
+
 
 @bot.command()
 async def cuddle(ctx):
