@@ -1,4 +1,4 @@
-import twitch
+# import twitch
 from discord.ext import commands
 import discord
 import praw
@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 import urbandict
 from random import choice
 import urllib
-import twitch
+import urbandictionary as ud
 
 TOKEN = 'NjQxNDA5MzMwODg4ODM1MDgz.XcLHRQ.PvhkvwlbL0ZNU_cCccDxaiOnlCA'
 
@@ -43,8 +43,10 @@ reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
                      user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                                 'Chrome/78.0.3904.87 Safari/537.36')
 
-twitch = twitch.TwitchClient(client_id='xl1zs0f0n5h17htlilk9piwitkqtaw', oauth_token='NjQxNDA5MzMwODg4ODM1MDgz.Xd8LMw'
-                                                                              '.QJXSOJ4jYV2ESYg8st7CW82OQTw')
+
+# twitch = twitch.TwitchClient(client_id='xl1zs0f0n5h17htlilk9piwitkqtaw', oauth_token='NjQxNDA5MzMwODg4ODM1MDgz.Xd8LMw'
+# '.QJXSOJ4jYV2ESYg8st7CW82OQTw')
+
 
 @bot.command()
 async def urban(ctx, message):
@@ -59,6 +61,15 @@ async def urban(ctx, message):
     except urllib.error.HTTPError:
         await ctx.channel.send("I'm sorry, but the definition is either not existent, or the server"
                                " is having issues processing your request.")
+
+
+@bot.command()
+async def coinflip(ctx):
+    rand_num = random.randint(0, 1)
+    if rand_num == 0:
+        await ctx.channel.send("Tails!")
+    else:
+        await ctx.channel.send("Heads!")
 
 
 @bot.command()
@@ -95,13 +106,6 @@ async def cipher(ctx, message, key):
 
 
 @bot.command()
-async def avatar(ctx, member: discord.Member):
-    embed = discord.Embed(title="", description="", color=0xce3a9b)
-    embed.set_image(url=f"{member.avatar_url}")
-    await ctx.send(embed=embed)
-
-
-@bot.command()
 async def qr(ctx, message):
     m = message
     now = datetime.datetime.now()
@@ -133,9 +137,6 @@ async def test(ctx):
 async def cuddle(ctx):
     await ctx.channel.send("*Timmy goes up to <@207505077013839883> and cuddles tightly, "
                            "trying his best to comfort her*")
-
-
-
 
 
 @bot.command()
@@ -173,6 +174,7 @@ async def kitsune(ctx):
 
 @bot.command()
 async def sub(ctx, message):
+    global submission
     name = message.split()[0]
     if name not in sub_cache:
         sub_cache[name] = []
@@ -180,16 +182,13 @@ async def sub(ctx, message):
 
         for i in range(100):
             submission = next(x for x in submissions)
-            if not submission.over_18:
-                sub_cache[name].append((submission.url, submission.title))
+            sub_cache[name].append((submission.url, submission.title))
 
         submissions = reddit.subreddit(name).top('all')
 
         for i in range(100):
             submission = next(x for x in submissions)
-            if not submission.over_18:
-                sub_cache[name].append((submission.url, submission.title))
-
+            sub_cache[name].append((submission.url, submission.title))
         await ctx.channel.send('Results found: {}'.format(len(sub_cache[name])))
 
     picture, name = random.choice(sub_cache[name])
