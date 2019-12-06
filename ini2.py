@@ -134,9 +134,9 @@ async def test(ctx):
 
 
 @bot.command()
-async def cuddle(ctx):
-    await ctx.channel.send("*Timmy goes up to <@207505077013839883> and cuddles tightly, "
-                           "trying his best to comfort her*")
+async def cuddle(ctx, message):
+    await ctx.channel.send(f"*{ctx.message.author.mention} goes up to {message} and cuddles tightly, "
+                           "trying their best to comfort them*")
 
 
 @bot.command()
