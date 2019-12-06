@@ -1,19 +1,11 @@
-# import twitch
 from discord.ext import commands
 import discord
 import praw
 import random
-import base64
 import datetime
-from PIL import Image, ImageDraw
-import math
 import qrcode
-import requests
-from bs4 import BeautifulSoup
 import urbandict
-from random import choice
 import urllib
-import urbandictionary as ud
 
 TOKEN = 'NjQxNDA5MzMwODg4ODM1MDgz.XcLHRQ.PvhkvwlbL0ZNU_cCccDxaiOnlCA'
 
