@@ -6,6 +6,7 @@ import datetime
 import qrcode
 import urbandict
 import urllib
+import operator
 
 TOKEN = 'NjQxNDA5MzMwODg4ODM1MDgz.XcLHRQ.PvhkvwlbL0ZNU_cCccDxaiOnlCA'
 
@@ -53,6 +54,21 @@ async def urban(ctx, message):
     except urllib.error.HTTPError:
         await ctx.channel.send("I'm sorry, but the definition is either not existent, or the server"
                                " is having issues processing your request.")
+
+
+@bot.command()
+async def calc(ctx, num1, operation, num2):
+    operators = {
+        '+': operator.add,
+        '-': operator.sub,
+        '*': operator.mul,
+        '%': operator.mod,
+        '/': operator.floordiv
+
+    }
+    #if operation in operators.keys():
+        #await ctx.channel.send(operators[operation](num1, num2)
+
 
 
 @bot.command()
@@ -115,8 +131,8 @@ async def qr(ctx, message):
     file_name = '{0}.png'.format(current_time[2:])
     img = qr.make_image(fill_color="black", back_color="white")
 
-    img.save(r'C:\Users\TIMBOLA\Desktop\HifuBot\hifumi_qr_code\{0}'.format(file_name))
-    with open(r'C:\Users\TIMBOLA\Desktop\HifuBot\hifumi_qr_code\{0}'.format(file_name), 'rb') as picture:
+    img.save(r'C:\Users\timdo\Desktop\HifuBot\hifumi_qr_code\{0}'.format(file_name))
+    with open(r'C:\Users\timdo\Desktop\HifuBot\hifumi_qr_code\{0}'.format(file_name), 'rb') as picture:
         await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
 
 
