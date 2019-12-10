@@ -11,7 +11,6 @@ from discord.utils import get
 import youtube_dl
 import os
 
-
 TOKEN = 'NjQxNDA5MzMwODg4ODM1MDgz.XcLHRQ.PvhkvwlbL0ZNU_cCccDxaiOnlCA'
 
 bot = commands.Bot(command_prefix='h!')
@@ -66,6 +65,17 @@ async def join(ctx):
     await ctx.send(f"Joined {channel}")
 
 
+@bot.command()
+async def test1(ctx):
+    await ctx.channel.send("Love you <@207505077013839883> :heart:\nLove you <@!207505077013839883> :heart:")
+
+@bot.command()
+async def avatar(ctx, member: discord.Member):
+    embed = discord.Embed(title="", description="", color=0xce3a9b)
+    embed.set_image(url=f"{member.avatar_url}")
+    await ctx.send(embed=embed)
+
+
 @bot.command(pass_context=True, aliases=['l', 'lea'])
 async def leave(ctx):
     channel = ctx.message.author.voice.channel
@@ -82,7 +92,6 @@ async def leave(ctx):
 
 @bot.command(pass_context=True, aliases=['p', 'pla'])
 async def play(ctx, url: str):
-
     song_there = os.path.isfile("song.mp3")
     try:
         if song_there:
@@ -116,7 +125,7 @@ async def play(ctx, url: str):
             print(f"Renamed File: {file}\n")
             os.rename(file, "song.mp3")
 
-    discord.utils.get(bot.voice_clients, guild=ctx.guild).play(discord.FFmpegPCMAudio("song.mp3"), after=lambda e: print("Song done!"))
+    voice.play(discord.FFmpegPCMAudio("song.mp3"), after=lambda e: print("Song done!"))
     voice.source = discord.PCMVolumeTransformer(voice.source)
     voice.source.volume = 0.3
 
