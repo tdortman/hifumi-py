@@ -43,6 +43,10 @@ reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
 # twitch = twitch.TwitchClient(client_id='xl1zs0f0n5h17htlilk9piwitkqtaw', oauth_token='NjQxNDA5MzMwODg4ODM1MDgz.Xd8LMw'
 # '.QJXSOJ4jYV2ESYg8st7CW82OQTw')
 
+@bot.command()
+async def test1(ctx):
+    await ctx.channel.send("Love you <@207505077013839883> :heart:\nLove you <@!207505077013839883> :heart:")
+
 
 @bot.command(pass_context=True, aliases=['j', 'joi'])
 async def join(ctx):
@@ -63,17 +67,6 @@ async def join(ctx):
         print(f"The bot has connected to {channel}\n")
 
     await ctx.send(f"Joined {channel}")
-
-
-@bot.command()
-async def test1(ctx):
-    await ctx.channel.send("Love you <@207505077013839883> :heart:\nLove you <@!207505077013839883> :heart:")
-
-@bot.command()
-async def avatar(ctx, member: discord.Member):
-    embed = discord.Embed(title="", description="", color=0xce3a9b)
-    embed.set_image(url=f"{member.avatar_url}")
-    await ctx.send(embed=embed)
 
 
 @bot.command(pass_context=True, aliases=['l', 'lea'])
