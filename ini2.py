@@ -47,6 +47,11 @@ reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
 async def test1(ctx):
     await ctx.channel.send("Love you <@207505077013839883> :heart:\nLove you <@!207505077013839883> :heart:")
 
+@bot.command()
+async def leaveserver(server_id):
+    to_leave = bot.get_guild(server_id)
+    await to_leave.leave()
+
 
 @bot.command(pass_context=True, aliases=['j', 'joi'])
 async def join(ctx):
