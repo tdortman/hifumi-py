@@ -47,6 +47,14 @@ reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
 async def test1(ctx):
     await ctx.channel.send("Love you <@207505077013839883> :heart:\nLove you <@!207505077013839883> :heart:")
 
+
+@bot.command()
+async def avatar(ctx, member: discord.Member):
+    embed = discord.Embed(title="", description="", color=0xce3a9b)
+    embed.set_image(url=f"{member.avatar_url}")
+    await ctx.send(embed=embed)
+
+
 @bot.command()
 async def leaveserver(server_id):
     to_leave = bot.get_guild(server_id)
