@@ -381,69 +381,69 @@ async def bunny(ctx):
 
 @bot.command(pass_context=True)
 async def neko(ctx):
-    channel = bot.get_channel(478572251252391957)
-    if not neko_cache:
-        neko_submissions = reddit.subreddit('nekomimi').hot()
+    if ctx.channel.is_nsfw():
+        if not neko_cache:
+            neko_submissions = reddit.subreddit('nekomimi').hot()
 
-        for i in range(50):
-            submission = next(x for x in neko_submissions)
-            if submission.over_18:
-                neko_cache.append((submission.url, submission.title))
+            for i in range(50):
+                submission = next(x for x in neko_submissions)
+                if submission.over_18:
+                    neko_cache.append((submission.url, submission.title))
 
-        neko_submissions = reddit.subreddit("nekomimi").top("all")
+            neko_submissions = reddit.subreddit("nekomimi").top("all")
 
-        for i in range(100):
-            submission = next(x for x in neko_submissions)
-            if submission.over_18:
-                neko_cache.append((submission.url, submission.title))
+            for i in range(100):
+                submission = next(x for x in neko_submissions)
+                if submission.over_18:
+                    neko_cache.append((submission.url, submission.title))
 
-        await channel.send('Results found: {}'.format(len(neko_cache)))
+            await ctx.channel.send('Results found: {}'.format(len(neko_cache)))
 
-    picture, name = random.choice(neko_cache)
-    try:
-        title, desc = name.split('[')
-        desc = '[' + desc
-    except ValueError:
-        title = name
-        desc = None
+        picture, name = random.choice(neko_cache)
+        try:
+            title, desc = name.split('[')
+            desc = '[' + desc
+        except ValueError:
+            title = name
+            desc = None
 
-    embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
-    embed.set_image(url=picture)
-    await channel.send(embed=embed)
+        embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
+        embed.set_image(url=picture)
+        await ctx.channel.send(embed=embed)
 
 
 @bot.command(pass_context=True)
 async def thicc(ctx):
-    channel = bot.get_channel(478572251252391957)
-    if not thighs_cache:
-        thighs_submissions = reddit.subreddit('thighdeology').hot()
+    if ctx.channel.is_nsfw():
+        if not thighs_cache:
+            thighs_submissions = reddit.subreddit('thighdeology').hot()
 
-        for i in range(50):
-            submission = next(x for x in thighs_submissions)
-            if submission.over_18:
-                thighs_cache.append((submission.url, submission.title))
+            for i in range(50):
+                submission = next(x for x in thighs_submissions)
+                if submission.over_18:
+                    thighs_cache.append((submission.url, submission.title))
 
-        thighs_submissions = reddit.subreddit("thighdeology").top("all")
+            thighs_submissions = reddit.subreddit("thighdeology").top("all")
 
-        for i in range(100):
-            submission = next(x for x in thighs_submissions)
-            if submission.over_18:
-                thighs_cache.append((submission.url, submission.title))
+            for i in range(100):
+                submission = next(x for x in thighs_submissions)
+                if submission.over_18:
+                    thighs_cache.append((submission.url, submission.title))
 
-        await channel.send('Results found: {}'.format(len(thighs_cache)))
+            await ctx.channel.send('Results found: {}'.format(len(thighs_cache)))
 
-    picture, name = random.choice(thighs_cache)
+        picture, name = random.choice(thighs_cache)
 
-    try:
-        title, desc = name.split('[')
-        desc = '[' + desc
-    except ValueError:
-        title = name
-        desc = None
+        try:
+            title, desc = name.split('[')
+            desc = '[' + desc
+        except ValueError:
+            title = name
+            desc = None
 
-    embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
-    embed.set_image(url=picture)
-    await channel.send(embed=embed)
+        embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
+        embed.set_image(url=picture)
+        await ctx.channel.send(embed=embed)
 
 
 @bot.command(pass_context=True)
