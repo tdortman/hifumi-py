@@ -58,13 +58,6 @@ async def avatar(ctx, member: discord.Member):
     embed.set_image(url=f"{member.avatar_url}")
     await ctx.send(embed=embed)
 
-
-@bot.command()
-async def leaveserver(server_id):
-    to_leave = bot.get_guild(server_id)
-    await to_leave.leave()
-
-
 @bot.command(pass_context=True, aliases=['j', 'joi'])
 async def join(ctx):
     channel = ctx.message.author.voice.channel
