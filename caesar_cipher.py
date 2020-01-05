@@ -43,3 +43,4 @@ qr = qrcode.QRCode(
     img.save(r'C:\Users\TIMBOLA\Desktop\HifuBot\hifumi_cipher_images\{0}'.format(file_name))
     with open(r'C:\Users\TIMBOLA\Desktop\HifuBot\hifumi_cipher_images\{0}'.format(file_name), 'rb') as picture:
         await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
+

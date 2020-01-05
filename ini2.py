@@ -1,15 +1,19 @@
-from discord.ext import commands
+import datetime
+import operator
+import os
+import random
+import urllib
+import urllib.request
+import json
 import discord
 import praw
-import random
-import datetime
 import qrcode
 import urbandict
-import urllib
-import operator
-from discord.utils import get
 import youtube_dl
-import os
+from discord.ext import commands
+from discord.utils import get
+import http.client
+import requests as req
 
 TOKEN = 'NjQxNDA5MzMwODg4ODM1MDgz.XcLHRQ.PvhkvwlbL0ZNU_cCccDxaiOnlCA'
 
@@ -284,33 +288,36 @@ async def kitsune(ctx):
 async def sub(ctx, message):
     global submission
     name = message.split()[0]
-    if name not in sub_cache:
-        sub_cache[name] = []
-        submissions = reddit.subreddit(name).hot()
+    with urllib.request.urlopen(f"https://www.reddit.com/r/{name}/about.json") as url:
+        data = json.loads(url.read().decode())
+        if ("over18", True) in data.items() and ctx.channel.is_nsfw():
+            if name not in sub_cache:
+                sub_cache[name] = []
+                submissions = reddit.subreddit(name).hot()
 
-        for i in range(100):
-            submission = next(x for x in submissions)
-            sub_cache[name].append((submission.url, submission.title))
+                for i in range(100):
+                    submission = next(x for x in submissions)
+                    sub_cache[name].append((submission.url, submission.title))
 
-        submissions = reddit.subreddit(name).top('all')
+                submissions = reddit.subreddit(name).top('all')
 
-        for i in range(100):
-            submission = next(x for x in submissions)
-            sub_cache[name].append((submission.url, submission.title))
-        await ctx.channel.send('Results found: {}'.format(len(sub_cache[name])))
+                for i in range(100):
+                    submission = next(x for x in submissions)
+                    sub_cache[name].append((submission.url, submission.title))
+                await ctx.channel.send('Results found: {}'.format(len(sub_cache[name])))
 
-    picture, name = random.choice(sub_cache[name])
+            picture, name = random.choice(sub_cache[name])
 
-    try:
-        title, desc = name.split('[')
-        desc = '[' + desc
-    except ValueError:
-        title = name
-        desc = None
+            try:
+                title, desc = name.split('[')
+                desc = '[' + desc
+            except ValueError:
+                title = name
+                desc = None
 
-    embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
-    embed.set_image(url=picture)
-    await ctx.channel.send(embed=embed)
+            embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
+            embed.set_image(url=picture)
+            await ctx.channel.send(embed=embed)
 
 
 @bot.command()
