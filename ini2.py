@@ -235,8 +235,8 @@ async def qr(ctx, message):
     file_name = '{0}.png'.format(current_time[2:])
     img = qr.make_image(fill_color="black", back_color="white")
 
-    img.save(r'/home/ubuntu/Hifumi/hifumi_qr_code\{0}'.format(file_name))
-    with open(r'/home/ubuntu/Hifumi/hifumi_qr_code\{0}'.format(file_name), 'rb') as picture:
+    img.save(r'/home/ubuntu/HifuBot/hifumi_qr_code\{0}'.format(file_name))
+    with open(r'/home/ubuntu/HifuBot/hifumi_qr_code\{0}'.format(file_name), 'rb') as picture:
         await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
 
 
