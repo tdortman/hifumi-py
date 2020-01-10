@@ -58,6 +58,7 @@ async def avatar(ctx, member: discord.Member):
     embed.set_image(url=f"{member.avatar_url}")
     await ctx.send(embed=embed)
 
+
 @bot.command(pass_context=True, aliases=['j', 'joi'])
 async def join(ctx):
     channel = ctx.message.author.voice.channel
@@ -178,26 +179,15 @@ async def coinflip(ctx):
 
 
 @bot.command()
-async def cipher(ctx):
+async def cipher(ctx, message):
     now = datetime.datetime.now()
     current_time = now.strftime("%Y%m%d%H%M%S")
-    source = ctx.message.content[1:]
-    sliced_msg = source.split('"')[1].split()
-    sliced_key = source.split('"')[2]
-    caesar = ""
-    num = int(sliced_key)
-
-    for word in sliced_msg:
-        for i in range(len(word)):
-            if word[i].isupper():
-                caesar += chr(((ord(word[i]) - 65 + num) % 26) + 65)
-            elif word[i].islower():
-                caesar += chr(((ord(word[i]) - 97 + num) % 26) + 97)
-            else:
-                caesar += word[i]
+    content = ctx.message.content.split()
+    sliced_msg = ' '.join(x for x in content[1:-1])
+    num = int(content[-1])
+    caesar = "".join(encript_letter(x, num) for x in sliced_msg)
 
     await ctx.channel.send(caesar)
-
 
     qr = qrcode.QRCode(
         version=1,
@@ -211,9 +201,18 @@ async def cipher(ctx):
     file_name = '{0}.png'.format(current_time[2:])
     img = qr.make_image(fill_color="black", back_color="white")
 
-    img.save(r'C:\Users\timdo\Desktop\HifuBot\hifumi_cipher_images\{0}'.format(file_name))
-    with open(r'C:\Users\timdo\Desktop\HifuBot\hifumi_cipher_images\{0}'.format(file_name), 'rb') as picture:
+    img.save(r'C:\Users\timbola\Desktop\HifuBot\hifumi_cipher_images\{0}'.format(file_name))
+    with open(r'C:\Users\timbola\Desktop\HifuBot\hifumi_cipher_images\{0}'.format(file_name), 'rb') as picture:
         await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
+
+
+def encript_letter(letter, num):
+    if letter.isupper():
+        return chr(((ord(letter) - 65 + num) % 26) + 65)
+    elif letter.islower():
+        return chr(((ord(letter) - 97 + num) % 26) + 97)
+    else:
+        return letter
 
 
 @bot.command()
