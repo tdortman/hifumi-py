@@ -178,20 +178,25 @@ async def coinflip(ctx):
 
 
 @bot.command()
-async def cipher(ctx, message, key):
+async def cipher(ctx):
     now = datetime.datetime.now()
     current_time = now.strftime("%Y%m%d%H%M%S")
-    source = message
+    source = ctx.message.content[1:]
+    sliced_msg = source.split('"')[1].split()
+    sliced_key = source.split('"')[2]
     caesar = ""
-    num = int(key)
-    for i in range(len(source)):
-        if source[i].isupper():
-            caesar += chr(((ord(source[i]) - 65 + num) % 26) + 65)
-        elif source[i].islower():
-            caesar += chr(((ord(source[i]) - 97 + num) % 26) + 97)
-        else:
-            caesar += source[i]
-        caesar = caesar.replace("_", " ")
+    num = int(sliced_key)
+
+    for word in sliced_msg:
+        for i in range(len(word)):
+            if word[i].isupper():
+                caesar += chr(((ord(word[i]) - 65 + num) % 26) + 65)
+            elif word[i].islower():
+                caesar += chr(((ord(word[i]) - 97 + num) % 26) + 97)
+            else:
+                caesar += word[i]
+
+    await ctx.channel.send(caesar)
 
     qr = qrcode.QRCode(
         version=1,
@@ -205,8 +210,8 @@ async def cipher(ctx, message, key):
     file_name = '{0}.png'.format(current_time[2:])
     img = qr.make_image(fill_color="black", back_color="white")
 
-    img.save(r'/home/ubuntu/HifuBot/hifumi_cipher_images/{0}'.format(file_name))
-    with open(r'/home/ubuntu/HifuBot/hifumi_cipher_images/{0}'.format(file_name), 'rb') as picture:
+    img.save(r'C:\Users\timdo\Desktop\HifuBot\hifumi_cipher_images\{0}'.format(file_name))
+    with open(r'C:\Users\timdo\Desktop\HifuBot\hifumi_cipher_images\{0}'.format(file_name), 'rb') as picture:
         await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
 
 
