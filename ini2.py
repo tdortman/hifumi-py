@@ -198,6 +198,7 @@ async def cipher(ctx):
 
     await ctx.channel.send(caesar)
 
+
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_M,
@@ -240,7 +241,7 @@ async def qr(ctx, message):
 
 @bot.command()
 async def test(ctx):
-    await ctx.channel.send('Learning Python is fun uwu')
+    await ctx.channel.send('Learning Python is fun!!')
 
 
 @bot.command()
