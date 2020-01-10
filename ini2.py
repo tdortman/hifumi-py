@@ -179,13 +179,13 @@ async def coinflip(ctx):
 
 
 @bot.command()
-async def cipher(ctx, message):
+async def cipher(ctx):
     now = datetime.datetime.now()
     current_time = now.strftime("%Y%m%d%H%M%S")
     content = ctx.message.content.split()
     sliced_msg = ' '.join(x for x in content[1:-1])
     num = int(content[-1])
-    caesar = "".join(encript_letter(x, num) for x in sliced_msg)
+    caesar = "".join(encrypt_letter(x, num) for x in sliced_msg)
 
     await ctx.channel.send(caesar)
 
@@ -201,12 +201,12 @@ async def cipher(ctx, message):
     file_name = '{0}.png'.format(current_time[2:])
     img = qr.make_image(fill_color="black", back_color="white")
 
-    img.save(r'C:\Users\timbola\Desktop\HifuBot\hifumi_cipher_images\{0}'.format(file_name))
-    with open(r'C:\Users\timbola\Desktop\HifuBot\hifumi_cipher_images\{0}'.format(file_name), 'rb') as picture:
+    img.save(r'/home/ubuntu/HifuBot/hifumi_cipher_images/{0}'.format(file_name))
+    with open(r'/home/ubuntu/HifuBot/hifumi_cipher_images/{0}'.format(file_name), 'rb') as picture:
         await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
 
 
-def encript_letter(letter, num):
+def encrypt_letter(letter, num):
     if letter.isupper():
         return chr(((ord(letter) - 65 + num) % 26) + 65)
     elif letter.islower():
