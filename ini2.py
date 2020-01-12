@@ -12,10 +12,11 @@ import urbandict
 import youtube_dl
 from discord.ext import commands
 from discord.utils import get
-import http.client
-import requests as req
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+import traceback
 
-TOKEN = 'NjQxNDA5MzMwODg4ODM1MDgz.XcLHRQ.PvhkvwlbL0ZNU_cCccDxaiOnlCA'
+TOKEN = 'NjQxNDA5MzMwODg4ODM1MDgz.XhsUwQ.BE0PBMwPJJgl56vs5ikJXerflC4'
 
 bot = commands.Bot(command_prefix='h!')
 
@@ -26,7 +27,8 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    # await bot.change_presence("with Miku")
+    #game = discord.Game("Shush Amy, you're cute ")
+    #await bot.change_presence(activity=game)
 
 
 # reddit caches
@@ -44,13 +46,8 @@ reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
                                 'Chrome/78.0.3904.87 Safari/537.36')
 
 
-# twitch = twitch.TwitchClient(client_id='xl1zs0f0n5h17htlilk9piwitkqtaw', oauth_token='NjQxNDA5MzMwODg4ODM1MDgz.Xd8LMw'
-# '.QJXSOJ4jYV2ESYg8st7CW82OQTw')
-
-@bot.command()
-async def test1(ctx):
-    await ctx.channel.send("Love you <@207505077013839883> :heart:\nLove you <@!207505077013839883> :heart:")
-
+# client_credentials_manager = SpotifyClientCredentials("49bcda85108442ccb26549d91da2abad")
+# sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 @bot.command()
 async def avatar(ctx, member: discord.Member):
@@ -153,6 +150,7 @@ async def urban(ctx, message):
                                " is having issues processing your request.")
 
 
+
 @bot.command()
 async def calc(ctx, num1, operation, num2):
     operators = {
@@ -166,7 +164,7 @@ async def calc(ctx, num1, operation, num2):
     }
 
     if operation in operators:
-        print(operators[operation](int(num1), int(num2)))
+        await ctx.channel.send(operators[operation](int(num1), int(num2)))
 
 
 @bot.command()
@@ -188,22 +186,6 @@ async def cipher(ctx):
     caesar = "".join(encrypt_letter(x, num) for x in sliced_msg)
 
     await ctx.channel.send(caesar)
-
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_M,
-        box_size=5,
-        border=0,
-    )
-    qr.add_data(caesar)
-    qr.make(fit=True)
-
-    file_name = '{0}.png'.format(current_time[2:])
-    img = qr.make_image(fill_color="black", back_color="white")
-
-    img.save(r'/home/ubuntu/HifuBot/hifumi_cipher_images/{0}'.format(file_name))
-    with open(r'/home/ubuntu/HifuBot/hifumi_cipher_images/{0}'.format(file_name), 'rb') as picture:
-        await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
 
 
 def encrypt_letter(letter, num):
@@ -233,8 +215,8 @@ async def qr(ctx, message):
     file_name = '{0}.png'.format(current_time[2:])
     img = qr.make_image(fill_color="black", back_color="white")
 
-    img.save(r'/home/ubuntu/HifuBot/hifumi_qr_code/{0}'.format(file_name))
-    with open(r'/home/ubuntu/HifuBot/hifumi_qr_code/{0}'.format(file_name), 'rb') as picture:
+    img.save(r'C:\Users\TIMBOLA\Desktop\HifuBot Dev\hifumi_qr_code\{0}'.format(file_name))
+    with open(r'C:\Users\TIMBOLA\Desktop\HifuBot Dev\hifumi_qr_code\{0}'.format(file_name), 'rb') as picture:
         await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
 
 
@@ -286,36 +268,33 @@ async def kitsune(ctx):
 async def sub(ctx, message):
     global submission
     name = message.split()[0]
-    with urllib.request.urlopen(f"https://www.reddit.com/r/{name}/about.json") as url:
-        data = json.loads(url.read().decode())
-        if ("over18", True) in data.items() and ctx.channel.is_nsfw():
-            if name not in sub_cache:
-                sub_cache[name] = []
-                submissions = reddit.subreddit(name).hot()
+    if name not in sub_cache:
+        sub_cache[name] = []
+        submissions = reddit.subreddit(name).hot()
 
-                for i in range(100):
-                    submission = next(x for x in submissions)
-                    sub_cache[name].append((submission.url, submission.title))
+        for i in range(100):
+            submission = next(x for x in submissions)
+            sub_cache[name].append((submission.url, submission.title))
 
-                submissions = reddit.subreddit(name).top('all')
+        submissions = reddit.subreddit(name).top('all')
 
-                for i in range(100):
-                    submission = next(x for x in submissions)
-                    sub_cache[name].append((submission.url, submission.title))
-                await ctx.channel.send('Results found: {}'.format(len(sub_cache[name])))
+        for i in range(100):
+            submission = next(x for x in submissions)
+            sub_cache[name].append((submission.url, submission.title))
+        await ctx.channel.send('Results found: {}'.format(len(sub_cache[name])))
 
-            picture, name = random.choice(sub_cache[name])
+    picture, name = random.choice(sub_cache[name])
 
-            try:
-                title, desc = name.split('[')
-                desc = '[' + desc
-            except ValueError:
-                title = name
-                desc = None
+    try:
+        title, desc = name.split('[')
+        desc = '[' + desc
+    except ValueError:
+        title = name
+        desc = None
 
-            embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
-            embed.set_image(url=picture)
-            await ctx.channel.send(embed=embed)
+    embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
+    embed.set_image(url=picture)
+    await ctx.channel.send(embed=embed)
 
 
 @bot.command()
@@ -416,6 +395,9 @@ async def neko(ctx):
         embed.set_image(url=picture)
         await ctx.channel.send(embed=embed)
 
+    else:
+        await ctx.channel.send("You may not use this command outside of NSFW channels!")
+
 
 @bot.command(pass_context=True)
 async def thicc(ctx):
@@ -449,6 +431,9 @@ async def thicc(ctx):
         embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
         embed.set_image(url=picture)
         await ctx.channel.send(embed=embed)
+
+    else:
+        await ctx.channel.send("You may not use this command outside of NSFW channels!")
 
 
 @bot.command(pass_context=True)
