@@ -12,11 +12,10 @@ import urbandict
 import youtube_dl
 from discord.ext import commands
 from discord.utils import get
-import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
-import traceback
+import http.client
+import requests as req
 
-TOKEN = 'NjQxNDA5MzMwODg4ODM1MDgz.XhsUwQ.BE0PBMwPJJgl56vs5ikJXerflC4'
+TOKEN = 'NjQxNDA5MzMwODg4ODM1MDgz.XjkzIg.0Sdef5yr1sumILwAnaOLAfpFf2k'
 
 bot = commands.Bot(command_prefix='h!')
 
@@ -27,8 +26,7 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    #game = discord.Game("Shush Amy, you're cute ")
-    #await bot.change_presence(activity=game)
+    # await bot.change_presence("with Miku")
 
 
 # reddit caches
@@ -46,10 +44,15 @@ reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
                                 'Chrome/78.0.3904.87 Safari/537.36')
 
 
-# client_credentials_manager = SpotifyClientCredentials("49bcda85108442ccb26549d91da2abad")
-# sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+# twitch = twitch.TwitchClient(client_id='xl1zs0f0n5h17htlilk9piwitkqtaw', oauth_token='NjQxNDA5MzMwODg4ODM1MDgz.Xd8LMw'
+# '.QJXSOJ4jYV2ESYg8st7CW82OQTw')
 
 @bot.command()
+async def test1(ctx):
+    await ctx.channel.send("Love you <@207505077013839883> :heart:\nLove you <@!207505077013839883> :heart:")
+
+
+@bot.command(aliases=["pfp"])
 async def avatar(ctx, member: discord.Member):
     embed = discord.Embed(title="", description="", color=0xce3a9b)
     embed.set_image(url=f"{member.avatar_url}")
@@ -150,7 +153,6 @@ async def urban(ctx, message):
                                " is having issues processing your request.")
 
 
-
 @bot.command()
 async def calc(ctx, num1, operation, num2):
     operators = {
@@ -164,7 +166,7 @@ async def calc(ctx, num1, operation, num2):
     }
 
     if operation in operators:
-        await ctx.channel.send(operators[operation](int(num1), int(num2)))
+        print(operators[operation](int(num1), int(num2)))
 
 
 @bot.command()
@@ -180,21 +182,38 @@ async def coinflip(ctx):
 async def cipher(ctx):
     now = datetime.datetime.now()
     current_time = now.strftime("%Y%m%d%H%M%S")
-    content = ctx.message.content.split()
-    sliced_msg = ' '.join(x for x in content[1:-1])
-    num = int(content[-1])
-    caesar = "".join(encrypt_letter(x, num) for x in sliced_msg)
+    source = ctx.message.content[1:]
+    sliced_msg = source.split('"')[1].split()
+    sliced_key = source.split('"')[2]
+    caesar = ""
+    num = int(sliced_key)
+
+    for word in sliced_msg:
+        for i in range(len(word)):
+            if word[i].isupper():
+                caesar += chr(((ord(word[i]) - 65 + num) % 26) + 65)
+            elif word[i].islower():
+                caesar += chr(((ord(word[i]) - 97 + num) % 26) + 97)
+            else:
+                caesar += word[i]
 
     await ctx.channel.send(caesar)
 
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_M,
+        box_size=5,
+        border=0,
+    )
+    qr.add_data(caesar)
+    qr.make(fit=True)
 
-def encrypt_letter(letter, num):
-    if letter.isupper():
-        return chr(((ord(letter) - 65 + num) % 26) + 65)
-    elif letter.islower():
-        return chr(((ord(letter) - 97 + num) % 26) + 97)
-    else:
-        return letter
+    file_name = '{0}.png'.format(current_time[2:])
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    img.save(r'C:\Users\timdo\Desktop\Hifumi Dev\hifumi_cipher_images\{0}'.format(file_name))
+    with open(r'C:\Users\timdo\Desktop\Hifumi Dev\hifumi_cipher_images\{0}'.format(file_name), 'rb') as picture:
+        await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
 
 
 @bot.command()
@@ -215,8 +234,8 @@ async def qr(ctx, message):
     file_name = '{0}.png'.format(current_time[2:])
     img = qr.make_image(fill_color="black", back_color="white")
 
-    img.save(r'C:\Users\TIMBOLA\Desktop\HifuBot Dev\hifumi_qr_code\{0}'.format(file_name))
-    with open(r'C:\Users\TIMBOLA\Desktop\HifuBot Dev\hifumi_qr_code\{0}'.format(file_name), 'rb') as picture:
+    img.save(r'/home/ubuntu/Hifumi Dev/hifumi_qr_code/{0}'.format(file_name))
+    with open(r'/home/ubuntu/Hifumi Dev/hifumi_qr_code/{0}'.format(file_name), 'rb') as picture:
         await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
 
 
@@ -268,33 +287,37 @@ async def kitsune(ctx):
 async def sub(ctx, message):
     global submission
     name = message.split()[0]
-    if name not in sub_cache:
-        sub_cache[name] = []
-        submissions = reddit.subreddit(name).hot()
+    if reddit.subreddit(name).over18 and not ctx.channel.is_nsfw():
+        await ctx.channel.send("You must be in a NSFW channel to access this subreddit!")
+        return
+    else:
+        if name not in sub_cache:
+            sub_cache[name] = []
+            submissions = reddit.subreddit(name).hot()
 
-        for i in range(100):
-            submission = next(x for x in submissions)
-            sub_cache[name].append((submission.url, submission.title))
+            for i in range(100):
+                submission = next(x for x in submissions)
+                sub_cache[name].append((submission.url, submission.title))
 
-        submissions = reddit.subreddit(name).top('all')
+            submissions = reddit.subreddit(name).top('all')
 
-        for i in range(100):
-            submission = next(x for x in submissions)
-            sub_cache[name].append((submission.url, submission.title))
-        await ctx.channel.send('Results found: {}'.format(len(sub_cache[name])))
+            for i in range(100):
+                submission = next(x for x in submissions)
+                sub_cache[name].append((submission.url, submission.title))
+            await ctx.channel.send('Results found: {}'.format(len(sub_cache[name])))
 
-    picture, name = random.choice(sub_cache[name])
+        picture, name = random.choice(sub_cache[name])
 
-    try:
-        title, desc = name.split('[')
-        desc = '[' + desc
-    except ValueError:
-        title = name
-        desc = None
+        try:
+            title, desc = name.split('[')
+            desc = '[' + desc
+        except ValueError:
+            title = name
+            desc = None
 
-    embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
-    embed.set_image(url=picture)
-    await ctx.channel.send(embed=embed)
+        embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
+        embed.set_image(url=picture)
+        await ctx.channel.send(embed=embed)
 
 
 @bot.command()
@@ -395,9 +418,6 @@ async def neko(ctx):
         embed.set_image(url=picture)
         await ctx.channel.send(embed=embed)
 
-    else:
-        await ctx.channel.send("You may not use this command outside of NSFW channels!")
-
 
 @bot.command(pass_context=True)
 async def thicc(ctx):
@@ -431,9 +451,6 @@ async def thicc(ctx):
         embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
         embed.set_image(url=picture)
         await ctx.channel.send(embed=embed)
-
-    else:
-        await ctx.channel.send("You may not use this command outside of NSFW channels!")
 
 
 @bot.command(pass_context=True)
