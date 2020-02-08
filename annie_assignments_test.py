@@ -1,9 +1,9 @@
-def f(text: str):
-    if len(text) % 2 == 0:
-        mid = len(text) // 2
-    else:
-        mid = (len(text) + 1) // 2
-    return text[mid]
+def mystery(num):
+    if num <= 0:
+        return
+    mystery(num - 2)
+    print(num, end="")
+    mystery(num - 1)
 
 
-print(f("Annie"))
+mystery(3)

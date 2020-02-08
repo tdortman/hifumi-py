@@ -166,7 +166,7 @@ async def calc(ctx, num1, operation, num2):
     }
 
     if operation in operators:
-        print(operators[operation](int(num1), int(num2)))
+        await ctx.channel.send(operators[operation](int(num1), int(num2)))
 
 
 @bot.command()
