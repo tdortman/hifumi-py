@@ -4,7 +4,6 @@ import os
 import random
 import urllib
 import urllib.request
-import json
 import discord
 import praw
 import qrcode
@@ -12,21 +11,21 @@ import urbandict
 import youtube_dl
 from discord.ext import commands
 from discord.utils import get
-import http.client
-import requests as req
+import asyncio
 
 TOKEN = 'NjQxNDA5MzMwODg4ODM1MDgz.XjkzIg.0Sdef5yr1sumILwAnaOLAfpFf2k'
-
-bot = commands.Bot(command_prefix='h!')
+# NjQxNDA5MzMwODg4ODM1MDgz.XjkzIg.0Sdef5yr1sumILwAnaOLAfpFf2k
+bot = commands.Bot(command_prefix='h?')
 
 
 @bot.event
 async def on_ready():
-    print('Logged in as')
+    print('Logged in as:')
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    # await bot.change_presence("with Miku")
+    game = discord.Game("with best girl Annie!")
+    await bot.change_presence(activity=game)
 
 
 # reddit caches
@@ -40,61 +39,66 @@ sub_cache = {}
 
 reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
                      client_secret='DFRuha1D_QLYm-AdCfQW54uiq1M',
-                     user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                     user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+                                ' AppleWebKit/537.36 (KHTML, like Gecko) '
                                 'Chrome/78.0.3904.87 Safari/537.36')
-
-
-# twitch = twitch.TwitchClient(client_id='xl1zs0f0n5h17htlilk9piwitkqtaw', oauth_token='NjQxNDA5MzMwODg4ODM1MDgz.Xd8LMw'
-# '.QJXSOJ4jYV2ESYg8st7CW82OQTw')
-
-@bot.command()
-async def test1(ctx):
-    await ctx.channel.send("Love you <@207505077013839883> :heart:\nLove you <@!207505077013839883> :heart:")
 
 
 @bot.command(aliases=["pfp"])
 async def avatar(ctx, member: discord.Member):
+    pfp = str(member.avatar_url).replace('.webp', '.png')
     embed = discord.Embed(title="", description="", color=0xce3a9b)
-    embed.set_image(url=f"{member.avatar_url}")
+    embed.set_image(url=pfp)
     await ctx.send(embed=embed)
 
 
-@bot.command(pass_context=True, aliases=['j', 'joi'])
+@bot.command()
+async def ping(ctx):
+    if ctx.message.author.id == 258993932262834188:
+        while True:
+            await ctx.channel.send("<@!258993932262834188>", delete_after=0.2)
+            await asyncio.sleep(0.2)
+    else:
+        await ctx.channel.send("Insufficient permissions!")
+
+
+@bot.command(aliases=["j"])
 async def join(ctx):
-    channel = ctx.message.author.voice.channel
-    voice = get(bot.voice_clients, guild=ctx.guild)
+    global voice
+    try:
+        channel = ctx.message.author.voice.channel
+        voice = get(bot.voice_clients, guild=ctx.guild)
 
-    if voice and voice.is_connected():
-        await voice.move_to(channel)
-    else:
-        voice = await channel.connect()
+        if voice and voice.is_connected():
+            await voice.move_to(channel)
+        else:
+            voice = await channel.connect()
 
-    await voice.disconnect()
-
-    if voice and voice.is_connected():
-        await voice.move_to(channel)
-    else:
-        voice = await channel.connect()
         print(f"The bot has connected to {channel}\n")
 
-    await ctx.send(f"Joined {channel}")
+        await ctx.send(f"Joined {channel}!")
+    except AttributeError:
+        await ctx.send("You have to join a voice channel first!")
 
 
-@bot.command(pass_context=True, aliases=['l', 'lea'])
+@bot.command(aliases=["l"])
 async def leave(ctx):
-    channel = ctx.message.author.voice.channel
-    voice = get(bot.voice_clients, guild=ctx.guild)
+    try:
+        channel = ctx.message.author.voice.channel
+        voice = get(bot.voice_clients, guild=ctx.guild)
 
-    if voice and voice.is_connected():
-        await voice.disconnect()
-        print(f"The bot has left {channel}")
-        await ctx.send(f"Left {channel}")
-    else:
-        print("Bot was told to leave voice channel, but was not in one")
-        await ctx.send("Don't think I am in a voice channel")
+        if voice and voice.is_connected():
+            await voice.disconnect()
+            print(f"The bot has left {channel}")
+            await ctx.send(f"Left {channel}!")
+        else:
+            await ctx.send("Not currently in a voice channel!")
+    except AttributeError:
+        await ctx.send("We both have to be in the same voice channel "
+                       "for this!")
 
 
-@bot.command(pass_context=True, aliases=['p', 'pla'])
+@bot.command(aliases=["p"])
 async def play(ctx, url: str):
     song_there = os.path.isfile("song.mp3")
     try:
@@ -103,20 +107,19 @@ async def play(ctx, url: str):
             print("Removed old song file")
     except PermissionError:
         print("Trying to delete song file, but it's being played")
-        await ctx.send("ERROR: Music playing")
+        await ctx.send("Music is already playing!")
         return
 
-    await ctx.send("Getting everything ready now")
+    await ctx.send("Getting things ready now!")
 
     voice = get(bot.voice_clients, guild=ctx.guild)
-
     ydl_opts = {
-        'format': 'bestaudio/best',
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192',
-        }],
+        "format": "bestaudio/best",
+        "postprocessors": [{
+            "key": "FFmpegExtractAudio",
+            "preferredcodec": "flac",
+            "preferredquality": "36864",
+        }]
     }
 
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
@@ -129,13 +132,12 @@ async def play(ctx, url: str):
             print(f"Renamed File: {file}\n")
             os.rename(file, "song.mp3")
 
-    voice.play(discord.FFmpegPCMAudio("song.mp3"), after=lambda e: print("Song done!"))
+    voice.play(discord.FFmpegPCMAudio("song.mp3"), after=lambda e: print(f"{name} has finished playing"))
     voice.source = discord.PCMVolumeTransformer(voice.source)
-    voice.source.volume = 0.3
+    voice.source.volume = 1
 
-    nname = name.rsplit("-", 2)
-    await ctx.send(f"Playing: {nname[0]}")
-    print("playing\n")
+    #nname = name.rsplit("-", 2)
+    #await ctx.send(f"Playing: {nname}")
 
 
 @bot.command()
@@ -145,12 +147,15 @@ async def urban(ctx, message):
         term = message
         word = urbandict.define(term)
         urban_list.append(word[0])
-        embed = discord.Embed(title=urban_list[0]["word"], description=urban_list[0]["def"], color=0xce3a9b)
+        embed = discord.Embed(title=urban_list[0]["word"],
+                              description=urban_list[0]["def"], color=0xce3a9b)
 
         await ctx.channel.send(embed=embed)
     except urllib.error.HTTPError:
-        await ctx.channel.send("I'm sorry, but the definition is either not existent, or the server"
-                               " is having issues processing your request.")
+        await ctx.channel.send(
+            "I'm sorry, but the definition is either not existent,"
+            " or the server"
+            " is having issues processing your request.")
 
 
 @bot.command()
@@ -182,38 +187,21 @@ async def coinflip(ctx):
 async def cipher(ctx):
     now = datetime.datetime.now()
     current_time = now.strftime("%Y%m%d%H%M%S")
-    source = ctx.message.content[1:]
-    sliced_msg = source.split('"')[1].split()
-    sliced_key = source.split('"')[2]
-    caesar = ""
-    num = int(sliced_key)
-
-    for word in sliced_msg:
-        for i in range(len(word)):
-            if word[i].isupper():
-                caesar += chr(((ord(word[i]) - 65 + num) % 26) + 65)
-            elif word[i].islower():
-                caesar += chr(((ord(word[i]) - 97 + num) % 26) + 97)
-            else:
-                caesar += word[i]
+    content = ctx.message.content.split()
+    sliced_msg = ' '.join(x for x in content[1:-1])
+    num = int(content[-1])
+    caesar = "".join(encrypt_letter(x, num) for x in sliced_msg)
 
     await ctx.channel.send(caesar)
 
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_M,
-        box_size=5,
-        border=0,
-    )
-    qr.add_data(caesar)
-    qr.make(fit=True)
 
-    file_name = '{0}.png'.format(current_time[2:])
-    img = qr.make_image(fill_color="black", back_color="white")
-
-    img.save(r'/home/ubuntu/HifuBot/hifumi_cipher_images/{0}'.format(file_name))
-    with open(r'/home/ubuntu/HifuBot/hifumi_cipher_images/0}'.format(file_name), 'rb') as picture:
-        await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
+def encrypt_letter(letter, num):
+    if letter.isupper():
+        return chr(((ord(letter) - 65 + num) % 26) + 65)
+    elif letter.islower():
+        return chr(((ord(letter) - 97 + num) % 26) + 97)
+    else:
+        return letter
 
 
 @bot.command()
@@ -234,8 +222,11 @@ async def qr(ctx, message):
     file_name = '{0}.png'.format(current_time[2:])
     img = qr.make_image(fill_color="black", back_color="white")
 
-    img.save(r'/home/ubuntu/HifuBot/hifumi_qr_code/{0}'.format(file_name))
-    with open(r'/home/ubuntu/HifuBot/hifumi_qr_code/{0}'.format(file_name), 'rb') as picture:
+    img.save(r'C:\Users\TIMBOLA\Desktop\HifuBot Dev\hifumi_qr_code\{0}'.format(
+        file_name))
+    with open(
+            r'C:\Users\TIMBOLA\Desktop\HifuBot Dev\hifumi_qr_code\{0}'.format(
+                file_name), 'rb') as picture:
         await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
 
 
@@ -246,8 +237,9 @@ async def test(ctx):
 
 @bot.command()
 async def cuddle(ctx, message):
-    await ctx.channel.send(f"*{ctx.message.author.mention} goes up to {message} and cuddles tightly, "
-                           "trying their best to comfort them*")
+    await ctx.channel.send(
+        f"*{ctx.message.author.mention} goes up to {message} and cuddles tightly, "
+        "trying their best to comfort them*")
 
 
 @bot.command()
@@ -287,37 +279,34 @@ async def kitsune(ctx):
 async def sub(ctx, message):
     global submission
     name = message.split()[0]
-    if reddit.subreddit(name).over18 and not ctx.channel.is_nsfw():
-        await ctx.channel.send("You must be in a NSFW channel to access this subreddit!")
-        return
-    else:
-        if name not in sub_cache:
-            sub_cache[name] = []
-            submissions = reddit.subreddit(name).hot()
+    if name not in sub_cache:
+        sub_cache[name] = []
+        submissions = reddit.subreddit(name).hot()
 
-            for i in range(100):
-                submission = next(x for x in submissions)
-                sub_cache[name].append((submission.url, submission.title))
+        for i in range(100):
+            submission = next(x for x in submissions)
+            sub_cache[name].append((submission.url, submission.title))
 
-            submissions = reddit.subreddit(name).top('all')
+        submissions = reddit.subreddit(name).top('all')
 
-            for i in range(100):
-                submission = next(x for x in submissions)
-                sub_cache[name].append((submission.url, submission.title))
-            await ctx.channel.send('Results found: {}'.format(len(sub_cache[name])))
+        for i in range(100):
+            submission = next(x for x in submissions)
+            sub_cache[name].append((submission.url, submission.title))
+        await ctx.channel.send(
+            'Results found: {}'.format(len(sub_cache[name])))
 
-        picture, name = random.choice(sub_cache[name])
+    picture, name = random.choice(sub_cache[name])
 
-        try:
-            title, desc = name.split('[')
-            desc = '[' + desc
-        except ValueError:
-            title = name
-            desc = None
+    try:
+        title, desc = name.split('[')
+        desc = '[' + desc
+    except ValueError:
+        title = name
+        desc = None
 
-        embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
-        embed.set_image(url=picture)
-        await ctx.channel.send(embed=embed)
+    embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
+    embed.set_image(url=picture)
+    await ctx.channel.send(embed=embed)
 
 
 @bot.command()
@@ -330,14 +319,16 @@ async def wholesome(ctx):
             if not submission.over_18:
                 wholesome_cache.append((submission.url, submission.title))
 
-        wholesome_submissions = reddit.subreddit("wholesomeanimemes").top("all")
+        wholesome_submissions = reddit.subreddit("wholesomeanimemes").top(
+            "all")
 
         for i in range(100):
             submission = next(x for x in wholesome_submissions)
             if not submission.over_18:
                 wholesome_cache.append((submission.url, submission.title))
 
-        await ctx.channel.send('Results found: {}'.format(len(wholesome_cache)))
+        await ctx.channel.send(
+            'Results found: {}'.format(len(wholesome_cache)))
 
     picture, name = random.choice(wholesome_cache)
 
@@ -418,6 +409,10 @@ async def neko(ctx):
         embed.set_image(url=picture)
         await ctx.channel.send(embed=embed)
 
+    else:
+        await ctx.channel.send(
+            "You may not use this command outside of NSFW channels!")
+
 
 @bot.command(pass_context=True)
 async def thicc(ctx):
@@ -437,7 +432,8 @@ async def thicc(ctx):
                 if submission.over_18:
                     thighs_cache.append((submission.url, submission.title))
 
-            await ctx.channel.send('Results found: {}'.format(len(thighs_cache)))
+            await ctx.channel.send(
+                'Results found: {}'.format(len(thighs_cache)))
 
         picture, name = random.choice(thighs_cache)
 
@@ -451,6 +447,10 @@ async def thicc(ctx):
         embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
         embed.set_image(url=picture)
         await ctx.channel.send(embed=embed)
+
+    else:
+        await ctx.channel.send(
+            "You may not use this command outside of NSFW channels!")
 
 
 @bot.command(pass_context=True)
@@ -470,7 +470,8 @@ async def animegirl(ctx):
             if not submission.over_18:
                 animegirl_cache.append((submission.url, submission.title))
 
-        await ctx.channel.send('Results found: {}'.format(len(animegirl_cache)))
+        await ctx.channel.send(
+            'Results found: {}'.format(len(animegirl_cache)))
 
     picture, name = random.choice(animegirl_cache)
 
@@ -491,8 +492,9 @@ async def animegirl(ctx):
 async def numguess(message):
     number = random.randint(1, 100)
     turns = 5
-    await message.channel.send("Welcome! Time to guess some numbers! You have 5 tries. I'll think"
-                               " of a number between 1 and 100.")
+    await message.channel.send(
+        "Welcome! Time to guess some numbers! You have 5 tries. I'll think"
+        " of a number between 1 and 100.")
 
     def check(author):
         def inner_check(message):
@@ -517,17 +519,20 @@ async def numguess(message):
                 f" You still have {turns - 1} guesses left")
             turns -= 1
         elif guess < number and turns != 0:
-            await message.channel.send(f"Awww, too bad! Might wanna go higher next time! You have {turns - 1} "
-                                       f"guesses left!")
+            await message.channel.send(
+                f"Awww, too bad! Might wanna go higher next time! You have {turns - 1} "
+                f"guesses left!")
             turns -= 1
         if guess == number:
-            await message.channel.send(f"Yes!! You guessed right! I'm so proud of you!!")
+            await message.channel.send(
+                f"Yes!! You guessed right! I'm so proud of you!!")
             break
         if guess == number and turns == 5:
             await message.channel.send("YOU'RE SO GOOD!!!! FIRST TRY!!")
             break
         if turns == 0 and guess != number:
-            await message.channel.send(f"Maybe next time! In case you wondered, my number was {number}!")
+            await message.channel.send(
+                f"Maybe next time! In case you wondered, my number was {number}!")
             break
 
 
