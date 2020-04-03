@@ -15,7 +15,7 @@ import asyncio
 
 TOKEN = 'NjQxNDA5MzMwODg4ODM1MDgz.XjkzIg.0Sdef5yr1sumILwAnaOLAfpFf2k'
 # NjQxNDA5MzMwODg4ODM1MDgz.XjkzIg.0Sdef5yr1sumILwAnaOLAfpFf2k
-bot = commands.Bot(command_prefix='h?')
+bot = commands.Bot(command_prefix='h!')
 
 
 @bot.event
@@ -24,6 +24,8 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
+    channel = bot.get_channel(655484804405657642)
+    await channel.send(f"Logged in as:\n{bot.user.name}\n{bot.user.id}")
     game = discord.Game("with best girl Annie!")
     await bot.change_presence(activity=game)
 
@@ -132,12 +134,10 @@ async def play(ctx, url: str):
             print(f"Renamed File: {file}\n")
             os.rename(file, "song.mp3")
 
-    voice.play(discord.FFmpegPCMAudio("song.mp3"), after=lambda e: print(f"{name} has finished playing"))
+    voice.play(discord.FFmpegPCMAudio("song.mp3"),
+               after=lambda e: print(f"{name} has finished playing"))
     voice.source = discord.PCMVolumeTransformer(voice.source)
     voice.source.volume = 1
-
-    #nname = name.rsplit("-", 2)
-    #await ctx.send(f"Playing: {nname}")
 
 
 @bot.command()
@@ -156,6 +156,14 @@ async def urban(ctx, message):
             "I'm sorry, but the definition is either not existent,"
             " or the server"
             " is having issues processing your request.")
+
+
+@bot.command()
+async def pingt(ctx, member: discord.Member):
+    #user1 = bot.get_user(member)
+    embed = discord.Embed(title="This is a test message!", description=
+    f"I am testing something!\n{member.mention}", color=0xce3a9b)
+    await ctx.send(embed=embed)
 
 
 @bot.command()
@@ -185,8 +193,6 @@ async def coinflip(ctx):
 
 @bot.command()
 async def cipher(ctx):
-    now = datetime.datetime.now()
-    current_time = now.strftime("%Y%m%d%H%M%S")
     content = ctx.message.content.split()
     sliced_msg = ' '.join(x for x in content[1:-1])
     num = int(content[-1])
