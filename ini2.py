@@ -47,11 +47,23 @@ reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
 
 
 @bot.command(aliases=["pfp"])
-async def avatar(ctx, member: discord.Member):
-    pfp = str(member.avatar_url).replace('.webp', '.png')
-    embed = discord.Embed(title="", description="", color=0xce3a9b)
-    embed.set_image(url=pfp)
-    await ctx.send(embed=embed)
+async def avatar(ctx):
+    try:
+        if ctx.message.mentions:
+            user = ctx.message.mentions[0]
+        else:
+            user = await bot.fetch_user(int(ctx.message.content.split()[1]))
+        pfp = str(user.avatar_url).replace(".webp", ".png")
+        desc = f"*{user.name}'s avatar*"
+        embed = discord.Embed(description=desc, color=0xce3a9b)
+        embed.set_image(url=pfp)
+        await ctx.send(embed=embed)
+    except ValueError:
+        await ctx.send("Invalid ID! Use numbers only please!")
+    except IndexError:
+        await ctx.send("Seems like you didn't mention anyone!")
+    except discord.errors.NotFound:
+        await ctx.send("That's not a valid ID!")
 
 
 @bot.command()
