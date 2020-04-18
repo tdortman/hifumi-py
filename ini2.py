@@ -25,7 +25,8 @@ async def on_ready():
     print(bot.user.id)
     print('------')
     channel = bot.get_channel(655484804405657642)
-    await channel.send(f"Logged in as:\n{bot.user.name}\n{bot.user.id}\n----------------------------")
+    await channel.send(
+        f"Logged in as:\n{bot.user.name}\n{bot.user.id}\n----------------------------")
     game = discord.Game("with best girl Annie!")
     await bot.change_presence(activity=game)
 
@@ -64,6 +65,15 @@ async def avatar(ctx):
         await ctx.send("Seems like you didn't mention anyone!")
     except discord.errors.NotFound:
         await ctx.send("That's not a valid ID!")
+
+
+@bot.command()
+async def hr(ctx):
+    if ctx.message.author.id == 258993932262834188:
+        await ctx.send("Bai baaaaaaaai!!")
+        await bot.logout()
+    else:
+        await ctx.send("Insufficient permissions!!")
 
 
 @bot.command()
@@ -172,7 +182,7 @@ async def urban(ctx, message):
 
 @bot.command()
 async def pingt(ctx, member: discord.Member):
-    #user1 = bot.get_user(member)
+    # user1 = bot.get_user(member)
     embed = discord.Embed(title="This is a test message!", description=
     f"I am testing something!\n{member.mention}", color=0xce3a9b)
     await ctx.send(embed=embed)
