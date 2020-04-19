@@ -46,12 +46,13 @@ reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
                                 ' AppleWebKit/537.36 (KHTML, like Gecko) '
                                 'Chrome/78.0.3904.87 Safari/537.36')
 
+
 @bot.event
 async def on_message(message):
     if "$cookie <@!641409330888835083>" in message.content \
             or "~cookie <@!641409330888835083>" in message.content:
         await message.channel.send("Thank you very much!! *noms*")
-        return
+    await bot.process_commands(message)
 
 
 @bot.command(aliases=["pfp"])
