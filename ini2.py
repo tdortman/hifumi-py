@@ -40,6 +40,14 @@ thighs_cache = []
 animegirl_cache = []
 sub_cache = {}
 
+# Reactions (will do extra files for them eventually)
+pat_reactions = ["<:Poiblush:476836982727639050> T-Thanks for the p-pat! *blushes deeply*",
+                 "<a:pikasparkle:699689694639947916> Thank chu so so much!! *smiles brightly*"]
+
+cookie_reactions = ["Thank you very much!! *noms*", "Your cookies are the best! They're super duper yummy!!",
+                    "COOKIEEEEEEEEEEEEEEESSSSSSSSSSSS"]
+
+
 reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
                      client_secret='DFRuha1D_QLYm-AdCfQW54uiq1M',
                      user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
@@ -51,7 +59,11 @@ reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
 async def on_message(message):
     if "$cookie <@!641409330888835083>" in message.content \
             or "~cookie <@!641409330888835083>" in message.content:
-        await message.channel.send("Thank you very much!! *noms*")
+        await message.channel.send(random.choice(cookie_reactions))
+    if "$pat <@!641409330888835083>" in message.content \
+            or "~pat <@!641409330888835083>" in message.content:
+        await message.channel.send(random.choice(pat_reactions))
+
     await bot.process_commands(message)
 
 
