@@ -91,8 +91,7 @@ async def avatar(ctx):
 
 @bot.command()
 async def add_emoji(ctx):
-    if ctx.message.author.id == 258993932262834188 or ctx.message.author.id == 207505077013839883 or \
-            ctx.message.author.id == 296301865627287553:
+    if ctx.message.author.guild_permissions.manage_emojis:
         try:
             import requests
             import shutil
@@ -109,10 +108,10 @@ async def add_emoji(ctx):
             r = requests.get(url, stream=True, headers={'User-agent': 'Mozilla/5.0'})
             if r.status_code == 200:
                 emoji = None
-                with open(f"/home/ubuntu/HifuBot/emojis/{name}.{img_type}", 'wb') as f:
+                with open(f"C:/Users/TIMBOLA/Desktop/HifuBot Dev/emojis/{name}.{img_type}", 'wb') as f:
                     r.raw.decode_content = True
                     shutil.copyfileobj(r.raw, f)
-                with open(f'/home/ubuntu/HifuBot/emojis/{name}.{img_type}', 'rb') as picture:
+                with open(f'C:/Users/TIMBOLA/Desktop/HifuBot Dev/emojis/{name}.{img_type}', 'rb') as picture:
 
                     emoji = await ctx.message.guild.create_custom_emoji(name=name, image=picture.read())
 
