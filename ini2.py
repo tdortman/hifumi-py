@@ -90,6 +90,47 @@ async def avatar(ctx):
 
 
 @bot.command()
+async def add_emoji(ctx):
+    if ctx.message.author.id == 258993932262834188 or ctx.message.author.id == 207505077013839883 or \
+            ctx.message.author.id == 296301865627287553:
+        try:
+            import requests
+            import shutil
+
+            content = ctx.message.content.split()
+            name, url = content[1], content[2]
+            if 'jpg' in url:
+                img_type = 'jpg'
+            elif 'png' in url:
+                img_type = 'png'
+            elif 'gif' in url:
+                img_type = 'gif'
+
+            r = requests.get(url, stream=True, headers={'User-agent': 'Mozilla/5.0'})
+            if r.status_code == 200:
+                emoji = None
+                with open(f"/home/ubuntu/HifuBot/emojis/{name}.{img_type}", 'wb') as f:
+                    r.raw.decode_content = True
+                    shutil.copyfileobj(r.raw, f)
+                with open(f'/home/ubuntu/HifuBot/emojis/{name}.{img_type}', 'rb') as picture:
+
+                    emoji = await ctx.message.guild.create_custom_emoji(name=name, image=picture.read())
+
+                if emoji and img_type != "gif":
+                    msg = f'<:{emoji.name}:{emoji.id}>'
+                elif emoji and img_type == "gif":
+                    msg = f"<a:{emoji.name}:{emoji.id}>"
+                else:
+                    msg = 'Emoji object not retrieved!'
+                await ctx.message.channel.send(msg)
+        except discord.errors.Forbidden:
+            msg = "I don't have the permissions for this!"
+            await ctx.message.channel.send(msg)
+    else:
+        await ctx.send("Insufficient Permissions!!")
+
+
+@bot.command()
 async def hr(ctx):
     if ctx.message.author.id == 258993932262834188:
         await ctx.send("Bai baaaaaaaai!!")
