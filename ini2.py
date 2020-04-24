@@ -297,14 +297,14 @@ async def kitsune(ctx):
 
         for i in range(50):
             submission = next(x for x in kitsune_submissions)
-            if not submission.over_18:
+            if not submission.over_18 and submission.url.split("/")[2] == "i.reddit.it":
                 kitsune_cache.append((submission.url, submission.title))
 
         kitsune_submissions = reddit.subreddit("kitsunemimi").top("all")
 
         for i in range(100):
             submission = next(x for x in kitsune_submissions)
-            if not submission.over_18:
+            if not submission.over_18 and submission.url.split("/")[2] == "i.reddit.it":
                 kitsune_cache.append((submission.url, submission.title))
 
         await ctx.channel.send('Results found: {}'.format(len(kitsune_cache)))
@@ -333,13 +333,15 @@ async def sub(ctx, message):
 
         for i in range(100):
             submission = next(x for x in submissions)
-            sub_cache[name].append((submission.url, submission.title))
+            if submission.url.split("/")[2] == "i.reddit.it":
+                sub_cache[name].append((submission.url, submission.title))
 
         submissions = reddit.subreddit(name).top('all')
 
         for i in range(100):
             submission = next(x for x in submissions)
-            sub_cache[name].append((submission.url, submission.title))
+            if submission.url.split("/")[2] == "i.reddit.it":
+                sub_cache[name].append((submission.url, submission.title))
         await ctx.channel.send(
             'Results found: {}'.format(len(sub_cache[name])))
 
@@ -358,13 +360,23 @@ async def sub(ctx, message):
 
 
 @bot.command()
+async def rt(ctx, submission_id):
+    if ctx.message.author.id == 258993932262834188:
+        submission = reddit.submission(submission_id).url
+        await ctx.send(submission)
+        await ctx.send(submission.split("/")[2])
+    else:
+        return
+
+
+@bot.command()
 async def wholesome(ctx):
     if not wholesome_cache:
         wholesome_submissions = reddit.subreddit('wholesomeanimemes').hot()
 
         for i in range(50):
             submission = next(x for x in wholesome_submissions)
-            if not submission.over_18:
+            if not submission.over_18 and submission.url.split("/")[2] == "i.reddit.it":
                 wholesome_cache.append((submission.url, submission.title))
 
         wholesome_submissions = reddit.subreddit("wholesomeanimemes").top(
@@ -372,7 +384,7 @@ async def wholesome(ctx):
 
         for i in range(100):
             submission = next(x for x in wholesome_submissions)
-            if not submission.over_18:
+            if not submission.over_18 and submission.url.split("/")[2] == "i.reddit.it":
                 wholesome_cache.append((submission.url, submission.title))
 
         await ctx.channel.send(
@@ -399,14 +411,14 @@ async def bunny(ctx):
 
         for i in range(100):
             submission = next(x for x in bunny_submissions)
-            if not submission.over_18:
+            if not submission.over_18 and submission.url.split("/")[2] == "i.reddit.it":
                 bunny_cache.append((submission.url, submission.title))
 
         bunny_submissions = reddit.subreddit("usagimimi").top("all")
 
         for i in range(100):
             submission = next(x for x in bunny_submissions)
-            if not submission.over_18:
+            if not submission.over_18 and submission.url.split("/")[2] == "i.reddit.it":
                 animegirl_cache.append((submission.url, submission.title))
 
         await ctx.channel.send('Results found: {}'.format(len(bunny_cache)))
@@ -433,14 +445,14 @@ async def neko(ctx):
 
             for i in range(50):
                 submission = next(x for x in neko_submissions)
-                if submission.over_18:
+                if submission.over_18 and submission.url.split("/")[2] == "i.reddit.it":
                     neko_cache.append((submission.url, submission.title))
 
             neko_submissions = reddit.subreddit("nekomimi").top("all")
 
             for i in range(100):
                 submission = next(x for x in neko_submissions)
-                if submission.over_18:
+                if submission.over_18 and submission.url.split("/")[2] == "i.reddit.it":
                     neko_cache.append((submission.url, submission.title))
 
             await ctx.channel.send('Results found: {}'.format(len(neko_cache)))
@@ -470,14 +482,14 @@ async def thicc(ctx):
 
             for i in range(50):
                 submission = next(x for x in thighs_submissions)
-                if submission.over_18:
+                if submission.over_18 and submission.url.split("/")[2] == "i.reddit.it":
                     thighs_cache.append((submission.url, submission.title))
 
             thighs_submissions = reddit.subreddit("thighdeology").top("all")
 
             for i in range(100):
                 submission = next(x for x in thighs_submissions)
-                if submission.over_18:
+                if submission.over_18 and submission.url.split("/")[2] == "i.reddit.it":
                     thighs_cache.append((submission.url, submission.title))
 
             await ctx.channel.send(
@@ -508,14 +520,14 @@ async def animegirl(ctx):
 
         for i in range(50):
             submission = next(x for x in animegirl_submissions)
-            if not submission.over_18:
+            if not submission.over_18 and submission.url.split("/")[2] == "i.reddit.it":
                 animegirl_cache.append((submission.url, submission.title))
 
         animegirl_submissions = reddit.subreddit("animegirls").top("all")
 
         for i in range(100):
             submission = next(x for x in animegirl_submissions)
-            if not submission.over_18:
+            if not submission.over_18 and submission.url.split("/")[2] == "i.reddit.it":
                 animegirl_cache.append((submission.url, submission.title))
 
         await ctx.channel.send(
