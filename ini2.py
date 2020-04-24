@@ -12,6 +12,8 @@ import youtube_dl
 from discord.ext import commands
 from discord.utils import get
 import asyncio
+from datetime import datetime
+
 
 TOKEN = 'NjQxNDA5MzMwODg4ODM1MDgz.XjkzIg.0Sdef5yr1sumILwAnaOLAfpFf2k'
 # NjQxNDA5MzMwODg4ODM1MDgz.XjkzIg.0Sdef5yr1sumILwAnaOLAfpFf2k
@@ -288,6 +290,22 @@ async def cuddle(ctx, message):
     await ctx.channel.send(
         f"*{ctx.message.author.mention} goes up to {message} and cuddles tightly, "
         "trying their best to comfort them*")
+
+
+@bot.command()
+async def redditor(ctx, username):
+    try:
+        user = reddit.redditor(username)
+        created_on = datetime.utcfromtimestamp(user.created_utc).strftime('%d/%m/%y')
+        desc = f"Link Karma: {user.link_karma}\nComment Karma: {user.comment_karma}\nCreated on: {created_on}\n"
+
+        embed = discord.Embed(title=user.name, description=desc, color=0xce3a9b)
+        embed.set_thumbnail(url=user.icon_img)
+        await ctx.send(embed=embed)
+    except AttributeError:
+        await ctx.send(f"Seems like the user {user.name} has been banned!")
+    except Exception:
+        await ctx.send("Invalid User! Make sure you typed the name correctly!")
 
 
 @bot.command()
