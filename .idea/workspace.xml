@@ -19,10 +19,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="519501b4-d093-4054-93c5-d644496d5eca" name="Default Changelist" comment="hopefully fixed startup problem">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-    </list>
+    <list default="true" id="519501b4-d093-4054-93c5-d644496d5eca" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -84,7 +81,7 @@
       <updated>1588622994535</updated>
       <workItem from="1588622996114" duration="2003000" />
       <workItem from="1588625032770" duration="30000" />
-      <workItem from="1588625094160" duration="404000" />
+      <workItem from="1588625094160" duration="712000" />
     </task>
     <task id="LOCAL-00001" summary="Split Hifumi into multiple files">
       <created>1588624215370</created>
@@ -107,7 +104,21 @@
       <option name="project" value="LOCAL" />
       <updated>1588624974006</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="hopefully fixed startup problem">
+      <created>1588625543968</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1588625543968</updated>
+    </task>
+    <task id="LOCAL-00005" summary="hopefully fixed startup problem">
+      <created>1588625579011</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1588625579011</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -131,30 +142,30 @@
     <option name="LAST_COMMIT_MESSAGE" value="hopefully fixed startup problem" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="588" y="92" key="CommitChangelistDialog2" timestamp="1588625112184">
+    <state x="588" y="92" key="CommitChangelistDialog2" timestamp="1588625578122">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="588" y="92" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1588625112184" />
-    <state width="538" height="883" key="GridCell.Tab.0.bottom" timestamp="1588625001307">
+    <state x="588" y="92" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1588625578122" />
+    <state width="538" height="883" key="GridCell.Tab.0.bottom" timestamp="1588625518137">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state width="538" height="883" key="GridCell.Tab.0.bottom/0.0.1680.1010@0.0.1680.1010" timestamp="1588625001307" />
-    <state width="538" height="883" key="GridCell.Tab.0.center" timestamp="1588625001306">
+    <state width="538" height="883" key="GridCell.Tab.0.bottom/0.0.1680.1010@0.0.1680.1010" timestamp="1588625518137" />
+    <state width="538" height="883" key="GridCell.Tab.0.center" timestamp="1588625518137">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state width="538" height="883" key="GridCell.Tab.0.center/0.0.1680.1010@0.0.1680.1010" timestamp="1588625001306" />
-    <state width="538" height="883" key="GridCell.Tab.0.left" timestamp="1588625001306">
+    <state width="538" height="883" key="GridCell.Tab.0.center/0.0.1680.1010@0.0.1680.1010" timestamp="1588625518137" />
+    <state width="538" height="883" key="GridCell.Tab.0.left" timestamp="1588625518137">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state width="538" height="883" key="GridCell.Tab.0.left/0.0.1680.1010@0.0.1680.1010" timestamp="1588625001306" />
-    <state width="538" height="883" key="GridCell.Tab.0.right" timestamp="1588625001306">
+    <state width="538" height="883" key="GridCell.Tab.0.left/0.0.1680.1010@0.0.1680.1010" timestamp="1588625518137" />
+    <state width="538" height="883" key="GridCell.Tab.0.right" timestamp="1588625518137">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state width="538" height="883" key="GridCell.Tab.0.right/0.0.1680.1010@0.0.1680.1010" timestamp="1588625001306" />
-    <state x="432" y="238" key="Vcs.Push.Dialog.v2" timestamp="1588624987703">
+    <state width="538" height="883" key="GridCell.Tab.0.right/0.0.1680.1010@0.0.1680.1010" timestamp="1588625518137" />
+    <state x="432" y="238" key="Vcs.Push.Dialog.v2" timestamp="1588625586672">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="432" y="238" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1588624987703" />
+    <state x="432" y="238" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1588625586672" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/HifuBot$main.coverage" NAME="main Coverage Results" MODIFIED="1588625518128" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
