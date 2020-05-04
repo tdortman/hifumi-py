@@ -20,9 +20,10 @@ import music
 import encryption
 
 bot = commands.Bot(command_prefix="h!")
-file = open(r'/files/token.txt', 'r')
-TOKEN = file.readline()
-file.close()
+# file = open(r'/files/token.txt', 'r')
+# TOKEN = file.readline()
+# file.close()
+TOKEN = "NjQxNDA5MzMwODg4ODM1MDgz.XqRiVQ.5EwR6YAHHQpVXfPKEoWUPlSyk3I"
 
 # Reactions (will do extra files for them eventually)
 pat_reactions = [
