@@ -20,7 +20,7 @@ import music
 import encryption
 
 bot = commands.Bot(command_prefix="h!")
-file = open(r'/home/ubuntu/HifuBot/files/token.txt', 'r')
+file = open(r'./files/token.txt', 'r')
 TOKEN = file.readline()
 file.close()
 
