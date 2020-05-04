@@ -86,6 +86,7 @@
       <workItem from="1588625094160" duration="2672000" />
       <workItem from="1588630695831" duration="267000" />
       <workItem from="1588630985894" duration="137000" />
+      <workItem from="1588631889900" duration="371000" />
     </task>
     <task id="LOCAL-00001" summary="Split Hifumi into multiple files">
       <created>1588624215370</created>
@@ -150,7 +151,14 @@
       <option name="project" value="LOCAL" />
       <updated>1588630743623</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="changed to full paths">
+      <created>1588632093629</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1588632093629</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -174,13 +182,14 @@
     <MESSAGE value="linux.." />
     <MESSAGE value="got rid of reactions" />
     <MESSAGE value="temporary fix hopefully" />
-    <option name="LAST_COMMIT_MESSAGE" value="temporary fix hopefully" />
+    <MESSAGE value="changed to full paths" />
+    <option name="LAST_COMMIT_MESSAGE" value="changed to full paths" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="588" y="92" key="CommitChangelistDialog2" timestamp="1588630742373">
+    <state x="588" y="92" key="CommitChangelistDialog2" timestamp="1588632092775">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="588" y="92" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1588630742373" />
+    <state x="588" y="92" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1588632092775" />
     <state width="538" height="883" key="GridCell.Tab.0.bottom" timestamp="1588630585065">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
@@ -197,10 +206,10 @@
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
     <state width="538" height="883" key="GridCell.Tab.0.right/0.0.1680.1010@0.0.1680.1010" timestamp="1588630585065" />
-    <state x="432" y="238" key="Vcs.Push.Dialog.v2" timestamp="1588630747256">
+    <state x="432" y="238" key="Vcs.Push.Dialog.v2" timestamp="1588632096511">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="432" y="238" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1588630747256" />
+    <state x="432" y="238" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1588632096511" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/HifuBot$main.coverage" NAME="main Coverage Results" MODIFIED="1588627433751" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

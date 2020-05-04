@@ -74,7 +74,7 @@ async def beautiful(ctx):
             user_avatar, stream=True, headers={
                 'User-agent': 'Mozilla/5.0'})
 
-        with open(f"/files/{user.id}.png", 'wb') as f:
+        with open(f"/home/ubuntu/HifuBot/files/{user.id}.png", 'wb') as f:
             r.raw.decode_content = True
             shutil.copyfileobj(r.raw, f)
 
