@@ -36,18 +36,6 @@ cookie_reactions = [
 
 
 @bot.event
-async def on_message(message):
-    if message.content.startswith("$cookie <@!665224627353681921>") or \
-            message.content.startswith("~cookie <@!665224627353681921>"):
-        await message.channel.send(random.choice(cookie_reactions))
-    if message.content.startswith("$pat <@!665224627353681921>") or \
-            message.content.startswith("~pat <@!665224627353681921>"):
-        await message.channel.send(random.choice(pat_reactions))
-
-    await bot.process_commands(message)
-
-
-@bot.event
 async def on_ready():
     now = datetime.now()
     print('Logged in as:')
