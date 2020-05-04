@@ -20,7 +20,7 @@ import music
 import encryption
 
 bot = commands.Bot(command_prefix="h!")
-file = open(r'files/token.txt', 'r')
+file = open(r'/files/token.txt', 'r')
 TOKEN = file.readline()
 file.close()
 
@@ -75,7 +75,7 @@ def current_time():
 @bot.command()
 async def beautiful(ctx):
     try:
-        beautiful_img = Image.open('files/background.png', 'r')
+        beautiful_img = Image.open('/files/background.png', 'r')
         if ctx.message.mentions:
             user = ctx.message.mentions[0]
         else:
@@ -86,30 +86,30 @@ async def beautiful(ctx):
             user_avatar, stream=True, headers={
                 'User-agent': 'Mozilla/5.0'})
 
-        with open(f"files/{user.id}.png", 'wb') as f:
+        with open(f"/files/{user.id}.png", 'wb') as f:
             r.raw.decode_content = True
             shutil.copyfileobj(r.raw, f)
 
         basewidth = 180
-        img = Image.open(f"files/{user.id}.png")
+        img = Image.open(f"/files/{user.id}.png")
         wpercent = (basewidth / float(img.size[0]))
         hsize = int((float(img.size[1]) * float(wpercent)))
         img = img.resize((basewidth, hsize), Image.ANTIALIAS)
-        img.save(f'files/{user.id}_resized.png')
+        img.save(f'/files/{user.id}_resized.png')
 
         canvas = Image.new("RGBA", (640, 674))
         canvas.paste(img, (422, 35))
         canvas.paste(img, (430, 377))
         canvas.paste(beautiful_img, None, beautiful_img)
-        canvas.save(f"files/beautiful.png")
+        canvas.save(f"/files/beautiful.png")
 
-        with open(f"files/beautiful.png", "rb") as g:
+        with open(f"/files/beautiful.png", "rb") as g:
             picture = discord.File(g)
             await ctx.send(file=picture)
 
-        os.remove(f"files/{user.id}.png")
-        os.remove(f"files/{user.id}_resized.png")
-        os.remove(f"files/beautiful.png")
+        os.remove(f"/files/{user.id}.png")
+        os.remove(f"/files/{user.id}_resized.png")
+        os.remove(f"/files/beautiful.png")
 
     except ValueError:
         await ctx.send("Invalid ID! Use numbers only please!")
@@ -183,12 +183,12 @@ async def emoji(ctx):
             if r.status_code == 200:
                 emoji = None
                 with open(
-                        f"emojis/{name}.{img_type}",
+                        f"/emojis/{name}.{img_type}",
                         'wb') as f:
                     r.raw.decode_content = True
                     shutil.copyfileobj(r.raw, f)
                 with open(
-                        f'emojis/{name}.{img_type}',
+                        f'/emojis/{name}.{img_type}',
                         'rb') as picture:
 
                     emoji = await ctx.message.guild.create_custom_emoji(
@@ -321,10 +321,10 @@ async def qr(ctx, message):
     file_name = '{0}.png'.format(current_time[2:])
     img = qr.make_image(fill_color="black", back_color="white")
 
-    img.save(r'hifumi_qr_code/{0}'.format(
+    img.save(r'/hifumi_qr_code/{0}'.format(
         file_name))
     with open(
-            r'hifumi_qr_code/{0}'.format(
+            r'/hifumi_qr_code/{0}'.format(
                 file_name), 'rb') as picture:
         await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
 
