@@ -40,7 +40,7 @@ async def on_message(message):
     if message.content.startswith("$cookie <@!665224627353681921>") or \
             message.content.startswith("~cookie <@!665224627353681921>"):
         await message.channel.send(random.choice(cookie_reactions))
-    if message.content.startswith("$pat <@!665224627353681921>") or \
+    elif message.content.startswith("$pat <@!665224627353681921>") or \
             message.content.startswith("~pat <@!665224627353681921>"):
         await message.channel.send(random.choice(pat_reactions))
 
@@ -306,7 +306,7 @@ async def coinflip(ctx):
 @bot.command()
 async def qr(ctx, message):
     m = message
-    now = datetime.datetime.now()
+    now = datetime.now()
     current_time = now.strftime("%Y%m%d%H%M%S")
 
     qr = qrcode.QRCode(
