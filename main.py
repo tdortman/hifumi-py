@@ -20,7 +20,7 @@ import music
 import encryption
 
 bot = commands.Bot(command_prefix="h!")
-file = open(r'/files/token.txt', 'r')
+file = open(r'files/token.txt', 'r')
 TOKEN = file.readline()
 file.close()
 
@@ -40,7 +40,7 @@ async def on_message(message):
     if message.content.startswith("$cookie <@!665224627353681921>") or \
             message.content.startswith("~cookie <@!665224627353681921>"):
         await message.channel.send(random.choice(cookie_reactions))
-    elif message.content.startswith("$pat <@!665224627353681921>") or \
+    if message.content.startswith("$pat <@!665224627353681921>") or \
             message.content.startswith("~pat <@!665224627353681921>"):
         await message.channel.send(random.choice(pat_reactions))
 
