@@ -1,11 +1,8 @@
 import datetime
 import operator
 import random
-import urllib
-import urllib.request
 import discord
 import qrcode
-import urbandict
 from discord.ext import commands
 import asyncio
 from datetime import datetime
@@ -14,7 +11,7 @@ from PIL import Image
 import requests
 import shutil
 import os
-
+from udpy import UrbanClient
 import reddit
 import music
 import encryption
@@ -249,21 +246,81 @@ async def play(ctx, url: str):
 
 
 @bot.command()
-async def urban(ctx, message):
+async def urban(ctx):
     try:
-        urban_list = []
-        term = message
-        word = urbandict.define(term)
-        urban_list.append(word[0])
-        embed = discord.Embed(title=urban_list[0]["word"],
-                              description=urban_list[0]["def"], color=0xce3a9b)
+        client = UrbanClient()
+        if ctx.message.content.split()[1] == "random":
+            defs = client.get_random_definition()
+        else:
+            urban_word = " ".join(ctx.message.content.split()[1:])
+            defs = client.get_definition(urban_word)
 
-        await ctx.channel.send(embed=embed)
-    except urllib.error.HTTPError:
-        await ctx.channel.send(
-            "I'm sorry, but the definition is either not existent,"
-            " or the server"
-            " is having issues processing your request.")
+        defs_sliced = defs[:5]
+
+        desc = f"**Definition**:\n{str(defs_sliced[0].definition).replace('[', '').replace(']', '')}\n\n**Example**:" \
+               f"\n{defs_sliced[0].example.replace('[', '').replace(']', '')}"
+        footer = f"Upvotes: {defs_sliced[0].upvotes}  Downvotes: {defs_sliced[0].downvotes}\nPage 1/5"
+        colour = 0xce3a9b
+
+        page1 = discord.Embed(title=defs_sliced[0].word,
+                              description=desc,
+                              color=0xce3a9b)
+        page1.set_footer(text=footer)
+
+        page2 = discord.Embed(title=defs_sliced[1].word,
+                              description=f"**Definition:**\n{str(defs_sliced[1].definition).replace('[', '').replace(']', '')}"
+                                          f"\n\n**Example**:\n{defs_sliced[1].example.replace('[', '').replace(']', '')}",
+                              color=colour)
+        page2.set_footer(text=f"Upvotes: {defs_sliced[1].upvotes}  Downvotes: {defs_sliced[1].downvotes}\nPage 2/5 ")
+
+        page3 = discord.Embed(title=defs_sliced[2].word,
+                              description=f"**Definition**:\n{str(defs_sliced[2].definition).replace('[', '').replace(']', '')}"
+                                          f"\n\n**Example**:\n{defs_sliced[2].example.replace('[', '').replace(']', '')}",
+                              color=colour)
+        page3.set_footer(text=f"Upvotes: {defs_sliced[2].upvotes}  Downvotes: {defs_sliced[2].downvotes}\nPage 3/5 ")
+
+        page4 = discord.Embed(title=defs_sliced[3].word,
+                              description=f"**Definition**:\n{str(defs_sliced[3].definition).replace('[', '').replace(']', '')}"
+                                          f"\n\n**Example**:\n{defs_sliced[3].example.replace('[', '').replace(']', '')}",
+                              color=colour)
+        page4.set_footer(text=f"Upvotes: {defs_sliced[3].upvotes}  Downvotes: {defs_sliced[3].downvotes}\nPage 4/5 ")
+
+        page5 = discord.Embed(title=defs_sliced[4].word,
+                              description=f"**Definition**:\n{str(defs_sliced[4].definition).replace('[', '').replace(']', '')}"
+                                          f"\n\n**Example**:\n{defs_sliced[4].example.replace('[', '').replace(']', '')}",
+                              color=colour)
+        page5.set_footer(text=f"Upvotes: {defs_sliced[4].upvotes}  Downvotes: {defs_sliced[4].downvotes}\nPage 5/5 ")
+
+        pages = [page1, page2, page3, page4, page5]
+        message = await ctx.send(embed=page1)
+
+        await message.add_reaction("\u2B05")
+        await message.add_reaction("\u27A1")
+
+        i = 0
+        emoji = ""
+        while True:
+            if emoji == "\u2B05" and i == 0:
+                i += 4
+                await message.edit(embed=pages[i])
+            if emoji == "\u2B05" and i > 0:
+                i -= 1
+                await message.edit(embed=pages[i])
+            if emoji == "\u27A1" and i == 4:
+                i -= 4
+                await message.edit(embed=pages[i])
+            if emoji == "\u27A1" and i < 4:
+                i += 1
+                await message.edit(embed=pages[i])
+
+            res = await bot.wait_for("reaction_add", timeout=60.0)
+            if res is None:
+                break
+            if str(res[1].id) != 641409330888835083:
+                emoji = str(res[0].emoji)
+                await message.remove_reaction(res[0].emoji, res[1])
+    except IndexError:
+        await ctx.send("Make sure you enter a valid word to search for!")
 
 
 @bot.command()
