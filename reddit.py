@@ -8,10 +8,7 @@ bot = commands.Bot(command_prefix='h?')
 
 reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
                      client_secret='DFRuha1D_QLYm-AdCfQW54uiq1M',
-                     user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-                                ' AppleWebKit/537.36 (KHTML, like Gecko) '
-                                'Chrome/78.0.3904.87 Safari/537.36')
-
+                     user_agent='Mozilla/5.0')
 
 # reddit caches
 kitsune_cache = []
@@ -20,17 +17,19 @@ bunny_cache = []
 neko_cache = []
 thighs_cache = []
 animegirl_cache = []
-sub_cache = {}
+sub_cache_img = {}
+sub_cache_text = {}
 
 
 @bot.command()
 async def profile(ctx):
     try:
-        msg = ctx.message.content.split()
-        user = reddit.redditor(msg[1])
+        user = reddit.redditor(ctx.message.content.split()[1])
+        user_url = f"https://www.reddit.com/user/{user.name}"
         created_on = datetime.datetime.utcfromtimestamp(
             user.created_utc).strftime('%d/%m/%y')
-        desc = f"Link Karma: {user.link_karma}\n" \
+        desc = f"[Link to profile]({user_url})\n" \
+               f"Post Karma: {user.link_karma}\n" \
                f"Comment Karma: {user.comment_karma}\n" \
                f"Created on: {created_on}\n"
 
@@ -83,37 +82,79 @@ async def kitsune(ctx):
 
 @bot.command()
 async def sub(ctx):
-    name = ctx.message.content.split()[1]
-    if name not in sub_cache:
-        sub_cache[name] = []
-        submissions = reddit.subreddit(name).hot()
-
-        for i in range(100):
-            submission = next(x for x in submissions)
-            if submission.url.split("/")[2] == "i.redd.it":
-                sub_cache[name].append((submission.url, submission.title))
-
-        submissions = reddit.subreddit(name).top('all')
-
-        for i in range(100):
-            submission = next(x for x in submissions)
-            if submission.url.split("/")[2] == "i.redd.it":
-                sub_cache[name].append((submission.url, submission.title))
-        await ctx.channel.send(
-            'Results found: {}'.format(len(sub_cache[name])))
-
-    picture, name = random.choice(sub_cache[name])
-
     try:
-        title, desc = name.split('[')
-        desc = '[' + desc
-    except ValueError:
-        title = name
-        desc = None
+        if ctx.message.content.split()[1] == "text":
+            await self_posts(ctx)
+        else:
+            name = ctx.message.content.split()[1]
+            if reddit.subreddit(name).over18 and not ctx.channel.is_nsfw():
+                await ctx.send("You can't access NSFW subreddits outside of NSFW channels!")
+                return
+            else:
+                if name not in sub_cache_img:
+                    sub_cache_img[name] = []
+                    submissions = reddit.subreddit(name).hot()
 
-    embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
-    embed.set_image(url=picture)
-    await ctx.channel.send(embed=embed)
+                    for i in range(100):
+                        submission = next(x for x in submissions)
+                        if submission.url.split("/")[2] == "i.redd.it":
+                            sub_cache_img[name].append((submission.url, submission.title))
+
+                    submissions = reddit.subreddit(name).top('all')
+
+                    for i in range(100):
+                        submission = next(x for x in submissions)
+                        if submission.url.split("/")[2] == "i.redd.it":
+                            sub_cache_img[name].append((submission.url, submission.title))
+                    await ctx.channel.send(
+                        'Results found: {}'.format(len(sub_cache_img[name])))
+
+                picture, name = random.choice(sub_cache_img[name])
+
+                try:
+                    title, desc = name.split('[')
+                    desc = '[' + desc
+                except ValueError:
+                    title = name
+                    desc = None
+
+                embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
+                embed.set_image(url=picture)
+                await ctx.channel.send(embed=embed)
+    except IndexError:
+        await ctx.send("You didn't specify a subreddit!")
+
+
+async def self_posts(ctx):
+    name = ctx.message.content.split()[-1]
+    if reddit.subreddit(name).over18 and not ctx.channel.is_nsfw():
+        await ctx.send("You can't access NSFW subreddits outside of NSFW channels!")
+        return
+    else:
+        if name not in sub_cache_text:
+            sub_cache_text[name] = []
+            submissions = reddit.subreddit(name).hot()
+
+            for i in range(100):
+                submission = next(x for x in submissions)
+                if submission.is_self:
+                    sub_cache_text[name].append((submission.url, submission.title, submission.selftext,
+                                                 submission.score, submission.upvote_ratio, submission.author.name))
+
+            submissions = reddit.subreddit(name).top('all')
+
+            for i in range(100):
+                submission = next(x for x in submissions)
+                if submission.is_self:
+                    sub_cache_text[name].append((submission.url, submission.title, submission.selftext,
+                                                 submission.score, submission.upvote_ratio, submission.author.name))
+            await ctx.channel.send(f"Results found: {len(sub_cache_text[name])}")
+
+        url, title, selftext, upvotes, ratio, author = random.choice(sub_cache_text[name])
+
+        embed = discord.Embed(title=title, description=f"[Link to post by u/{author}]({url})\n\n{selftext}", color=0xce3a9b)
+        embed.set_footer(text=f"Upvotes: {upvotes}  Ratio: {ratio * 100}%")
+        await ctx.send(embed=embed)
 
 
 @bot.command()

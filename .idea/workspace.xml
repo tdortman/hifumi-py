@@ -19,9 +19,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="519501b4-d093-4054-93c5-d644496d5eca" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="519501b4-d093-4054-93c5-d644496d5eca" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -93,6 +91,7 @@
       <workItem from="1588637314850" duration="49000" />
       <workItem from="1588637903185" duration="49000" />
       <workItem from="1588783809332" duration="359000" />
+      <workItem from="1588784446139" duration="110000" />
     </task>
     <task id="LOCAL-00001" summary="Split Hifumi into multiple files">
       <created>1588624215370</created>
@@ -206,7 +205,14 @@
       <option name="project" value="LOCAL" />
       <updated>1588784097241</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Reworked urbandictionary command">
+      <created>1588784541860</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1588784541861</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -238,26 +244,26 @@
     <option name="LAST_COMMIT_MESSAGE" value="Reworked urbandictionary command" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="588" y="92" key="CommitChangelistDialog2" timestamp="1588784095885">
+    <state x="588" y="92" key="CommitChangelistDialog2" timestamp="1588784540307">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="588" y="92" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1588784095885" />
-    <state width="538" height="883" key="GridCell.Tab.0.bottom" timestamp="1588637952025">
+    <state x="588" y="92" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1588784540307" />
+    <state width="538" height="883" key="GridCell.Tab.0.bottom" timestamp="1588784556163">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state width="538" height="883" key="GridCell.Tab.0.bottom/0.0.1680.1010@0.0.1680.1010" timestamp="1588637952025" />
-    <state width="538" height="883" key="GridCell.Tab.0.center" timestamp="1588637952025">
+    <state width="538" height="883" key="GridCell.Tab.0.bottom/0.0.1680.1010@0.0.1680.1010" timestamp="1588784556163" />
+    <state width="538" height="883" key="GridCell.Tab.0.center" timestamp="1588784556163">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state width="538" height="883" key="GridCell.Tab.0.center/0.0.1680.1010@0.0.1680.1010" timestamp="1588637952025" />
-    <state width="538" height="883" key="GridCell.Tab.0.left" timestamp="1588637952025">
+    <state width="538" height="883" key="GridCell.Tab.0.center/0.0.1680.1010@0.0.1680.1010" timestamp="1588784556163" />
+    <state width="538" height="883" key="GridCell.Tab.0.left" timestamp="1588784556163">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state width="538" height="883" key="GridCell.Tab.0.left/0.0.1680.1010@0.0.1680.1010" timestamp="1588637952025" />
-    <state width="538" height="883" key="GridCell.Tab.0.right" timestamp="1588637952025">
+    <state width="538" height="883" key="GridCell.Tab.0.left/0.0.1680.1010@0.0.1680.1010" timestamp="1588784556163" />
+    <state width="538" height="883" key="GridCell.Tab.0.right" timestamp="1588784556163">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state width="538" height="883" key="GridCell.Tab.0.right/0.0.1680.1010@0.0.1680.1010" timestamp="1588637952025" />
+    <state width="538" height="883" key="GridCell.Tab.0.right/0.0.1680.1010@0.0.1680.1010" timestamp="1588784556163" />
     <state width="1639" height="336" key="GridCell.Tab.1.bottom" timestamp="1588637363384">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
@@ -274,10 +280,10 @@
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
     <state width="1639" height="336" key="GridCell.Tab.1.right/0.0.1680.1010@0.0.1680.1010" timestamp="1588637363384" />
-    <state x="432" y="238" key="Vcs.Push.Dialog.v2" timestamp="1588784109368">
+    <state x="432" y="238" key="Vcs.Push.Dialog.v2" timestamp="1588784544187">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="432" y="238" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1588784109368" />
+    <state x="432" y="238" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1588784544187" />
     <state x="391" y="234" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1588637361521">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
