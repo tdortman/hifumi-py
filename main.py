@@ -316,7 +316,7 @@ async def urban(ctx):
             res = await bot.wait_for("reaction_add", timeout=60.0)
             if res is None:
                 break
-            if str(res[1].id) != 641409330888835083:
+            if str(res[1].id) != "641409330888835083":
                 emoji = str(res[0].emoji)
                 await message.remove_reaction(res[0].emoji, res[1])
     except IndexError:
