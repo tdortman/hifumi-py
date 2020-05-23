@@ -92,6 +92,7 @@
       <workItem from="1588637903185" duration="49000" />
       <workItem from="1588783809332" duration="359000" />
       <workItem from="1588784446139" duration="110000" />
+      <workItem from="1588806197631" duration="334000" />
     </task>
     <task id="LOCAL-00001" summary="Split Hifumi into multiple files">
       <created>1588624215370</created>
@@ -212,7 +213,14 @@
       <option name="project" value="LOCAL" />
       <updated>1588784541861</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="You can now search for text posts only on reddit!">
+      <created>1588806270068</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1588806270068</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -241,13 +249,14 @@
     <MESSAGE value="paths in linux suck btw" />
     <MESSAGE value="now it should finally all work.." />
     <MESSAGE value="Reworked urbandictionary command" />
-    <option name="LAST_COMMIT_MESSAGE" value="Reworked urbandictionary command" />
+    <MESSAGE value="You can now search for text posts only on reddit!" />
+    <option name="LAST_COMMIT_MESSAGE" value="You can now search for text posts only on reddit!" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="588" y="92" key="CommitChangelistDialog2" timestamp="1588784540307">
+    <state x="588" y="92" key="CommitChangelistDialog2" timestamp="1588806268979">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="588" y="92" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1588784540307" />
+    <state x="588" y="92" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1588806268979" />
     <state width="538" height="883" key="GridCell.Tab.0.bottom" timestamp="1588784556163">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
@@ -280,10 +289,10 @@
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
     <state width="1639" height="336" key="GridCell.Tab.1.right/0.0.1680.1010@0.0.1680.1010" timestamp="1588637363384" />
-    <state x="432" y="238" key="Vcs.Push.Dialog.v2" timestamp="1588784544187">
+    <state x="432" y="238" key="Vcs.Push.Dialog.v2" timestamp="1588806271662">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="432" y="238" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1588784544187" />
+    <state x="432" y="238" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1588806271662" />
     <state x="391" y="234" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1588637361521">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>

@@ -196,7 +196,9 @@ async def emoji(ctx):
 @bot.command(aliases=["pfp"])
 async def avatar(ctx):
     try:
-        if ctx.message.mentions:
+        if len(ctx.message.content.split()) == 1:
+            user = ctx.message.author
+        elif ctx.message.mentions:
             user = ctx.message.mentions[0]
         else:
             user = await bot.fetch_user(int(ctx.message.content.split()[1]))
