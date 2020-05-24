@@ -1,9 +1,11 @@
 import datetime
 import operator
 import random
+import urllib
+import urllib.request
 import discord
 import qrcode
-from discord.ext import commands
+from udpy import UrbanClient
 import asyncio
 from datetime import datetime
 import importlib
@@ -11,15 +13,17 @@ from PIL import Image
 import requests
 import shutil
 import os
-from udpy import UrbanClient
+from pathlib import Path
+from PIL import ImageFile
+import traceback
+
 import reddit
 import music
 import encryption
+import pillow
 
-bot = commands.Bot(command_prefix="h!")
-file = open(r'files/token.txt', 'r')
-TOKEN = file.readline()
-file.close()
+
+bot = discord.Client()
 
 # Reactions (will do extra files for them eventually)
 pat_reactions = [
@@ -32,128 +36,127 @@ cookie_reactions = [
     "COOKIEEEEEEEEEEEEEEESSSSSSSSSSSS"]
 
 
-@bot.event
-async def on_ready():
+async def error_log(message=None, error_msg=None, cmd=None):
     now = datetime.now()
-    print('Logged in as:')
-    print(bot.user.name)
-    print(bot.user.id)
-    print('------')
-    channel = await bot.fetch_channel(655484804405657642)
-    time = now.strftime("%d/%m/%Y %H:%M:%S")
-    await channel.send(f"Logged in as:\n{bot.user.name}\nTime: {time}\n"
-                       f"--------------------------")
-    game = discord.Game("with best girl Annie!")
-    await bot.change_presence(activity=game)
+    current_time = now.strftime("%d/%m/%Y %H:%M:%S")
+
+    if cmd is None and message is not None:
+        cmd = message.content.split()[0][2:]
+    elif cmd is None:
+        cmd = 'unknown, message missing'
+    else:
+        cmd = 'unknown'
+
+    tb = str(traceback.format_exc())
+
+    if message is None:
+        msg = f"An Error occurred on {current_time}\n" \
+              f"**Command used**: {cmd}\n" \
+              f"Message data unavailable due to the error not being client-side!\n" \
+              f"Error:\n{error_msg}\n\n**{tb}**\n<@258993932262834188>"
+    else:
+        msg = f"An Error occurred on {current_time}\n" \
+              f'**Server:** {message.guild} - {message.guild.id}\n' \
+              f'**Room:** {message.channel} - {message.channel.id}\n' \
+              f'**User:** {message.author} - {message.author.id}\n' \
+              f"**Command used**: {message.content}\n" \
+              f"**Error**:\n{error_msg}\n\n**{tb}**\n<@258993932262834188>"
+
+    if message is None:
+        channel = bot.get_channel(655484804405657642)
+    elif message.channel.id in [655484859405303809, 551588329003548683]:
+        channel = message.channel
+    else:
+        channel = bot.get_channel(655484804405657642)
+
+    try:
+        await channel.send(msg)
+    except discord.errors.HTTPException:
+        await channel.send(f"An Error occurred on {current_time}\nCheck console for full error (2000 character limit)\n"
+                           f"<@258993932262834188>")
+        print(msg)
+
+
+async def message_in(message):
+    try:
+        if message.content.startswith("h?"):
+            cmd = message.content.split()[0][2:].lower()
+
+            try:
+                sub_cmd = message.content.split()[1].lower()
+            except:
+                sub_cmd = None
+
+            if cmd == "beautiful":
+                await pillow.beautiful(message)
+            if cmd == "redditor":
+                await reddit.profile(message)
+            if cmd == "kitsune":
+                await reddit.sub(message, "kitsunemimi")
+            if cmd == "sub":
+                if sub_cmd == "text":
+                    await reddit.self_posts(message)
+                else:
+                    await reddit.sub(message, message.content.split()[-1])
+            if cmd == "wholesome":
+                await reddit.sub(message, "wholesomeanimemes")
+            if cmd == "bunny":
+                await reddit.sub(message, "usagimimi")
+            if cmd == "neko":
+                await reddit.sub(message, "nekomimi")
+            if cmd == "thicc":
+                await reddit.sub(message, "thighdeology")
+            if cmd == "animegirl":
+                await reddit.sub(message, "animegirl")
+            if cmd == "cipher":
+                await encryption.caeser_cipher(message)
+            if cmd == "emoji":
+                await emoji(message)
+            if cmd in ["pfp", "avatar"]:
+                await avatar(message)
+            if cmd == "bye":
+                await bye(message)
+            if cmd in ["join", "j", "joi"]:
+                await music.join(message)
+            if cmd in ["leave", "leav", "l"]:
+                await music.leave(message)
+            if cmd in ["play", "p"]:
+                await message.channel.send("Sorry, this command is currently unavailable!")
+            if cmd == "urban":
+                await urban(message)
+            if cmd == "calc":
+                await calc(message)
+            if cmd == "coinflip":
+                await coinflip(message)
+            if cmd == "numguess":
+                await numguess(message)
+            if cmd == "cuddle":
+                await cuddle(message)
+            if cmd == "qr":
+                await qr(message)
+            if cmd == "test":
+                await test(message)
+            if cmd == "error":
+                await error_log(message, "This is a test error!")
+    except Exception as e:
+        await error_log(message, e)
 
 
 async def reload_modules():
     importlib.reload(encryption)
     importlib.reload(music)
     importlib.reload(reddit)
+    importlib.reload(pillow)
 
 
 def current_time():
     return datetime.utcnow()
 
 
-@bot.command()
-async def beautiful(ctx):
-    try:
-        beautiful_img = Image.open('files/background.png', 'r')
-        if ctx.message.mentions:
-            user = ctx.message.mentions[0]
-        else:
-            user = await bot.fetch_user(int(ctx.message.content.split()[1]))
-
-        user_avatar = str(user.avatar_url).replace("webp", "png")
-        r = requests.get(
-            user_avatar, stream=True, headers={
-                'User-agent': 'Mozilla/5.0'})
-
-        with open(f"files/{user.id}.png", 'wb') as f:
-            r.raw.decode_content = True
-            shutil.copyfileobj(r.raw, f)
-
-        basewidth = 180
-        img = Image.open(f"files/{user.id}.png")
-        wpercent = (basewidth / float(img.size[0]))
-        hsize = int((float(img.size[1]) * float(wpercent)))
-        img = img.resize((basewidth, hsize), Image.ANTIALIAS)
-        img.save(f'files/{user.id}_resized.png')
-
-        canvas = Image.new("RGBA", (640, 674))
-        canvas.paste(img, (422, 35))
-        canvas.paste(img, (430, 377))
-        canvas.paste(beautiful_img, None, beautiful_img)
-        canvas.save(f"files/beautiful.png")
-
-        with open(f"files/beautiful.png", "rb") as g:
-            picture = discord.File(g)
-            await ctx.send(file=picture)
-
-        os.remove(f"files/{user.id}.png")
-        os.remove(f"files/{user.id}_resized.png")
-        os.remove(f"files/beautiful.png")
-
-    except ValueError:
-        await ctx.send("Invalid ID! Use numbers only please!")
-    except IndexError:
-        await ctx.send("Seems like you didn't mention anyone!")
-    except discord.errors.NotFound:
-        await ctx.send("That's not a valid ID!")
-
-
-@bot.command()
-async def redditor(username):
-    await reddit.profile(username)
-
-
-@bot.command()
-async def kitsune(ctx):
-    await reddit.kitsune(ctx)
-
-
-@bot.command()
-async def sub(message):
-    await reddit.sub(message)
-
-
-@bot.command()
-async def wholesome(ctx):
-    await reddit.wholesome(ctx)
-
-
-@bot.command()
-async def bunny(ctx):
-    await reddit.bunny(ctx)
-
-
-@bot.command()
-async def neko(ctx):
-    await reddit.neko(ctx)
-
-
-@bot.command()
-async def thicc(ctx):
-    await reddit.thicc(ctx)
-
-
-@bot.command()
-async def animegirl(ctx):
-    await reddit.animegirl(ctx)
-
-
-@bot.command()
-async def cipher(ctx):
-    await encryption.caeser_cipher(ctx)
-
-
-@bot.command()
-async def emoji(ctx):
-    if ctx.message.author.guild_permissions.manage_emojis:
+async def emoji(message):
+    if message.author.guild_permissions.manage_emojis:
         try:
-            content = ctx.message.content.split()
+            content = message.content.split()
             name, url = content[1], content[2]
             if 'jpg' in url:
                 img_type = 'jpg'
@@ -162,21 +165,36 @@ async def emoji(ctx):
             elif 'gif' in url:
                 img_type = 'gif'
 
+            if img_type == "gif":
+                if getsizes(url) > 256000:
+                    await message.channel.send("This gif is too big to be uploaded! Try resizing it first.")
+                    return
+
             r = requests.get(
                 url, stream=True, headers={
                     'User-agent': 'Mozilla/5.0'})
             if r.status_code == 200:
                 emoji = None
-                with open(
-                        f"emojis/{name}.{img_type}",
-                        'wb') as f:
+                with open(f"emojis/{name}.{img_type}", 'wb') as f:
+
                     r.raw.decode_content = True
                     shutil.copyfileobj(r.raw, f)
-                with open(
-                        f'emojis/{name}.{img_type}',
-                        'rb') as picture:
+                    print("Successfully downloaded image!")
+                print(Path(f"emojis/{name}.{img_type}").stat().st_size)
+                print(img_type)
 
-                    emoji = await ctx.message.guild.create_custom_emoji(
+                if Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and img_type == "jpg" or img_type == "png":
+                    basewidth = 128
+                    img = Image.open(f"emojis/{name}.{img_type}")
+                    wpercent = (basewidth / float(img.size[0]))
+                    hsize = int((float(img.size[1]) * float(wpercent)))
+                    img = img.resize((basewidth, hsize), Image.ANTIALIAS)
+                    img.save(f"emojis/{name}.{img_type}")
+
+                with open(
+                        f"emojis/{name}.{img_type}", "rb") as picture:
+
+                    emoji = await message.guild.create_custom_emoji(
                         name=name, image=picture.read())
 
                 if emoji and img_type != "gif":
@@ -185,120 +203,93 @@ async def emoji(ctx):
                     msg = f"<a:{emoji.name}:{emoji.id}>"
                 else:
                     msg = 'Emoji object not retrieved!'
-                await ctx.message.channel.send(msg)
+                await message.channel.send(msg)
+
+            os.remove(f"emojis/{name}.{img_type}")
+
         except discord.errors.Forbidden:
-            msg = "I don't have the permissions for this!"
-            await ctx.message.channel.send(msg)
+            await message.channel.send("I don't have the permissions for this!")
+        except Exception as e:
+            await error_log(message, e)
     else:
-        await ctx.send("Insufficient Permissions!!")
+        await message.channel.send("Insufficient Permissions!!")
 
 
-@bot.command(aliases=["pfp"])
-async def avatar(ctx):
+def getsizes(url):
+    file = urllib.request.urlopen(url)
+    size = int(file.headers.get("content-length"))
+    p = ImageFile.Parser()
+    while True:
+        data = file.read(1024)
+        if not data:
+            break
+        p.feed(data)
+        if p.image:
+            return size
+    file.close()
+    return size
+
+
+async def avatar(message):
     try:
-        if len(ctx.message.content.split()) == 1:
-            user = ctx.message.author
-        elif ctx.message.mentions:
-            user = ctx.message.mentions[0]
+        if len(message.content.split()) == 1:
+            user = message.author
+        elif message.mentions:
+            user = message.mentions[0]
         else:
-            user = await bot.fetch_user(int(ctx.message.content.split()[1]))
+            user = await bot.fetch_user(int(message.content.split()[1]))
         pfp = str(user.avatar_url).replace(".webp", ".png")
         desc = f"*{user.name}'s avatar*"
         embed = discord.Embed(description=desc, color=0xce3a9b)
         embed.set_image(url=pfp)
-        await ctx.send(embed=embed)
+        await message.channel.send(embed=embed)
+
     except ValueError:
-        await ctx.send("Invalid ID! Use numbers only please!")
+        await message.channel.send("Invalid ID! Use numbers only please!")
     except IndexError:
-        await ctx.send("Seems like you didn't mention anyone!")
+        await message.channel.send("Seems like you didn't mention anyone!")
     except discord.errors.NotFound:
-        await ctx.send("That's not a valid ID!")
+        await message.channel.send("That's not a valid ID!")
+    except Exception as e:
+        await error_log(message, e)
 
 
-@bot.command()
-async def bye(ctx):
-    if ctx.message.author.id == 258993932262834188:
-        await ctx.send("Bai baaaaaaaai!!")
-        await bot.logout()
+async def bye(message):
+    try:
+        if message.author.id == 258993932262834188:
+            await message.channel.send("Bai baaaaaaaai!!")
+            await bot.logout()
+    except Exception as e:
+        await error_log(message, e)
 
 
-@bot.command()
-async def ping(ctx):
-    if ctx.message.author.id == 258993932262834188:
-        while True:
-            await ctx.channel.send("<@!258993932262834188>", delete_after=0.2)
-            await asyncio.sleep(0.2)
-    else:
-        await ctx.channel.send("Insufficient permissions!")
-
-
-@bot.command(aliases=["j"])
-async def join(ctx):
-    await music.join(ctx)
-
-
-@bot.command(aliases=["l"])
-async def leave(ctx):
-    await music.leave(ctx)
-
-
-@bot.command(aliases=["p"])
-async def play(ctx, url: str):
-    await music.play(ctx, url)
-
-
-@bot.command()
-async def urban(ctx):
+async def urban(message):
     try:
         client = UrbanClient()
-        if ctx.message.content.split()[1] == "random":
+        if message.content.split()[1] == "random":
             defs = client.get_random_definition()
         else:
-            urban_word = " ".join(ctx.message.content.split()[1:])
+            urban_word = " ".join(message.content.split()[1:])
             defs = client.get_definition(urban_word)
 
         defs_sliced = defs[:5]
+        pages = []
+        for i in range(5):
 
-        desc = f"**Definition**:\n{str(defs_sliced[0].definition).replace('[', '').replace(']', '')}\n\n**Example**:" \
-               f"\n{defs_sliced[0].example.replace('[', '').replace(']', '')}"
-        footer = f"Upvotes: {defs_sliced[0].upvotes}  Downvotes: {defs_sliced[0].downvotes}\nPage 1/5"
-        colour = 0xce3a9b
+            desc = f"**Definition**:\n{str(defs_sliced[i].definition).replace('[', '').replace(']', '')}\n\n" \
+                   f"**Example**:\n{defs_sliced[i].example.replace('[', '').replace(']', '')}"
+            footer = f"Upvotes: {defs_sliced[i].upvotes}  Downvotes: {defs_sliced[i].downvotes}\nPage {i + 1}/5"
 
-        page1 = discord.Embed(title=defs_sliced[0].word,
-                              description=desc,
-                              color=0xce3a9b)
-        page1.set_footer(text=footer)
+            page = discord.Embed(title=defs_sliced[i].word,
+                                 description=desc,
+                                 color=0xce3a9b)
+            page.set_footer(text=footer)
+            pages.append(page)
 
-        page2 = discord.Embed(title=defs_sliced[1].word,
-                              description=f"**Definition:**\n{str(defs_sliced[1].definition).replace('[', '').replace(']', '')}"
-                                          f"\n\n**Example**:\n{defs_sliced[1].example.replace('[', '').replace(']', '')}",
-                              color=colour)
-        page2.set_footer(text=f"Upvotes: {defs_sliced[1].upvotes}  Downvotes: {defs_sliced[1].downvotes}\nPage 2/5 ")
-
-        page3 = discord.Embed(title=defs_sliced[2].word,
-                              description=f"**Definition**:\n{str(defs_sliced[2].definition).replace('[', '').replace(']', '')}"
-                                          f"\n\n**Example**:\n{defs_sliced[2].example.replace('[', '').replace(']', '')}",
-                              color=colour)
-        page3.set_footer(text=f"Upvotes: {defs_sliced[2].upvotes}  Downvotes: {defs_sliced[2].downvotes}\nPage 3/5 ")
-
-        page4 = discord.Embed(title=defs_sliced[3].word,
-                              description=f"**Definition**:\n{str(defs_sliced[3].definition).replace('[', '').replace(']', '')}"
-                                          f"\n\n**Example**:\n{defs_sliced[3].example.replace('[', '').replace(']', '')}",
-                              color=colour)
-        page4.set_footer(text=f"Upvotes: {defs_sliced[3].upvotes}  Downvotes: {defs_sliced[3].downvotes}\nPage 4/5 ")
-
-        page5 = discord.Embed(title=defs_sliced[4].word,
-                              description=f"**Definition**:\n{str(defs_sliced[4].definition).replace('[', '').replace(']', '')}"
-                                          f"\n\n**Example**:\n{defs_sliced[4].example.replace('[', '').replace(']', '')}",
-                              color=colour)
-        page5.set_footer(text=f"Upvotes: {defs_sliced[4].upvotes}  Downvotes: {defs_sliced[4].downvotes}\nPage 5/5 ")
-
-        pages = [page1, page2, page3, page4, page5]
-        message = await ctx.send(embed=page1)
+        message = await message.channel.send(embed=pages[0])
 
         await message.add_reaction("\u2B05")
         await message.add_reaction("\u27A1")
-
         i = 0
         emoji = ""
         while True:
@@ -318,135 +309,144 @@ async def urban(ctx):
             res = await bot.wait_for("reaction_add", timeout=60.0)
             if res is None:
                 break
-            if str(res[1].id) != "641409330888835083":
+            if str(res[1].id) != 665224627353681921:
                 emoji = str(res[0].emoji)
                 await message.remove_reaction(res[0].emoji, res[1])
     except IndexError:
-        await ctx.send("Make sure you enter a valid word to search for!")
+        await message.channel.send("Make sure you enter a valid word to search for!")
+    except asyncio.TimeoutError:
+        return
+    except Exception as e:
+        await error_log(message, e)
 
 
-@bot.command()
-async def calc(ctx, num1, operation, num2):
-    operators = {
-        '+': operator.add,
-        '-': operator.sub,
-        '*': operator.mul,
-        '%': operator.mod,
-        '/': operator.truediv,
-        '//': operator.floordiv,
-        '**': operator.pow
-    }
+async def calc(message):
+    try:
+        num1 = message.content.split()[1]
+        operation = message.content.split()[2]
+        num2 = message.content.split()[3]
 
-    if operation in operators:
-        await ctx.channel.send(operators[operation](int(num1), int(num2)))
+        operators = {
+            '+': operator.add,
+            '-': operator.sub,
+            '*': operator.mul,
+            '%': operator.mod,
+            '/': operator.truediv,
+            '//': operator.floordiv,
+            '**': operator.pow
+        }
 
-
-@bot.command()
-async def coinflip(ctx):
-    rand_num = random.randint(0, 1)
-    if rand_num == 0:
-        await ctx.channel.send("Tails!")
-    else:
-        await ctx.channel.send("Heads!")
+        if operation in operators:
+            await message.channel.send(operators[operation](int(num1), int(num2)))
+    except Exception as e:
+        await error_log(message, e)
 
 
-@bot.command()
-async def qr(ctx, message):
-    m = message
-    now = datetime.now()
-    current_time = now.strftime("%Y%m%d%H%M%S")
-
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_M,
-        box_size=5,
-        border=0,
-    )
-    qr.add_data(m)
-    qr.make(fit=True)
-
-    file_name = '{0}.png'.format(current_time[2:])
-    img = qr.make_image(fill_color="black", back_color="white")
-
-    img.save(r'hifumi_qr_code/{0}'.format(
-        file_name))
-    with open(
-            r'hifumi_qr_code/{0}'.format(
-                file_name), 'rb') as picture:
-        await ctx.channel.send(file=discord.File(picture, "new_filename.png"))
+async def coinflip(message):
+    try:
+        rand_num = random.randint(0, 1)
+        if rand_num == 0:
+            await message.channel.send("Tails!")
+        else:
+            await message.channel.send("Heads!")
+    except Exception as e:
+        await error_log(message, e)
 
 
-@bot.command()
-async def test(ctx):
-    await ctx.channel.send('Learning Python is fun!!')
+async def qr(message):
+    try:
+        m = " ".join(message.content.split()[1:])
+        now = datetime.now()
+        current_time = now.strftime("%Y%m%d%H%M%S")
+
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_M,
+            box_size=5,
+            border=0,
+        )
+        qr.add_data(m)
+        qr.make(fit=True)
+
+        file_name = '{0}.png'.format(current_time[2:])
+        img = qr.make_image(fill_color="black", back_color="white")
+
+        img.save(r'C:\Users\TIMBOLA\Desktop\HifuBot Dev\hifumi_qr_code\{0}'.format(
+            file_name))
+        with open(
+                r'C:\Users\TIMBOLA\Desktop\HifuBot Dev\hifumi_qr_code\{0}'.format(
+                    file_name), 'rb') as picture:
+            await message.channel.send(file=discord.File(picture, "new_filename.png"))
+    except Exception as e:
+        await error_log(message, e)
 
 
-@bot.command()
-async def cuddle(ctx, message):
-    await ctx.channel.send(
-        f"*{ctx.message.author.mention} goes up to {message} and cuddles "
-        f"tightly, "
-        "trying their best to comfort them*")
+async def test(message):
+    await message.channel.send('Learning Python is fun!!')
 
 
-@bot.command(name='numguess',
-             brief='Guess a number between 1 and 100')
-async def numguess(ctx, message):
-    number = random.randint(1, 100)
-    turns = 5
-    await ctx.send(
-        "Welcome! Time to guess some numbers! You have 5 tries. I'll think"
-        " of a number between 1 and 100.")
-
-    def check(author):
-        def inner_check(ctx):
-            if ctx.message.author != author:
-                return False
-            try:
-                int(ctx.message.content)
-                return True
-            except ValueError:
-                return False
-
-        return inner_check
-
-    while turns != 0:
-        await ctx.send("Go try your luck and take a guess!")
-        msg = await bot.wait_for("message", check=check, timeout=60)
-        guess = int(msg.content)
-
-        if guess > number and turns != 0:
-            await message.channel.send(
-                f"Woah there, this is way too high!"
-                f" Maybe try and guess a lower number next time."
-                f" You still have {turns - 1} guesses left")
-            turns -= 1
-        elif guess < number and turns != 0:
-            await message.channel.send(
-                f"Awww, too bad! Might wanna go higher next time!"
-                f" You have {turns - 1} guesses left!")
-
-            turns -= 1
-        if guess == number:
-            await message.channel.send(
-                f"Yes!! You guessed right! I'm so proud of you!!")
-            break
-        if guess == number and turns == 5:
-            await message.channel.send("YOU'RE SO GOOD!!!! FIRST TRY!!")
-            break
-        if turns == 0 and guess != number:
-            await message.channel.send(
-                f"Maybe next time! In case you wondered, my number was {number}!")
-            break
+async def cuddle(message):
+    try:
+        target = message.mentions[0]
+        await message.channel.send(
+            f"*{message.author.mention} goes up to {target} and cuddles tightly, "
+            "trying their best to comfort them*")
+    except Exception as e:
+        await error_log(message, e)
 
 
-@bot.command()
-async def test2(ctx, *args):
-    output = ''
-    for word in args:
-        output += word
-        output += ' '
-    await ctx.channel.send(output)
+async def numguess(message):
+    await message.channel.send("An error occurred! Please try again later")
+    return
+    try:
+        number = random.randint(1, 100)
+        turns = 5
+        await message.channel.send(
+            "Welcome! Time to guess some numbers! You have 5 tries. I'll think"
+            " of a number between 1 and 100.")
 
+        def check(author):
+            def inner_check(ctx):
+                if ctx.message.author != author:
+                    return False
+                try:
+                    int(ctx.message.content)
+                    return True
+                except ValueError:
+                    return False
 
-bot.run(TOKEN)
+            return inner_check
+
+        while turns != 0:
+            await message.channel.send("Go try your luck and take a guess!")
+            msg = await bot.wait_for("message", check=check, timeout=60)
+            guess = int(msg.content)
+
+            if guess > number and turns != 0:
+                await message.channel.send(
+                    f"Woah there, this is way too high!"
+                    f" Maybe try and guess a lower number next time."
+                    f" You still have {turns - 1} guesses left")
+                turns -= 1
+            elif guess < number and turns != 0:
+                await message.channel.send(
+                    f"Awww, too bad! Might wanna go higher next time!"
+                    f" You have {turns - 1} guesses left!")
+
+                turns -= 1
+            if guess == number:
+                await message.channel.send(
+                    f"Yes!! You guessed right! I'm so proud of you!!")
+                break
+            if guess == number and turns == 5:
+                await message.channel.send("YOU'RE SO GOOD!!!! FIRST TRY!!")
+                break
+            if turns == 0 and guess != number:
+                await message.channel.send(
+                    f"Maybe next time! In case you wondered, my number was {number}!")
+                break
+    except asyncio.TimeoutError:
+        return
+    except Exception as e:
+        await error_log(message, e)
+

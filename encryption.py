@@ -1,16 +1,16 @@
-from discord.ext import commands
-
-bot = commands.Bot(command_prefix="h?")
+from main import error_log
 
 
-@bot.command()
-async def caeser_cipher(ctx):
-    content = ctx.message.content.split()
-    sliced_msg = ' '.join(x for x in content[1:-1])
-    num = int(content[-1])
-    caesar = "".join(encrypt_letter(x, num) for x in sliced_msg)
+async def caeser_cipher(message):
+    try:
+        content = message.content.split()
+        sliced_msg = ' '.join(x for x in content[1:-1])
+        num = int(content[-1])
+        caesar = "".join(encrypt_letter(x, num) for x in sliced_msg)
 
-    await ctx.channel.send(caesar)
+        await message.channel.send(caesar)
+    except Exception as e:
+        await error_log(message, e)
 
 
 def encrypt_letter(letter, num):

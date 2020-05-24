@@ -1,83 +1,88 @@
 import discord
-from discord.ext import commands
 import os
 import youtube_dl
 from discord.utils import get
+from main import error_log
 
-bot = commands.Bot(command_prefix="h?")
+bot = discord.Client()
 
 
-@bot.command(aliases=["j"])
-async def join(ctx):
-    global voice
+async def join(message):
     try:
-        channel = ctx.message.author.voice.channel
-        voice = get(bot.voice_clients, guild=ctx.guild)
+        global voice
+        try:
+            channel = message.author.voice.channel
+            voice = get(bot.voice_clients, guild=message.guild)
 
-        if voice and voice.is_connected():
-            await voice.move_to(channel)
-        else:
-            voice = await channel.connect()
+            if voice and voice.is_connected():
+                await voice.move_to(channel)
+            else:
+                voice = await channel.connect()
 
-        print(f"The bot has connected to {channel}\n")
+            print(f"The bot has connected to {channel}\n")
 
-        await ctx.send(f"Joined {channel}!")
-    except AttributeError:
-        await ctx.send("You have to join a voice channel first!")
+            await message.channel.send(f"Joined {channel}!")
+        except AttributeError:
+            await message.channel.send("You have to join a voice channel first!")
+    except Exception as e:
+        await error_log(message, e)
 
 
-@bot.command(aliases=["l"])
-async def leave(ctx):
+async def leave(message):
     try:
-        channel = ctx.message.author.voice.channel
-        voice = get(bot.voice_clients, guild=ctx.guild)
+        channel = message.author.voice.channel
+        voice = get(bot.voice_clients, guild=message.guild)
 
         if voice and voice.is_connected():
             await voice.disconnect()
             print(f"The bot has left {channel}")
-            await ctx.send(f"Left {channel}!")
+            await message.channel.send(f"Left {channel}!")
         else:
-            await ctx.send("Not currently in a voice channel!")
+            await message.channel.send("Not currently in a voice channel!")
     except AttributeError:
-        await ctx.send("We both have to be in the same voice channel "
+        await message.channel.send("We both have to be in the same voice channel "
                        "for this!")
+    except Exception as e:
+        await error_log(message, e)
 
 
-@bot.command(aliases=["p"])
-async def play(ctx, url: str):
-    song_there = os.path.isfile("song.mp3")
+async def play(message, url: str):
     try:
-        if song_there:
-            os.remove("song.mp3")
-            print("Removed old song file")
-    except PermissionError:
-        print("Trying to delete song file, but it's being played")
-        await ctx.send("Music is already playing!")
-        return
+        song_there = os.path.isfile("song.mp3")
+        try:
+            if song_there:
+                os.remove("song.mp3")
+                print("Removed old song file")
+        except PermissionError:
+            print("Trying to delete song file, but it's being played")
+            await message.channel.send("Music is already playing!")
+            return
 
-    await ctx.send("Getting things ready now!")
+        await message.channel.send("Getting things ready now!")
 
-    voice = get(bot.voice_clients, guild=ctx.guild)
-    ydl_opts = {
-        "format": "bestaudio/best",
-        "postprocessors": [{
-            "key": "FFmpegExtractAudio",
-            "preferredcodec": "mp3",
-            "preferredquality": "320",
-        }]
-    }
+        voice = get(bot.voice_clients, guild=message.guild)
+        ydl_opts = {
+            "format": "bestaudio/best",
+            "postprocessors": [{
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": "mp3",
+                "preferredquality": "320",
+            }]
+        }
 
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        print("Downloading audio now\n")
-        ydl.download([url])
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            print("Downloading audio now\n")
+            ydl.download([url])
 
-    for file in os.listdir("./"):
-        if file.endswith(".mp3"):
-            name = file
-            print(f"Renamed File: {file}\n")
-            os.rename(file, "song.mp3")
+        for file in os.listdir("./"):
+            if file.endswith(".mp3"):
+                name = file
+                print(f"Renamed File: {file}\n")
+                os.rename(file, "song.mp3")
 
-    voice.play(discord.FFmpegPCMAudio("song.mp3"),
-               after=lambda e: print(f"{name} has finished playing"))
-    voice.source = discord.PCMVolumeTransformer(voice.source)
-    voice.source.volume = 1
+        voice.play(discord.FFmpegPCMAudio("song.mp3"),
+                   after=lambda e: print(f"{name} has finished playing"))
+        voice.source = discord.PCMVolumeTransformer(voice.source)
+        voice.source.volume = 1
+    except Exception as e:
+        await error_log(message, e)
