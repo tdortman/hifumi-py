@@ -21,6 +21,7 @@ import reddit
 import music
 import encryption
 import pillow
+import tools
 from tools import error_log
 
 bot = discord.Client()
@@ -38,7 +39,7 @@ cookie_reactions = [
 
 async def message_in(message):
     try:
-        if message.content.startswith("h?"):
+        if message.content.startswith("h!"):
             cmd = message.content.split()[0][2:].lower()
 
             try:
@@ -106,6 +107,7 @@ async def reload_modules():
     importlib.reload(music)
     importlib.reload(reddit)
     importlib.reload(pillow)
+    importlib.reload(tools)
 
 
 def current_time():
