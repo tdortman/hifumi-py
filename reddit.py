@@ -3,7 +3,7 @@ import praw
 import datetime
 import random
 import prawcore
-from main import error_log
+from tools import error_log
 
 reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
                      client_secret='DFRuha1D_QLYm-AdCfQW54uiq1M',
