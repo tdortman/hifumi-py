@@ -3,7 +3,7 @@ import requests
 import shutil
 import discord
 import os
-from main import error_log
+from tools import error_log
 
 bot = discord.Client()
 

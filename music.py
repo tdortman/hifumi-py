@@ -2,7 +2,7 @@ import discord
 import os
 import youtube_dl
 from discord.utils import get
-from main import error_log
+from tools import error_log
 
 bot = discord.Client()
 

@@ -1,4 +1,4 @@
-from main import error_log
+from tools import error_log
 
 
 async def caeser_cipher(message):
