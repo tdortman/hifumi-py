@@ -44,7 +44,7 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    channel = await bot.fetch_channel(655484804405657642)
+    channel = bot.get_channel(655484804405657642)
     time = now.strftime("%d/%m/%Y %H:%M:%S")
     await channel.send(f"Logged in as:\n{bot.user.name}\nTime: {time}\n"
                        f"--------------------------")
