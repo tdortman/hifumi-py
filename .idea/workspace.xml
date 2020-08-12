@@ -19,12 +19,68 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="519501b4-d093-4054-93c5-d644496d5eca" name="Default Changelist" comment="Fixed numerous bugs">
+    <list default="true" id="519501b4-d093-4054-93c5-d644496d5eca" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261211573_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261214143_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261214553_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261215393_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261217453_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261219333_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261220323_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261221333_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261222213_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261224413_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261227453_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261230543_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261231143_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261231263_15.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261232323_14.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261237043_3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261237153_14.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261237343_23.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261237573_19.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261238383_15.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261305173.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261306173.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261307133.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261312043.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261313503.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261315293.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261339593.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261344493.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261352523.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261406063.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261406443.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261408093.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261422153.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261425103.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261502033_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261503373_18.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261856043.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261858043.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/191126211727.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/191126211904.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/191126212103.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/191126212152.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/191126213124.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/191126213155.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/191210110434.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/191216003225.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/200108222034.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/200110160804.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/200110162518.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/200110163442.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/200110174125.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/200110174145.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_qr_code/191126213743.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_qr_code/191126213835.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_qr_code/191126213906.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_qr_code/191126213941.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_qr_code/191126220642.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_qr_code/191126220649.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hifumi_qr_code/200504224131.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/init.py" beforeDir="false" afterPath="$PROJECT_DIR$/init.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pillow.py" beforeDir="false" afterPath="$PROJECT_DIR$/pillow.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reddit.py" beforeDir="false" afterPath="$PROJECT_DIR$/reddit.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,7 +160,7 @@
       <workItem from="1590251243631" duration="111000" />
       <workItem from="1590351098011" duration="1681000" />
       <workItem from="1590353497340" duration="601000" />
-      <workItem from="1597267179122" duration="4176000" />
+      <workItem from="1597267179122" duration="5176000" />
     </task>
     <task id="LOCAL-00001" summary="Split Hifumi into multiple files">
       <created>1588624215370</created>
@@ -260,7 +316,14 @@
       <option name="project" value="LOCAL" />
       <updated>1590353784633</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="Fixed numerous bugs, added some image functionalities">
+      <created>1597273828184</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1597273828184</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -293,13 +356,14 @@
     <MESSAGE value="little qol changes" />
     <MESSAGE value="Added error log, moved core functionality to init file" />
     <MESSAGE value="Moved error log to separate file" />
-    <option name="LAST_COMMIT_MESSAGE" value="Moved error log to separate file" />
+    <MESSAGE value="Fixed numerous bugs, added some image functionalities" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed numerous bugs, added some image functionalities" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="588" y="92" key="CommitChangelistDialog2" timestamp="1597268102482">
+    <state x="588" y="92" key="CommitChangelistDialog2" timestamp="1597273826999">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="588" y="92" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1597268102482" />
+    <state x="588" y="92" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1597273826999" />
     <state width="538" height="883" key="GridCell.Tab.0.bottom" timestamp="1588784556163">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
@@ -332,10 +396,10 @@
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
     <state width="1639" height="336" key="GridCell.Tab.1.right/0.0.1680.1010@0.0.1680.1010" timestamp="1588637363384" />
-    <state x="454" y="260" key="Vcs.Push.Dialog.v2" timestamp="1597268063560">
+    <state x="454" y="260" key="Vcs.Push.Dialog.v2" timestamp="1597273837044">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="454" y="260" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1597268063560" />
+    <state x="454" y="260" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1597273837044" />
     <state x="391" y="234" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1588637361521">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
