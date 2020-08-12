@@ -7,23 +7,14 @@ bot = discord.Client()
 start_time = main.current_time()
 main.passClientVar(bot)
 
-
 file = open(r"files/token.txt", "r")
 TOKEN = file.readline()
 file.close()
 
 
-file = open(r'files/dev_token.txt', 'r')
-dev = file.readline() == "True"
-file.close()
-
-
 @bot.event
 async def on_message(message):
-    if dev:
-        restart_shortcut = "hr~"
-    else:
-        restart_shortcut = "hr~~~"
+    restart_shortcut = "hr~~~"
     if message.content.startswith(restart_shortcut):
         if message.author.id == 258993932262834188:
             try:

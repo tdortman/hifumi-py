@@ -79,7 +79,6 @@
       <change beforePath="$PROJECT_DIR$/hifumi_qr_code/191126220642.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/hifumi_qr_code/191126220649.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/hifumi_qr_code/200504224131.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,7 +101,29 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="restartRequiresConfirmation" value="false" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.init">
+    <configuration name="init" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="HifuBot" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/init.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="HifuBot" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -127,6 +148,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.init" />
         <item itemvalue="Python.main" />
       </list>
     </recent_temporary>
@@ -159,7 +181,7 @@
       <workItem from="1590251243631" duration="111000" />
       <workItem from="1590351098011" duration="1681000" />
       <workItem from="1590353497340" duration="601000" />
-      <workItem from="1597267179122" duration="5557000" />
+      <workItem from="1597267179122" duration="5959000" />
     </task>
     <task id="LOCAL-00001" summary="Split Hifumi into multiple files">
       <created>1588624215370</created>
@@ -329,7 +351,14 @@
       <option name="project" value="LOCAL" />
       <updated>1597274806985</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="got rid of saucenao">
+      <created>1597275165166</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1597275165166</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -364,13 +393,14 @@
     <MESSAGE value="Moved error log to separate file" />
     <MESSAGE value="Fixed numerous bugs, added some image functionalities" />
     <MESSAGE value="shows utc time now, cause why not" />
-    <option name="LAST_COMMIT_MESSAGE" value="shows utc time now, cause why not" />
+    <MESSAGE value="got rid of saucenao" />
+    <option name="LAST_COMMIT_MESSAGE" value="got rid of saucenao" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="588" y="92" key="CommitChangelistDialog2" timestamp="1597274806111">
+    <state x="588" y="92" key="CommitChangelistDialog2" timestamp="1597275164211">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="588" y="92" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1597274806111" />
+    <state x="588" y="92" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1597275164211" />
     <state width="538" height="883" key="GridCell.Tab.0.bottom" timestamp="1588784556163">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
@@ -403,10 +433,10 @@
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
     <state width="1639" height="336" key="GridCell.Tab.1.right/0.0.1680.1010@0.0.1680.1010" timestamp="1588637363384" />
-    <state x="454" y="260" key="Vcs.Push.Dialog.v2" timestamp="1597274812352">
+    <state x="454" y="260" key="Vcs.Push.Dialog.v2" timestamp="1597275166656">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="454" y="260" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1597274812352" />
+    <state x="454" y="260" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1597275166656" />
     <state x="391" y="234" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1588637361521">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>

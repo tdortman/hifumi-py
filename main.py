@@ -41,7 +41,7 @@ cookie_reactions = [
 
 async def message_in(message):
     try:
-        if message.content.startswith("h?"):
+        if message.content.startswith("h!"):
             cmd = message.content.split()[0][2:].lower()
 
             try:
