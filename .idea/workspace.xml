@@ -19,9 +19,12 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="519501b4-d093-4054-93c5-d644496d5eca" name="Default Changelist" comment="">
+    <list default="true" id="519501b4-d093-4054-93c5-d644496d5eca" name="Default Changelist" comment="Fixed numerous bugs">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/init.py" beforeDir="false" afterPath="$PROJECT_DIR$/init.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pillow.py" beforeDir="false" afterPath="$PROJECT_DIR$/pillow.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reddit.py" beforeDir="false" afterPath="$PROJECT_DIR$/reddit.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,6 +34,7 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="JupyterTrust" id="5aa8a1bf-f22f-4eca-a9fc-a58a3f2451f8" />
   <component name="ProjectId" id="1bSQPxCnwuqLdX1ZuC0boUXvxlM" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -72,6 +76,7 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -99,6 +104,7 @@
       <workItem from="1590251243631" duration="111000" />
       <workItem from="1590351098011" duration="1681000" />
       <workItem from="1590353497340" duration="601000" />
+      <workItem from="1597267179122" duration="4176000" />
     </task>
     <task id="LOCAL-00001" summary="Split Hifumi into multiple files">
       <created>1588624215370</created>
@@ -258,7 +264,7 @@
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="2" />
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -290,10 +296,10 @@
     <option name="LAST_COMMIT_MESSAGE" value="Moved error log to separate file" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="588" y="92" key="CommitChangelistDialog2" timestamp="1590353783763">
+    <state x="588" y="92" key="CommitChangelistDialog2" timestamp="1597268102482">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="588" y="92" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1590353783763" />
+    <state x="588" y="92" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1597268102482" />
     <state width="538" height="883" key="GridCell.Tab.0.bottom" timestamp="1588784556163">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
@@ -326,10 +332,10 @@
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
     <state width="1639" height="336" key="GridCell.Tab.1.right/0.0.1680.1010@0.0.1680.1010" timestamp="1588637363384" />
-    <state x="454" y="260" key="Vcs.Push.Dialog.v2" timestamp="1590353794502">
+    <state x="454" y="260" key="Vcs.Push.Dialog.v2" timestamp="1597268063560">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="454" y="260" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1590353794502" />
+    <state x="454" y="260" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1597268063560" />
     <state x="391" y="234" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1588637361521">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>

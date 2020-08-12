@@ -1,13 +1,11 @@
-import datetime
 import operator
 import random
 import urllib
-import urllib.request
+from urllib import request
 import discord
 import qrcode
 from udpy import UrbanClient
 import asyncio
-from datetime import datetime
 import importlib
 from PIL import Image
 import requests
@@ -15,16 +13,22 @@ import shutil
 import os
 from pathlib import Path
 from PIL import ImageFile
-
-
+from saucenao_api import SauceNao
+from saucenao_api.params import DB, Hide, Bgcolor
+import time
 import reddit
 import music
 import encryption
 import pillow
-import tools
 from tools import error_log
 
-bot = discord.Client()
+bot = None
+
+
+def passClientVar(client):
+    global bot
+    bot = client
+
 
 # Reactions (will do extra files for them eventually)
 pat_reactions = [
@@ -39,7 +43,7 @@ cookie_reactions = [
 
 async def message_in(message):
     try:
-        if message.content.startswith("h!"):
+        if message.content.startswith("h?"):
             cmd = message.content.split()[0][2:].lower()
 
             try:
@@ -77,19 +81,19 @@ async def message_in(message):
             if cmd == "bye":
                 await bye(message)
             if cmd in ["join", "j", "joi"]:
-                await music.join(message)
+                await message.channel.send("Sorry, this command is currently unavailable!")
             if cmd in ["leave", "leav", "l"]:
-                await music.leave(message)
+                await message.channel.send("Sorry, this command is currently unavailable!")
             if cmd in ["play", "p"]:
                 await message.channel.send("Sorry, this command is currently unavailable!")
             if cmd == "urban":
-                await urban(message)
+                await message.channel.send("An error occurred! Please try again later")
             if cmd == "calc":
                 await calc(message)
             if cmd == "coinflip":
                 await coinflip(message)
             if cmd == "numguess":
-                await numguess(message)
+                await message.channel.send("An error occurred! Please try again later")
             if cmd == "cuddle":
                 await cuddle(message)
             if cmd == "qr":
@@ -98,6 +102,12 @@ async def message_in(message):
                 await test(message)
             if cmd == "error":
                 await error_log(message, "This is a test error!")
+            # if cmd == "sauce":
+            # await sauce(message)
+            if cmd == "resize":
+                await pillow.resize_img(message)
+            if cmd == 'imgur':
+                await pillow.imgur(message)
     except Exception as e:
         await error_log(message, e)
 
@@ -107,11 +117,39 @@ async def reload_modules():
     importlib.reload(music)
     importlib.reload(reddit)
     importlib.reload(pillow)
-    importlib.reload(tools)
 
 
 def current_time():
-    return datetime.utcnow()
+    return int(time.time())
+
+
+async def sauce(message):
+    sauce = SauceNao(api_key=None, testmode=0, dbmask=None, dbmaski=None,
+                     db=DB.ALL, numres=6, hide=Hide.NONE, bgcolor=Bgcolor.NONE)
+
+    url = message.content.split()[1]
+    # url = "https://cdn.discordapp.com/attachments/551588329003548683/715332085572829184/73375795_p0_master1200.jpg"
+
+    r = requests.get(
+        url, stream=True, headers={
+            'User-agent': 'Mozilla/5.0'})
+
+    with open(f"files/test_sauce.png", 'wb') as f:
+        r.raw.decode_content = True
+        shutil.copyfileobj(r.raw, f)
+
+    results = sauce.from_url(url)
+
+    if results[0].author is not None:
+        desc = f"[Link to image by {results[0].author}]({results[0].url})"
+    else:
+        desc = None
+
+    embed = discord.Embed(title=results[0].title, description=desc, colour=0xce3a9b)
+    # embed.se
+    embed.set_footer(text=f"Similarity: {results[0].similarity}%  ")
+
+    await message.channel.send(embed=embed)
 
 
 async def emoji(message):
@@ -125,11 +163,6 @@ async def emoji(message):
                 img_type = 'png'
             elif 'gif' in url:
                 img_type = 'gif'
-
-            if img_type == "gif":
-                if getsizes(url) > 256000:
-                    await message.channel.send("This gif is too big to be uploaded! Try resizing it first.")
-                    return
 
             r = requests.get(
                 url, stream=True, headers={
@@ -151,6 +184,10 @@ async def emoji(message):
                     hsize = int((float(img.size[1]) * float(wpercent)))
                     img = img.resize((basewidth, hsize), Image.ANTIALIAS)
                     img.save(f"emojis/{name}.{img_type}")
+
+                elif Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and img_type == "gif":
+                    await message.channel.send("This gif is too big to be uploaded! Try resizing it first.")
+                    return
 
                 with open(
                         f"emojis/{name}.{img_type}", "rb") as picture:
@@ -224,7 +261,6 @@ async def bye(message):
         await error_log(message, e)
 
 
-@bot.event
 async def urban(message):
     try:
         client = UrbanClient()
@@ -237,7 +273,6 @@ async def urban(message):
         defs_sliced = defs[:5]
         pages = []
         for i in range(5):
-
             desc = f"**Definition**:\n{str(defs_sliced[i].definition).replace('[', '').replace(']', '')}\n\n" \
                    f"**Example**:\n{defs_sliced[i].example.replace('[', '').replace(']', '')}"
             footer = f"Upvotes: {defs_sliced[i].upvotes}  Downvotes: {defs_sliced[i].downvotes}\nPage {i + 1}/5"
@@ -318,8 +353,6 @@ async def coinflip(message):
 async def qr(message):
     try:
         m = " ".join(message.content.split()[1:])
-        now = datetime.now()
-        current_time = now.strftime("%Y%m%d%H%M%S")
 
         qr = qrcode.QRCode(
             version=1,
@@ -330,15 +363,15 @@ async def qr(message):
         qr.add_data(m)
         qr.make(fit=True)
 
-        file_name = '{0}.png'.format(current_time[2:])
         img = qr.make_image(fill_color="black", back_color="white")
 
-        img.save(r'C:\Users\TIMBOLA\Desktop\HifuBot Dev\hifumi_qr_code\{0}'.format(
-            file_name))
-        with open(
-                r'C:\Users\TIMBOLA\Desktop\HifuBot Dev\hifumi_qr_code\{0}'.format(
-                    file_name), 'rb') as picture:
-            await message.channel.send(file=discord.File(picture, "new_filename.png"))
+        img.save('hifumi_qr_code/unknown.png')
+
+        with open('hifumi_qr_code/unknown.png', 'rb') as picture:
+            await message.channel.send(file=discord.File(picture, "unknown.png"))
+
+        os.remove('hifumi_qr_code/unknown.png')
+
     except Exception as e:
         await error_log(message, e)
 
@@ -358,8 +391,6 @@ async def cuddle(message):
 
 
 async def numguess(message):
-    await message.channel.send("An error occurred! Please try again later")
-    return
     try:
         number = random.randint(1, 100)
         turns = 5
@@ -411,4 +442,3 @@ async def numguess(message):
         return
     except Exception as e:
         await error_log(message, e)
-
