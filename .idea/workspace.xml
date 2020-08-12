@@ -20,7 +20,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="519501b4-d093-4054-93c5-d644496d5eca" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261211573_1.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261214143_1.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261214553_1.png" beforeDir="false" />
@@ -80,7 +79,7 @@
       <change beforePath="$PROJECT_DIR$/hifumi_qr_code/191126220642.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/hifumi_qr_code/191126220649.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/hifumi_qr_code/200504224131.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/init.py" beforeDir="false" afterPath="$PROJECT_DIR$/init.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -160,7 +159,7 @@
       <workItem from="1590251243631" duration="111000" />
       <workItem from="1590351098011" duration="1681000" />
       <workItem from="1590353497340" duration="601000" />
-      <workItem from="1597267179122" duration="5176000" />
+      <workItem from="1597267179122" duration="5557000" />
     </task>
     <task id="LOCAL-00001" summary="Split Hifumi into multiple files">
       <created>1588624215370</created>
@@ -323,7 +322,14 @@
       <option name="project" value="LOCAL" />
       <updated>1597273828184</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="shows utc time now, cause why not">
+      <created>1597274806985</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1597274806985</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -357,13 +363,14 @@
     <MESSAGE value="Added error log, moved core functionality to init file" />
     <MESSAGE value="Moved error log to separate file" />
     <MESSAGE value="Fixed numerous bugs, added some image functionalities" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed numerous bugs, added some image functionalities" />
+    <MESSAGE value="shows utc time now, cause why not" />
+    <option name="LAST_COMMIT_MESSAGE" value="shows utc time now, cause why not" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="588" y="92" key="CommitChangelistDialog2" timestamp="1597273826999">
+    <state x="588" y="92" key="CommitChangelistDialog2" timestamp="1597274806111">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="588" y="92" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1597273826999" />
+    <state x="588" y="92" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1597274806111" />
     <state width="538" height="883" key="GridCell.Tab.0.bottom" timestamp="1588784556163">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
@@ -396,10 +403,10 @@
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
     <state width="1639" height="336" key="GridCell.Tab.1.right/0.0.1680.1010@0.0.1680.1010" timestamp="1588637363384" />
-    <state x="454" y="260" key="Vcs.Push.Dialog.v2" timestamp="1597273837044">
+    <state x="454" y="260" key="Vcs.Push.Dialog.v2" timestamp="1597274812352">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="454" y="260" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1597273837044" />
+    <state x="454" y="260" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1597274812352" />
     <state x="391" y="234" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1588637361521">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
