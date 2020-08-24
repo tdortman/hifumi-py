@@ -13,8 +13,6 @@ import shutil
 import os
 from pathlib import Path
 from PIL import ImageFile
-from saucenao_api import SauceNao
-from saucenao_api.params import DB, Hide, Bgcolor
 from datetime import datetime as dt
 import time
 import reddit

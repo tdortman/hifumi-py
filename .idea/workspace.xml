@@ -19,8 +19,24 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="519501b4-d093-4054-93c5-d644496d5eca" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="519501b4-d093-4054-93c5-d644496d5eca" name="Default Changelist" comment="little tweaks">
+      <change beforePath="$PROJECT_DIR$/emojis/02hype.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emojis/02jam.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emojis/OMEGALMAO.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emojis/chikadance.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emojis/cutiepeek.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emojis/dokidoki2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emojis/naosigh.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emojis/nyanSenko.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emojis/nyanSenko.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emojis/nyanSenko_still.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emojis/owogiggle.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emojis/pensiveheh.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emojis/sugoi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emojis/tamapat.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emojis/tamapat2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emojis/testuwu.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emojis/uwu.gif" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261211573_1.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261214143_1.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/hifumi_cipher_images/1911261214553_1.png" beforeDir="false" />
@@ -183,6 +199,7 @@
       <workItem from="1590351098011" duration="1681000" />
       <workItem from="1590353497340" duration="601000" />
       <workItem from="1597267179122" duration="6376000" />
+      <workItem from="1598283153894" duration="301000" />
     </task>
     <task id="LOCAL-00001" summary="Split Hifumi into multiple files">
       <created>1588624215370</created>
@@ -366,7 +383,14 @@
       <option name="project" value="LOCAL" />
       <updated>1597275885367</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="Added currency conversion and multiple little QOL change">
+      <created>1598283420457</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1598283420457</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -403,13 +427,14 @@
     <MESSAGE value="shows utc time now, cause why not" />
     <MESSAGE value="got rid of saucenao" />
     <MESSAGE value="little tweaks" />
-    <option name="LAST_COMMIT_MESSAGE" value="little tweaks" />
+    <MESSAGE value="Added currency conversion and multiple little QOL change" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added currency conversion and multiple little QOL change" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="588" y="92" key="CommitChangelistDialog2" timestamp="1597275884391">
+    <state x="884" y="98" key="CommitChangelistDialog2" timestamp="1598283419318">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="588" y="92" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1597275884391" />
+    <state x="884" y="98" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1598283419318" />
     <state width="538" height="883" key="GridCell.Tab.0.bottom" timestamp="1597275967552">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
@@ -426,30 +451,10 @@
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
     <state width="538" height="883" key="GridCell.Tab.0.right/0.0.1680.1010@0.0.1680.1010" timestamp="1597275967552" />
-    <state width="1639" height="336" key="GridCell.Tab.1.bottom" timestamp="1588637363384">
+    <state x="690" y="252" key="Vcs.Push.Dialog.v2" timestamp="1598283696325">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state width="1639" height="336" key="GridCell.Tab.1.bottom/0.0.1680.1010@0.0.1680.1010" timestamp="1588637363384" />
-    <state width="1639" height="336" key="GridCell.Tab.1.center" timestamp="1588637363384">
-      <screen x="0" y="0" width="1680" height="1010" />
-    </state>
-    <state width="1639" height="336" key="GridCell.Tab.1.center/0.0.1680.1010@0.0.1680.1010" timestamp="1588637363384" />
-    <state width="1639" height="336" key="GridCell.Tab.1.left" timestamp="1588637363384">
-      <screen x="0" y="0" width="1680" height="1010" />
-    </state>
-    <state width="1639" height="336" key="GridCell.Tab.1.left/0.0.1680.1010@0.0.1680.1010" timestamp="1588637363384" />
-    <state width="1639" height="336" key="GridCell.Tab.1.right" timestamp="1588637363384">
-      <screen x="0" y="0" width="1680" height="1010" />
-    </state>
-    <state width="1639" height="336" key="GridCell.Tab.1.right/0.0.1680.1010@0.0.1680.1010" timestamp="1588637363384" />
-    <state x="454" y="260" key="Vcs.Push.Dialog.v2" timestamp="1597275887023">
-      <screen x="0" y="0" width="1680" height="1010" />
-    </state>
-    <state x="454" y="260" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1597275887023" />
-    <state x="391" y="234" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1588637361521">
-      <screen x="0" y="0" width="1680" height="1010" />
-    </state>
-    <state x="391" y="234" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.1680.1010@0.0.1680.1010" timestamp="1588637361521" />
+    <state x="690" y="252" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1598283696325" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/HifuBot$main.coverage" NAME="main Coverage Results" MODIFIED="1588784488918" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
