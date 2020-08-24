@@ -5,6 +5,8 @@ import discord
 import os
 from imgurpython import ImgurClient
 from tools import error_log
+import pytesseract
+
 
 bot = discord.Client()
 
@@ -121,5 +123,19 @@ async def imgur(message):
         await message.channel.send(f"{img['link']}")
 
     os.remove(f"files/imgur.{img_type}")
+
+
+async def download_from_url(url):
+    r = requests.get(
+        url, stream=True, headers={
+            'User-agent': 'Mozilla/5.0'})
+
+    with open(f"files/attachment.png", 'wb') as f:
+        r.raw.decode_content = True
+        shutil.copyfileobj(r.raw, f)
+
+
+async def extract_string_image(message):
+    await message.channel.send(pytesseract.image_to_string(Image.open('files/test.png')))
 
 

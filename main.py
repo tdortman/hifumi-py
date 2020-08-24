@@ -13,11 +13,15 @@ import shutil
 import os
 from pathlib import Path
 from PIL import ImageFile
+from saucenao_api import SauceNao
+from saucenao_api.params import DB, Hide, Bgcolor
+from datetime import datetime as dt
 import time
 import reddit
 import music
 import encryption
 import pillow
+import tools
 from tools import error_log
 
 bot = None
@@ -96,8 +100,8 @@ async def message_in(message):
                 await cuddle(message)
             if cmd == "qr":
                 await qr(message)
-            if cmd == "test":
-                await test(message)
+            if cmd in ['convert', 'conv', 'con', 'c']:
+                await convert(message)
             if cmd == "error":
                 await error_log(message, "This is a test error!")
             # if cmd == "sauce":
@@ -106,6 +110,8 @@ async def message_in(message):
                 await pillow.resize_img(message)
             if cmd == 'imgur':
                 await pillow.imgur(message)
+            if cmd in ['currencies', 'currency', 'cur', 'cu']:
+                await currency_codes(message)
     except Exception as e:
         await error_log(message, e)
 
@@ -115,10 +121,119 @@ async def reload_modules():
     importlib.reload(music)
     importlib.reload(reddit)
     importlib.reload(pillow)
+    importlib.reload(tools)
 
 
 def current_time():
     return int(time.time())
+
+
+currencies = {
+    'EUR': 'Euro', 'AED': 'Emirati Dirham', 'AUD': 'Australian Dollar', 'ARS': 'Argentine Peso',
+    'BGN': 'Bulgarian lev', 'BRL': 'Brazilian Real', 'BSD': 'Bahamian Dollar', 'CAD': 'Canadian Dollar',
+    'CHF': 'Swiss Franc', 'CLP': 'Chilean Peso', 'CNY': 'Chinese Yuan', 'COP': 'Colombian Peso',
+    'CZK': 'Czech Koruna', 'DKK': 'Danish Krone', 'DOP': 'Dominican Peso', 'EGP': 'Egyptian Pound',
+    'FJD': 'Fijian Dollar', 'GBP': 'Pound Sterling', 'GTQ': 'Guatemalan Quetzal', 'HKD': 'Hong Kong Dollar',
+    'HRK': 'Croatian Kuna', 'HUF': 'Hungarian Forint', 'IDR': 'Indonesian Rupiah', 'ILS': 'Israeli Shekel',
+    'INR': 'Indian Rupee', 'ISK': 'Icelandic Króna', 'JPY': 'Japanese Yen', 'KRW': 'South Korean Won',
+    'KZT': 'Kazakhstani Tenge', 'MVR': 'Maldivian Rufiyaa', 'MXN': 'Mexican Peso', 'MYR': 'Malaysian Ringgit',
+    'NOK': 'Norwegian Krone', 'NZD': 'New Zealand Dollar', 'PEN': 'Peruvian Sol', 'PHP': 'Philippine Peso',
+    'PKR': 'Pakistani Rupee', 'PLN': 'Polish Złoty', 'PYG': 'Paraguayan Guaraní', 'RON': 'Romanian Leu',
+    'RUB': 'Russian Rouble', 'SAR': 'Saudi Riyal', 'SEK': 'Swedish Krona', 'SGD': 'Singapore Dollar',
+    'THB': 'Thai Baht', 'TRY': 'Turkish Lira', 'TWD': 'New Taiwan Dollar', 'UAH': 'Ukrainian Hryvnia',
+    'USD': 'United States Dollar', 'UYU': 'Uruguayan Peso', 'ZAR': 'South African Rand'
+}
+
+
+async def convert(message):
+    try:
+        content = message.content.split()
+        if len(content) == 1:
+            await message.channel.send("You have to specify the amount of money you want to convert, as well as the "
+                                       "currencies!")
+            return
+
+        val, cur1, cur2 = float(content[1]), content[2].upper(), content[3].upper()
+
+        url = f'https://prime.exchangerate-api.com/v5/7113ac9174ade28a0e1e5eed/latest/{cur1}'
+        response = requests.get(url)
+        result = response.json()
+        if result['result'] == 'error':
+            if result['error'] == 'unknown-code':
+                await message.channel.send(f"{cur1} is not a valid currency code!")
+            else:
+                await message.channel.send("An unknown error occurred! Please try again later!")
+            return
+
+        data = result['conversion_rates']
+
+        if cur2 not in data:
+            await message.channel.send(f"{cur2} is not a valid currency code!")
+            return
+        rslt = round(val * data[cur2], 2)
+        desc = f"**{round(val)} {cur1} ≈ {rslt} {cur2}**\n\n" \
+               f"Exchange rate:\n1 {cur1} ≈ {data[cur2]} {cur2}"
+
+        embed = discord.Embed(description=desc, title=f"Converting {currencies[cur1]} into {currencies[cur2]}",
+                              color=0xce3a9b)
+        embed.set_footer(text=f"{dt.utcnow().strftime('%d/%m/%Y %H:%M:%S')} UTC\nUse the command h!currencies for a "
+                              f"list of currencies available for conversion")
+        await message.channel.send(embed=embed)
+
+    except Exception as e:
+        await error_log(message, e)
+
+
+async def currency_codes(message):
+    title = 'List of currencies available for conversion'
+    columns = ["", "", ""]
+    currency_keys = sorted(list(currencies))
+
+    for i in range(len(currency_keys)):
+        if i <= 16:
+            columns[0] += str(f"**{currency_keys[i]}** - {currencies[str(currency_keys[i])]}\n")
+        elif 17 <= i <= 33:
+            columns[1] += str(f"**{currency_keys[i]}** - {currencies[str(currency_keys[i])]}\n")
+        else:
+            columns[2] += str(f"**{currency_keys[i]}** - {currencies[str(currency_keys[i])]}\n")
+
+    embed = discord.Embed(title=title, color=0xce3a9b)
+    for i in range(3):
+        embed.add_field(name='\u200b', value=columns[i])
+    await message.channel.send(embed=embed)
+
+
+async def description():
+    pass
+
+
+async def sauce(message):
+    sauce = SauceNao(api_key=None, testmode=0, dbmask=None, dbmaski=None,
+                     db=DB.ALL, numres=6, hide=Hide.NONE, bgcolor=Bgcolor.NONE)
+
+    url = message.content.split()[1]
+    # url = "https://cdn.discordapp.com/attachments/551588329003548683/715332085572829184/73375795_p0_master1200.jpg"
+
+    r = requests.get(
+        url, stream=True, headers={
+            'User-agent': 'Mozilla/5.0'})
+
+    with open(f"files/test_sauce.png", 'wb') as f:
+        r.raw.decode_content = True
+        shutil.copyfileobj(r.raw, f)
+
+    results = sauce.from_url(url)
+
+    if results[0].author is not None:
+        desc = f"[Link to image by {results[0].author}]({results[0].url})"
+    else:
+        desc = None
+
+    embed = discord.Embed(title=results[0].title, description=desc, colour=0xce3a9b)
+    # embed.se
+    embed.set_footer(text=f"Similarity: {results[0].similarity}%  ")
+
+    await message.channel.send(embed=embed)
 
 
 async def emoji(message):
@@ -338,7 +453,6 @@ async def qr(message):
 
         with open('hifumi_qr_code/unknown.png', 'rb') as picture:
             await message.channel.send(file=discord.File(picture, "unknown.png"))
-
         os.remove('hifumi_qr_code/unknown.png')
 
     except Exception as e:

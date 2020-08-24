@@ -2,7 +2,12 @@ from datetime import datetime
 import traceback
 import discord
 
-bot = discord.Client()
+bot = None
+
+
+def passClientVar(client):
+    global bot
+    bot = client
 
 
 async def error_log(message=None, error_msg=None, cmd=None):
@@ -44,3 +49,10 @@ async def error_log(message=None, error_msg=None, cmd=None):
         await channel.send(f"An Error occurred on {current_time}\nCheck console for full error (2000 character limit)\n"
                            f"<@258993932262834188>")
         print(msg)
+
+
+async def download_attachments(message):
+    if message.attachments and not message.author.bot:
+        for item in message.attachments:
+            attach = await item.to_file(use_cached=True)
+            await message.channel.send(file=attach)

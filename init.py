@@ -2,10 +2,12 @@ from datetime import datetime as dt
 from importlib import reload
 import discord
 import main
+import tools
 
 bot = discord.Client()
 start_time = main.current_time()
 main.passClientVar(bot)
+tools.passClientVar(bot)
 
 file = open(r"files/token.txt", "r")
 TOKEN = file.readline()
