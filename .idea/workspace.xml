@@ -20,6 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="519501b4-d093-4054-93c5-d644496d5eca" name="Default Changelist" comment="little tweaks">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/emojis/02hype.gif" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/emojis/02jam.jpg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/emojis/OMEGALMAO.png" beforeDir="false" />
@@ -96,6 +97,7 @@
       <change beforePath="$PROJECT_DIR$/hifumi_qr_code/191126220642.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/hifumi_qr_code/191126220649.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/hifumi_qr_code/200504224131.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pillow.py" beforeDir="false" afterPath="$PROJECT_DIR$/pillow.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -199,7 +201,7 @@
       <workItem from="1590351098011" duration="1681000" />
       <workItem from="1590353497340" duration="601000" />
       <workItem from="1597267179122" duration="6376000" />
-      <workItem from="1598283153894" duration="301000" />
+      <workItem from="1598283153894" duration="915000" />
     </task>
     <task id="LOCAL-00001" summary="Split Hifumi into multiple files">
       <created>1588624215370</created>
@@ -390,7 +392,14 @@
       <option name="project" value="LOCAL" />
       <updated>1598283420457</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="saucenao..">
+      <created>1598283714799</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1598283714799</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -428,13 +437,14 @@
     <MESSAGE value="got rid of saucenao" />
     <MESSAGE value="little tweaks" />
     <MESSAGE value="Added currency conversion and multiple little QOL change" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added currency conversion and multiple little QOL change" />
+    <MESSAGE value="saucenao.." />
+    <option name="LAST_COMMIT_MESSAGE" value="saucenao.." />
   </component>
   <component name="WindowStateProjectService">
-    <state x="884" y="98" key="CommitChangelistDialog2" timestamp="1598283419318">
+    <state x="884" y="85" width="775" height="837" key="CommitChangelistDialog2" timestamp="1598284011529">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="884" y="98" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1598283419318" />
+    <state x="884" y="85" width="775" height="837" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1598284011529" />
     <state width="538" height="883" key="GridCell.Tab.0.bottom" timestamp="1597275967552">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
@@ -451,10 +461,10 @@
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
     <state width="538" height="883" key="GridCell.Tab.0.right/0.0.1680.1010@0.0.1680.1010" timestamp="1597275967552" />
-    <state x="690" y="252" key="Vcs.Push.Dialog.v2" timestamp="1598283696325">
+    <state x="690" y="252" key="Vcs.Push.Dialog.v2" timestamp="1598283720170">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="690" y="252" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1598283696325" />
+    <state x="690" y="252" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1598283720170" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/HifuBot$main.coverage" NAME="main Coverage Results" MODIFIED="1588784488918" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

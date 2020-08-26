@@ -6,9 +6,16 @@ import os
 from imgurpython import ImgurClient
 from tools import error_log
 import pytesseract
+from urllib.request import Request, urlopen
+from PIL import ImageFile
+
+bot = None
 
 
-bot = discord.Client()
+def passClientVar(client):
+    global bot
+    bot = client
+
 
 client_id = 'e6520e1c5f89fea'
 client_secret = '38894f326220d5f45e6d7b2adea5635408e6fe71'
@@ -71,58 +78,188 @@ async def resize(file_location: str, width: int, save_location: str = None):
 
 
 async def resize_img(message):
+    global img_type
     try:
-        img_url = message.content.split()[1]
-        width = int(message.content.split()[-1])
+        img_url = message.content.split()[-1]
+        width = int(message.content.split()[1])
+
+        if 'jpg' in img_url:
+            img_type = 'jpg'
+        elif 'png' in img_url:
+            img_type = 'png'
+        elif 'gif' in img_url:
+            img_type = 'gif'
 
         r = requests.get(
             img_url, stream=True, headers={
                 'User-agent': 'Mozilla/5.0'})
 
-        with open(f"files/unknown.png", 'wb') as f:
+        with open(f"files/unknown.{img_type}", 'wb') as f:
             r.raw.decode_content = True
             shutil.copyfileobj(r.raw, f)
 
-        await resize(f"files/unknown.png", width, f"files/unknown_resized.png")
+        image = Image.open(f"files/unknown.{img_type}")
+        width_res, height_res = image.size
+        print(width_res, height_res)
 
-        if os.stat("files/unknown_resized.png").st_size > 8000000:
-            await message.channel.send("Your image is over 8MB big, try resizing it first.")
+        if img_type != 'gif':
+            await resize(f"files/unknown.{img_type}", width, f"files/unknown_resized.{img_type}")
+        elif img_type == 'gif' and width >= width_res:
+            await message.channel.send("Sorry, but you can't use this command for upscaling")
+            return
         else:
-            with open(f"files/unknown_resized.png", "rb") as g:
+            await resize_gif(message, f"files/unknown.{img_type}", f"files/unknown_resized.{img_type}", (width, width))
+
+        if 8000000 < os.stat(f"files/unknown_resized.{img_type}").st_size < 10000000:
+            await imgur(message, img_url)
+        elif os.stat(f"files/unknown_resized.{img_type}").st_size > 10000000:
+            await message.channel.send("Your image is over 8MB big, try resizing it first.")
+            return
+        else:
+            with open(f"files/unknown_resized.{img_type}", "rb") as g:
                 picture = discord.File(g)
                 await message.channel.send(file=picture)
 
-        os.remove("files/unknown.png")
-        os.remove("files/unknown_resized.png")
+        # os.remove(f"files/unknown.{img_type}")
+        # os.remove(f"files/unknown_resized.{img_type}")
     except Exception as e:
         await error_log(message, e)
 
 
-async def imgur(message):
-    img_url = message.content.split()[1]
+async def resize_gif(message, path, save_as=None, resize_to=None):
+    """
+    Resizes the GIF to a given length:
 
-    if 'jpg' in img_url:
-        img_type = 'jpg'
-    elif 'png' in img_url:
-        img_type = 'png'
-    elif 'gif' in img_url:
-        img_type = 'gif'
+    Args:
+        path: the path to the GIF file
+        save_as (optional): Path of the resized gif. If not set, the original gif will be overwritten.
+        resize_to (optional): new size of the gif. Format: (int, int). If not set, the original GIF will be resized to
+                              half of its size.
+    """
+    all_frames = extract_and_resize_frames(path, resize_to)
 
-    r = requests.get(
-        img_url, stream=True, headers={
-            'User-agent': 'Mozilla/5.0'})
+    if not save_as:
+        save_as = path
 
-    with open(f"files/imgur.{img_type}", 'wb') as f:
-        r.raw.decode_content = True
-        shutil.copyfileobj(r.raw, f)
-
-    if os.stat(f"files/imgur.{img_type}").st_size > 10000000:
-        await message.channel.send("Your image is over 10MB big, try resizing it first.")
+    if len(all_frames) == 1:
+        await message.channel.send("Warning: only 1 frame found")
+        all_frames[0].save(save_as, optimize=True)
     else:
-        img = im.upload_from_path(f"files/imgur.{img_type}")
-        await message.channel.send(f"{img['link']}")
+        all_frames[0].save(save_as, optimize=True, save_all=True, append_images=all_frames[1:], loop=1000)
 
-    os.remove(f"files/imgur.{img_type}")
+
+def analyseImage(path):
+    """
+    Pre-process pass over the image to determine the mode (full or additive).
+    Necessary as assessing single frames isn't reliable. Need to know the mode
+    before processing all frames.
+    """
+    im = Image.open(path)
+    results = {
+        'size': im.size,
+        'mode': 'full',
+    }
+    try:
+        while True:
+            if im.tile:
+                tile = im.tile[0]
+                update_region = tile[1]
+                update_region_dimensions = update_region[2:]
+                if update_region_dimensions != im.size:
+                    results['mode'] = 'partial'
+                    break
+            im.seek(im.tell() + 1)
+    except EOFError:
+        pass
+    return results
+
+
+def extract_and_resize_frames(path, resize_to=None):
+    """
+    Iterate the GIF, extracting each frame and resizing them
+
+    Returns:
+        An array of all frames
+    """
+    mode = analyseImage(path)['mode']
+
+    im = Image.open(path)
+
+    if not resize_to:
+        resize_to = (im.size[0] // 2, im.size[1] // 2)
+
+    i = 0
+    p = im.getpalette()
+    last_frame = im.convert('RGBA')
+
+    all_frames = []
+
+    try:
+        while True:
+            # print("saving %s (%s) frame %d, %s %s" % (path, mode, i, im.size, im.tile))
+
+            '''
+            If the GIF uses local colour tables, each frame will have its own palette.
+            If not, we need to apply the global palette to the new frame.
+            '''
+            if not im.getpalette():
+                im.putpalette(p)
+
+            new_frame = Image.new('RGBA', im.size)
+
+            '''
+            Is this file a "partial"-mode GIF where frames update a region of a different size to the entire image?
+            If so, we need to construct the new frame by pasting it on top of the preceding frames.
+            '''
+            if mode == 'partial':
+                new_frame.paste(last_frame)
+
+            new_frame.paste(im, (0, 0), im.convert('RGBA'))
+
+            new_frame.thumbnail(resize_to, Image.ANTIALIAS)
+            all_frames.append(new_frame)
+
+            i += 1
+            last_frame = new_frame
+            im.seek(im.tell() + 1)
+    except EOFError:
+        pass
+
+    return all_frames
+
+
+async def imgur(message, url=None):
+    try:
+        if url:
+            img_url = url
+        else:
+            img_url = message.content.split()[1]
+
+        if 'jpg' in img_url:
+            img_type = 'jpg'
+        elif 'png' in img_url:
+            img_type = 'png'
+        elif 'gif' in img_url:
+            img_type = 'gif'
+
+        r = requests.get(
+            img_url, stream=True, headers={
+                'User-agent': 'Mozilla/5.0'})
+
+        with open(f"files/imgur.{img_type}", 'wb') as f:
+            r.raw.decode_content = True
+            shutil.copyfileobj(r.raw, f)
+
+        if os.stat(f"files/imgur.{img_type}").st_size > 10000000:
+            await message.channel.send("Your image is over 10MB big, try resizing it first.")
+        else:
+            img = im.upload_from_path(f"files/imgur.{img_type}")
+            await message.channel.send(f"{img['link']}")
+
+        os.remove(f"files/imgur.{img_type}")
+
+    except Exception as e:
+        await error_log(message, e)
 
 
 async def download_from_url(url):
@@ -137,5 +274,3 @@ async def download_from_url(url):
 
 async def extract_string_image(message):
     await message.channel.send(pytesseract.image_to_string(Image.open('files/test.png')))
-
-

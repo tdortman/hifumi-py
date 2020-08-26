@@ -153,7 +153,7 @@ async def convert(message):
 
         val, cur1, cur2 = float(content[1]), content[2].upper(), content[3].upper()
 
-        url = f'https://prime.exchangerate-api.com/v5/7113ac9174ade28a0e1e5eed/latest/{cur1}'
+        url = f'https://prime.exchangerate-api.com/v5/81f453a13268228658567d13/latest/{cur1}'
         response = requests.get(url)
         result = response.json()
         if result['result'] == 'error':
