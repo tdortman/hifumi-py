@@ -38,7 +38,7 @@ async def on_ready():
     time = dt.utcnow().strftime("%d/%m/%Y %H:%M:%S")
     done_loading_time = main.current_time()
 
-    print(f'Started up in {done_loading_time - start_time} seconds on {time}')
+    print(f'Started up in {done_loading_time - start_time} seconds on {time} UTC')
     print('Logged in as:')
     print(bot.user.name)
     print(bot.user.id)

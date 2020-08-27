@@ -270,7 +270,3 @@ async def download_from_url(url):
     with open(f"files/attachment.png", 'wb') as f:
         r.raw.decode_content = True
         shutil.copyfileobj(r.raw, f)
-
-
-async def extract_string_image(message):
-    await message.channel.send(pytesseract.image_to_string(Image.open('files/test.png')))

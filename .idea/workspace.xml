@@ -97,6 +97,7 @@
       <change beforePath="$PROJECT_DIR$/hifumi_qr_code/191126220642.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/hifumi_qr_code/191126220649.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/hifumi_qr_code/200504224131.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pillow.py" beforeDir="false" afterPath="$PROJECT_DIR$/pillow.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -202,6 +203,8 @@
       <workItem from="1590353497340" duration="601000" />
       <workItem from="1597267179122" duration="6376000" />
       <workItem from="1598283153894" duration="915000" />
+      <workItem from="1598467735613" duration="320000" />
+      <workItem from="1598562890205" duration="313000" />
     </task>
     <task id="LOCAL-00001" summary="Split Hifumi into multiple files">
       <created>1588624215370</created>
@@ -399,7 +402,14 @@
       <option name="project" value="LOCAL" />
       <updated>1598283714799</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="updated api key for currency conversion, rewrote resizing implementation and added stuff to it">
+      <created>1598467870217</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1598467870217</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -438,13 +448,14 @@
     <MESSAGE value="little tweaks" />
     <MESSAGE value="Added currency conversion and multiple little QOL change" />
     <MESSAGE value="saucenao.." />
-    <option name="LAST_COMMIT_MESSAGE" value="saucenao.." />
+    <MESSAGE value="updated api key for currency conversion, rewrote resizing implementation and added stuff to it" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated api key for currency conversion, rewrote resizing implementation and added stuff to it" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="884" y="85" width="775" height="837" key="CommitChangelistDialog2" timestamp="1598284011529">
+    <state x="884" y="85" width="775" height="837" key="CommitChangelistDialog2" timestamp="1598467868790">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="884" y="85" width="775" height="837" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1598284011529" />
+    <state x="884" y="85" width="775" height="837" key="CommitChangelistDialog2/0.0.1680.1010@0.0.1680.1010" timestamp="1598467868790" />
     <state width="538" height="883" key="GridCell.Tab.0.bottom" timestamp="1597275967552">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
@@ -461,10 +472,10 @@
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
     <state width="538" height="883" key="GridCell.Tab.0.right/0.0.1680.1010@0.0.1680.1010" timestamp="1597275967552" />
-    <state x="690" y="252" key="Vcs.Push.Dialog.v2" timestamp="1598283720170">
+    <state x="690" y="252" key="Vcs.Push.Dialog.v2" timestamp="1598467875404">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="690" y="252" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1598283720170" />
+    <state x="690" y="252" key="Vcs.Push.Dialog.v2/0.0.1680.1010@0.0.1680.1010" timestamp="1598467875404" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/HifuBot$main.coverage" NAME="main Coverage Results" MODIFIED="1588784488918" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
