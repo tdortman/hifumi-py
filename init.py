@@ -35,7 +35,7 @@ async def on_message(message):
 
 @bot.event
 async def on_ready():
-    time = dt.utcnow().strftime("%d/%m/%Y %H:%M:%S")
+    time = dt.utcnow().strftime("%d/%m/%Y %H:%M:%S UTC")
     done_loading_time = main.current_time()
 
     print(f'Started up in {done_loading_time - start_time} seconds on {time} UTC')
@@ -45,8 +45,8 @@ async def on_ready():
     print('------')
 
     channel = bot.get_channel(655484804405657642)
-    await channel.send(f"Logged in as:\n{bot.user.name}\nTime: {time}\n"
-                       f"--------------------------")
+    # await channel.send(f"Logged in as:\n{bot.user.name}\nTime: {time}\n"
+                       # f"--------------------------")
     game = discord.Game("with best girl Annie!")
     await bot.change_presence(activity=game)
 

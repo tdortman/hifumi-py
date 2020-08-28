@@ -103,8 +103,6 @@ async def message_in(message):
                 await pillow.resize_img(message)
             if cmd == 'imgur':
                 await pillow.imgur(message)
-            if cmd == 'tess':
-                await pillow.extract_string_image(message)
             if cmd in ['currencies', 'currency', 'cur', 'cu']:
                 await currency_codes(message)
             if cmd == 'test':
