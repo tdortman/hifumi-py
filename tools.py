@@ -59,28 +59,28 @@ async def download_attachments(message):
 
 
 async def help_cmd(message):
-    msgs = ["**h?avatar @user/user-id** - take a nice look at that cool avatar "
-            "your friend or even a stranger has\n\n**h?emoji <name> <emoji/url>** - lets you quickly add any "
-            "emoji/image as an emoji in your server\n\n**h?convert <amount> <currency1> <currency2>** - for all those "
-            "occasions where you might wanna quickly convert money from one currency to another\n\n**h?currencies** - "
-            "gives you a nice list of all the currencies you can use for conversion\n\n**h?qr <text>** - for whenever "
-            "you want to generate a QR-code from any text\n\n**h?calc <num1> <operator> <num2>** - a very basic "
-            "calculator to play around with for fun\n\n**h?coinflip** - for all those indecisive people who can't "
-            "decide what to eat for dinner\n\n**h?urban <term>** - gives you the first five definitions"
-            " on Urban Dictionary for your search term\n\n**h?cipher <text> <num>** - a nice and simple encryption"
-            " method if you want to send secret messages\n\n**h?numguess** - let's you guess a number"
+    msgs = ["**h!avatar @user/user-id** - take a nice look at that cool avatar "
+            "your friend or even a stranger has\n\n**h!emoji <name> <emoji/url>** - lets you quickly add any "
+            "emoji/image as an emoji in your server\n\n**h!convert <amount> <currency1> <currency2>** - for all those "
+            "occasions where you might wanna quickly convert money from one currency to another\n\n**h!currencies** - "
+            "gives you a nice list of all the currencies you can use for conversion\n\n**h!qr <text>** - for whenever "
+            "you want to generate a QR-code from any text\n\n**h!calc <num1> <operator> <num2>** - a very basic "
+            "calculator to play around with for fun\n\n**h!coinflip** - for all those indecisive people who can't "
+            "decide what to eat for dinner\n\n**h!urban <term>** - gives you the first five definitions"
+            " on Urban Dictionary for your search term\n\n**h!cipher <text> <num>** - a nice and simple encryption"
+            " method if you want to send secret messages\n\n**h!numguess** - let's you guess a number"
             " between 1 and 100\n\n"
-            "**h?beautiful @user/user-id** - shows your friend how beautiful they are, even if they don't want to"
-            " admit it\n\n**h?resize <width> <emoji/url>** - let's you resize any emoji or image you want\n\n"
-            "**h?imgur <url>** - let's you upload any image to imgur",
+            "**h!beautiful @user/user-id** - shows your friend how beautiful they are, even if they don't want to"
+            " admit it\n\n**h!resize <width> <emoji/url>** - let's you resize any emoji or image you want\n\n"
+            "**h!imgur <url>** - let's you upload any image to imgur",
 
-            "**h?sub <name>** - gives you one of the hot or top rated image posts from a "
-            "specific subreddit\n\n**h?sub text <name>** - gives you one of the hot or top rated text posts from a "
-            "specific subreddit\n\n**h?kitsune** - fox girls, who doesn't love them\n\n"
-            "**h?neko** - for all you cat girl lovers (nsfw)\n\n**h?wholesome** - your daily dose of wholesome"
-            " anime memes\n\n**h?bunny** - bunny girls, what were you expecting\n\n**h?thicc** - for all you thigh"
-            " connoisseurs out there (nsfw)\n\n**h?animegirl** - sometimes simple girls are best girl\n\n"
-            "**h?redditor <name>** - for a nice breakdown of someone's reddit profile"]
+            "**h!sub <name>** - gives you one of the hot or top rated image posts from a "
+            "specific subreddit\n\n**h!sub text <name>** - gives you one of the hot or top rated text posts from a "
+            "specific subreddit\n\n**h!kitsune** - fox girls, who doesn't love them\n\n"
+            "**h!neko** - for all you cat girl lovers (nsfw)\n\n**h!wholesome** - your daily dose of wholesome"
+            " anime memes\n\n**h!bunny** - bunny girls, what were you expecting\n\n**h!thicc** - for all you thigh"
+            " connoisseurs out there (nsfw)\n\n**h!animegirl** - sometimes simple girls are best girl\n\n"
+            "**h!redditor <name>** - for a nice breakdown of someone's reddit profile"]
 
     titles = ["**List of Yukino's commands**", "**Reddit commands**"]
 

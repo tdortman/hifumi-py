@@ -273,7 +273,7 @@ async def message_in(message):
             if cmd in ['currencies', 'currency', 'cur', 'cu']:
                 await currency_codes(message)
 
-            if cmd == 'helpp':
+            if cmd == 'test':
                 await tools.help_cmd(message)
 
         elif message.content.startswith(f"${react_cmd} <@!641409330888835083>"):
