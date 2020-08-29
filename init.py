@@ -47,8 +47,8 @@ async def on_ready():
     print('------')
 
     channel = bot.get_channel(655484804405657642)
-    # await channel.send(f"Logged in as:\n{bot.user.name}\nTime: {time}\n"
-                       # f"--------------------------")
+    await channel.send(f"Logged in as:\n{bot.user.name}\nTime: {time}\n"
+                       f"--------------------------")
     game = discord.Game("with best girl Annie!")
     await bot.change_presence(activity=game)
 
