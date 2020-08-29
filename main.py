@@ -10,8 +10,6 @@ import requests
 import shutil
 import os
 from pathlib import Path
-from saucenao_api import SauceNao
-from saucenao_api.params import DB, Hide, Bgcolor
 from datetime import datetime as dt
 import time
 import reddit
@@ -388,38 +386,6 @@ async def currency_codes(message):
     embed = discord.Embed(title=title, color=0xce3a9b)
     for i in range(3):
         embed.add_field(name='\u200b', value=columns[i])
-    await message.channel.send(embed=embed)
-# 0xce3a9b
-
-async def description():
-    pass
-
-
-async def sauce(message):
-    sauce = SauceNao(api_key=None, testmode=0, dbmask=None, dbmaski=None,
-                     db=DB.ALL, numres=6, hide=Hide.NONE, bgcolor=Bgcolor.NONE)
-
-    url = message.content.split()[1]
-    # url = "https://cdn.discordapp.com/attachments/551588329003548683/715332085572829184/73375795_p0_master1200.jpg"
-
-    r = requests.get(
-        url, stream=True, headers={
-            'User-agent': 'Mozilla/5.0'})
-
-    with open(f"files/test_sauce.png", 'wb') as f:
-        r.raw.decode_content = True
-        shutil.copyfileobj(r.raw, f)
-
-    results = sauce.from_url(url)
-
-    if results[0].author is not None:
-        desc = f"[Link to image by {results[0].author}]({results[0].url})"
-    else:
-        desc = None
-
-    embed = discord.Embed(title=results[0].title, description=desc, colour=0xce3a9b)
-    embed.set_footer(text=f"Similarity: {results[0].similarity}%  ")
-
     await message.channel.send(embed=embed)
 
 
