@@ -61,6 +61,7 @@ async def sub(message, subreddit: str = None):
                     submission = next(x for x in submissions)
                     if submission.url.split("/")[2] == "i.redd.it":
                         sub_cache_img[name].append((submission.url, submission.title))
+
                 await message.channel.send(
                     'Results found: {}'.format(len(sub_cache_img[name])))
 
@@ -78,6 +79,8 @@ async def sub(message, subreddit: str = None):
             await message.channel.send(embed=embed)
     except prawcore.exceptions.Redirect:
         await message.channel.send("That's not a valid subreddit!")
+    except prawcore.exceptions.Forbidden:
+        await message.channel.send("Seems like this subreddit is set to private.")
     except Exception as e:
         await error_log(message, e)
 
@@ -116,6 +119,10 @@ async def self_posts(message):
             await message.channel.send(embed=embed)
     except AttributeError:
         await self_posts(message)
+    except prawcore.exceptions.Redirect:
+        await message.channel.send("That's not a valid subreddit!")
+    except prawcore.exceptions.Forbidden:
+        await message.channel.send("Seems like this subreddit is set to private.")
     except Exception as e:
         await error_log(message, e)
 

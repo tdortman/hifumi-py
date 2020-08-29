@@ -3,11 +3,13 @@ from importlib import reload
 import discord
 import main
 import tools
+import pillow
 
 bot = discord.Client()
 start_time = main.current_time()
 main.passClientVar(bot)
 tools.passClientVar(bot)
+pillow.passClientVar(bot)
 
 file = open(r"files/token.txt", "r")
 TOKEN = file.readline()

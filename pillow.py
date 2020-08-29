@@ -6,8 +6,7 @@ import os
 from imgurpython import ImgurClient
 from tools import error_log
 import pytesseract
-from urllib.request import Request, urlopen
-from PIL import ImageFile
+import main
 
 bot = None
 
@@ -78,10 +77,18 @@ async def resize(file_location: str, width: int, save_location: str = None):
 
 
 async def resize_img(message):
-    global img_type
     try:
-        img_url = message.content.split()[-1]
-        width = int(message.content.split()[1])
+        content = message.content.split()
+        width = int(content[1])
+
+        if width >= 5000:
+            await message.channel.send("Don't you think that's a bit too much?..")
+            return
+
+        if content[2].startswith("<"):
+            img_url = await main.extract_emoji(message)
+        else:
+            img_url = content[2]
 
         if 'jpg' in img_url:
             img_type = 'jpg'
@@ -105,7 +112,7 @@ async def resize_img(message):
         if img_type != 'gif':
             await resize(f"files/unknown.{img_type}", width, f"files/unknown_resized.{img_type}")
         elif img_type == 'gif' and width >= width_res:
-            await message.channel.send("Sorry, but you can't use this command for upscaling")
+            await message.channel.send("Sorry, but you can't use this command for upscaling gifs")
             return
         else:
             await resize_gif(message, f"files/unknown.{img_type}", f"files/unknown_resized.{img_type}", (width, width))
@@ -113,15 +120,16 @@ async def resize_img(message):
         if 8000000 < os.stat(f"files/unknown_resized.{img_type}").st_size < 10000000:
             await imgur(message, img_url)
         elif os.stat(f"files/unknown_resized.{img_type}").st_size > 10000000:
-            await message.channel.send("Your image is over 8MB big, try resizing it first.")
+            await message.channel.send("Your image is over 10MB big, try resizing it first.")
             return
         else:
             with open(f"files/unknown_resized.{img_type}", "rb") as g:
                 picture = discord.File(g)
                 await message.channel.send(file=picture)
 
-        # os.remove(f"files/unknown.{img_type}")
-        # os.remove(f"files/unknown_resized.{img_type}")
+        image.close()
+        os.remove(f"files/unknown.{img_type}")
+        os.remove(f"files/unknown_resized.{img_type}")
     except Exception as e:
         await error_log(message, e)
 
@@ -270,3 +278,7 @@ async def download_from_url(url):
     with open(f"files/attachment.png", 'wb') as f:
         r.raw.decode_content = True
         shutil.copyfileobj(r.raw, f)
+
+
+async def extract_string_image(message):
+    await message.channel.send(pytesseract.image_to_string(Image.open('files/test.png')))

@@ -1,7 +1,5 @@
 import operator
 import random
-import urllib
-from urllib import request
 import discord
 import qrcode
 from udpy import UrbanClient
@@ -12,7 +10,8 @@ import requests
 import shutil
 import os
 from pathlib import Path
-from PIL import ImageFile
+from saucenao_api import SauceNao
+from saucenao_api.params import DB, Hide, Bgcolor
 from datetime import datetime as dt
 import time
 import reddit
@@ -32,229 +31,254 @@ def passClientVar(client):
 
 bot_owner = 258993932262834188
 
+emote_msg = {
+    'cuddle': ['cuddle', 'cuddles', 'cuddwe', 'cuddwes'],
+    'hug': ['hug', 'hugs', 'hwug', 'hwugs'],
+    'kiss': ['kiss', 'kisses', 'kwiss', 'kwisses'],
+    'pat': ['pat', 'pet', 'pats', 'pets', 'pwat', 'pwet', 'pwats', 'pwets'],
+    'snuggle': ['snuggle', 'snuggles', 'snuggwe', 'snuggwes'],
+    'poke': ['poke', 'pokes', 'pwoke', 'pwokes'],
+    'slap': ['slap', 'slaps'],
+    'shy': ['shy', 'shies', 'shwy', 'shwies', 'shwiesh'],
+    'handhold': ['handhold', 'handholds', 'handhowd', 'handhowds'],
+    'lick': ['lick', 'licks', 'wick', 'wicks'],
+    'tickle': ['tickle', 'tickles', 'tickwe', 'tickwes'],
+    'cheekkiss': ['cheekkiss', 'kiss_cheek', 'kisscheek', 'kwisscheek', 'cheekkwiss', 'kwiss_cheek'],
+    'boop': ['boop', 'boops', 'bwoop', 'bwoops'],
+    'nuzzle': ['nuzzle', 'nuzzwe'],
+    'huggle': ['huggle', 'huggles', 'huggwe', 'huggwes'],
+    'smile': ['smile'],
+    'hide': ['hide', 'hides', 'hwide', 'hwides'],
+    'nibble': ['nibble', 'nibbles', 'nibbwe', 'nibbwes'],
+    'flick': ["flick", "fwick"]
+}
+
+react_msg = {
+    'cuddle': ['Ah, s-senpai, thank you for your c-cuddle..! _Smiles and  cuddles back._',
+               'Mmmm~ Senpai, thank chuu!~  _Smiles and cuddles {0} back._',
+               "_Rubs {0}'s back softly_  Your cuddles are always the b-best, senpai~",
+               "_Blushes and cuddles into {user} as well._ Cuddlesss for the best senpai!~ _Giggles._",
+               "_Cuddles back into {0}._ Mmm~  You must l-l-love m-me, s-senpai...!~"],
+
+    'hug': ["Huggiess!~ _Giggles and hugs {0} back._",
+            "_Hugs and cuddles {0} back._  T-thank chu for a hug.. I needed it!~",
+            "_Smiles and nuzzle-hugs {0}._  Ah, I missed hugs from y-you, senpai!~",
+            "_Embraces {0} in a hug as well._  H-here, let m-me hug you b-back..!",
+            "H-huh..? Aaaah..!  S-senpai..! What an unexpected h-hug..! _Blushes._"],
+
+    'kiss': ["_Blushes bright red._  S-senpai..! Y-you kissed me..!",
+             "_Blushes in a shock._  W-wha..? _Hides her face, shy._",
+             "S-senpai...! W-why you k-k-kiss... m-me..? _Looks away, embarrassed by your kiss._",
+             "H-huhh...? Aaaah~ S-senpai...! _Blushes and hides after {0}'s kiss._",
+             "_Blushes and kisses back, blushing afterwards._ D-don't tell anyone, o-okay..? _Smiles "
+             "cutely._"],
+
+    'pat': ["_Looks at {0} confused._  W-what are you d-doing, s-senpai..?~",
+            "_Blushes and looks shily at {0}._  T-thank chu for a pat~",
+            "S-senpai~  _Giggles_  Thank you for a pat!!~",
+            "_Smiles at {0}._  Thank you~  _Giggles and smiles some more._",
+            "Ahhhh~ _Smiles happily,_  M-more, s-senpai...!~"],
+
+    'snuggle': ["Snugglesss~  _Chuckles and snuggles back into {0}._",
+                "_Snuggles back into {0} with a blush and a smile_  Snuggles for my senpai!~",
+                "Awwh, senpai~  _Smiles and snuggles back._",
+                "T-thank you, senpai~  _Smiles and snuggles {0} softly._",
+                "Awwwwh, more, pwease..!~  _Snuggles softly into {0}._"],
+
+    'poke': ["H-huh..? W-what do you n-need...? _Looks at you._",
+             "Oh, s-senpai..! Didn't notice you there..! Do you need anything? _Smiles at you._",
+             "Senpai..! _Smiles_  Do you need anything?~",
+             "_Jumps a little_  Y-yes..? W-what is it? Need something..? You could've just sent an E-Mail...",
+             "_Looks away for a moment before turning back to you_  Y-yes..? "],
+
+    'slap': ["_Looks at you and runs away._",
+             "_Stares at you_  W-what did I do to y-you...  _Leaves._",
+             "W-what..? _Look at you confused about what just happened._ ",
+             "W-what...? W-why, s-senpai...? _Looks sad, tear rolling down her cheek._",
+             "Why would you...? _Looks at you through tear in her eyes._"],
+
+    'shy': ["Ah, you cute little sweetheart~  _Smiles and huggles {0} softly._",
+            "_Wraps her arms around {0}_  Senpai~  What made you so shy?~",
+            "O-oh..? Is aught w-wrong, senpai..? _Smiles as you shy into her._",
+            "Hmm? What.. Oh, s-senpai..! _Looks a bit surprised and hugs you softly._",
+            "_Hugs you softly and shily._  S-senpai~ Why so shy?~ _Blushes._"],
+
+    'handhold': ["_Holds your hand as well, blushing a little_.",
+                 "Aaah, m-my hand..! _Blushes and looks away, shy._",
+                 "S-senpai..? W-what are you doing? This is n-not really a-appropriate.. _Blushes._",
+                 "_Smiles at you as you hold her hand_  S-senpai, we s-shouldn't...",
+                 "_Jumps a little as you touched her hand_  H-huh.. oh.. you are... _Blushes and stares "
+                 "into your "
+                 "eyes._"],
+
+    'lick': ["_Looks at you in a shock_  S-senpai..! W-what are y-you doing..??",
+             "H-huh..? W-what did you do..? Eww..!  _Blushes and turns away._",
+             "H-hey..! D-don't lick me! _Pouts a little, being shy and cute_",
+             "S-senpai..! W-why would you l-lick me..? That is a very l-l-lewd thing to do..!",
+             "N-no..! D-don't do this a-again, s-senpai..! _Looks at you cutely, wiping off the place you "
+             "licked._"],
+
+    'tickle': [
+        "Aaah..! Ahahahah..! S-senpai.. Hehh.. Y-you can't do t-this to.. Ahahahh.. to me..! _Laughs as "
+        "you tickle her._",
+        "N-nooo..! _Giggles_  S-senpai..! T-that is e-enough.. Aahhhahahh.. S-stoop it..! _Squirms around "
+        "as you tickle her relentlessly._",
+        "H-huh..? N-noo..! Ahahahah s-senpai..! P-please stoooop..! _Laughs uncontrollably_",
+        "O-oh, s-senpai.. N-nuh uh.. Aahahhah.. Noo..! S-stop.. _Giggles_  S-stop pwease..! Ahahahah..!",
+        "_Laughs happily, squirming around as you tickle her._  S-senpai.. Ahahahah.. s-stop pwease..! "],
+
+    'cheekkiss': ["_Smiles and blushes cutely as you kiss her cheek._",
+                  "Oh s-senpai~  _Smiles at you cutely, hugging you afterwards._",
+                  "_Blushes as you kiss her cheek, kissing your cheek as well._",
+                  "Awwh, t-thank you, senpai~  _Smiles cutely at you._",
+                  "_Quickly leans to {0} and kisses their cheek as well._  T-there you go, s-senpai!~ _Smiles._"],
+
+    'boop': ["H-huh..? _Looks at you confused as you booped her nose._",
+             "Uwa... W-what..? W-why..?  _Looks at you confused and embarrassed._",
+             "_Looks shily away as you booped her nose, turning her cute and embarrassed._",
+             "Hyaaan.. W-what was that..? S-senpai..! _Looks away, shy._  M-my nose..",
+             "S-senpai..! W-why would you... _Cuts off the sentence, looking away shily._"],
+
+    'smile': ["_Smiles back at you._  Your smile is very nice today, s-senpai~",
+              "_Smiles back at {0}, cheeks going slightly red._",
+              "Oh, s-senpai~ _Returns the smile._",
+              "_Returns the smile with a slight blush._",
+              "What a s-sweet senpai you are~ _Smiles at {0}, blushing slightly as well._"],
+
+    'nuzzle': ["Ah, s-senpai..! D-don't embarrass m-me.. _Blushes and hugs you as you nuzzle into her._",
+               "H-huh..? What are you doing, s-senpai..? Oh well, c-come here~  _Wraps her arms around you as you "
+               "nuzzle into her._",
+               "Hehe, senpai~  _Nuzzles back into you as well._  You always k-know what I n-need~",
+               "_Smiles and snuggles into you as you nuzzle into her._  Mmmm~  Senpai~",
+               "W-what's w-wrong..? W-why are you s-smiling at me..? _Asks in an embarrassed tone._"],
+
+    'huggle': ["Ah, s-senpai~  _Giggles and smiles a little as she returns the huggle._",
+               "_Huggles you back, blushing a little_  Huggwes anytime f-for my s-senpai~",
+               "Uh-uhhh? S-senpai, w-what are you doing? Oh.. I s-see.. _Huggles {0} back, cuddling a little as "
+               "well~_",
+               "_Giggles._  Ah, senpai~  You're like a big child sometimes, you know that?~  _Huggles back~_",
+               "Senpai~ A-again?~ Ah well, c-come here~ _Huggles into you softly, stroking your back a little._"],
+
+    'flick': ["Awww aw oh.. oh.. s-senpai..! _Holds her forehead after the flick._",
+              "Awwhh...! _She looks shy and embarrassed after you flicked her forehead._",
+              "_Holds her forehead, looking down in an embarrassment._",
+              "_Gasps in a surprise as you flick her forehead._  S-senpai..!",
+              "_Blushes in an embarrassment after you flick her forehead_  Nawww~ d-don't do thaaat!~"],
+
+    'hide': ["_Giggles as you hide behind her._  It's okay, you're safe with me~",
+             "_Blushes as you hide behind her, standing still._  H-huh..? W-what is going on h-here..?",
+             "H-huh..? S-senpai..?  _Looks at you as you were hiding behind her._ W-what's wrong..?",
+             "_Gasps as she suddenly finds you behind her._  W-what is going on..?",
+             "W-what happened..? D-did Hazuki-senpai try to dress y-you in some w-weird clothes again..?"],
+
+    'nibble': ["_Stares at you with a scared expression._  W-what are you d-doing, s-senpai..??",
+               "N-no s-senpai..! N-not there..! _Squirms as you nibble on her, making her blush_",
+               "_Gasps at your action._  S-senpai..! W-w-what are you d-doing..! N-not here..! Noo..",
+               "S-senpai, s-stoop..! I'm n-not your f-food..! _Looks away embarrassed._",
+               "H-huh..? S-senpai n-noo..! S-sojiro, p-protect me..! _Blushes brighly red._"]
+}
+
 
 async def message_in(message):
     try:
-        content = message.content
-        react_cmd = message.content.split()[0][1:]
+        content = message.content.split()
+        react_cmd = content[0][1:] if len(content) > 1 else None
 
-        if content.startswith("h!"):
-            cmd = content.split()[0][2:].lower()
-
-            try:
-                sub_cmd = content.split()[1].lower()
-            except:
-                sub_cmd = None
+        if message.content.startswith("h!"):
+            cmd = content[0].strip("h!")
+            sub_cmd = content[1] if len(content) >= 2 else None
 
             if cmd == "beautiful":
                 await pillow.beautiful(message)
+
             if cmd == "redditor":
                 await reddit.profile(message)
+
             if cmd == "kitsune":
                 await reddit.sub(message, "kitsunemimi")
+
             if cmd == "sub":
                 if sub_cmd == "text":
                     await reddit.self_posts(message)
                 else:
-                    await reddit.sub(message, message.content.split()[-1])
+                    await reddit.sub(message, content[1])
+
             if cmd == "wholesome":
                 await reddit.sub(message, "wholesomeanimemes")
+
             if cmd == "bunny":
                 await reddit.sub(message, "usagimimi")
+
             if cmd == "neko":
                 await reddit.sub(message, "nekomimi")
+
             if cmd == "thicc":
                 await reddit.sub(message, "thighdeology")
+
             if cmd == "animegirl":
                 await reddit.sub(message, "animegirl")
+
             if cmd == "cipher":
                 await encryption.caeser_cipher(message)
+
             if cmd == "emoji":
                 await emoji(message)
+
             if cmd in ["pfp", "avatar"]:
                 await avatar(message)
+
             if cmd == "bye":
                 await bye(message)
+
             if cmd in ["join", "j", "joi"]:
                 await message.channel.send("Sorry, this command is currently unavailable!")
+
             if cmd in ["leave", "leav", "l"]:
                 await message.channel.send("Sorry, this command is currently unavailable!")
+
             if cmd in ["play", "p"]:
                 await message.channel.send("Sorry, this command is currently unavailable!")
+
             if cmd == "urban":
                 await message.channel.send("An error occurred! Please try again later")
+
             if cmd == "calc":
                 await calc(message)
+
             if cmd == "coinflip":
                 await coinflip(message)
+
             if cmd == "numguess":
                 await message.channel.send("An error occurred! Please try again later")
+
             if cmd == "cuddle":
                 await cuddle(message)
+
             if cmd == "qr":
                 await qr(message)
+
             if cmd in ['convert', 'conv', 'con', 'c']:
                 await convert(message)
+
             if cmd == "error":
                 await error_log(message, "This is a test error!")
-            # if cmd == "sauce":
-            # await sauce(message)
+
             if cmd == "resize":
                 await pillow.resize_img(message)
+
             if cmd == 'imgur':
                 await pillow.imgur(message)
+
+            if cmd == 'tess':
+                await pillow.extract_string_image(message)
+
             if cmd in ['currencies', 'currency', 'cur', 'cu']:
                 await currency_codes(message)
-            if cmd == 'test':
-                pass
 
-        elif content.startswith(f"${react_cmd} <@!641409330888835083>"):
-            emote_msg = {
-                'cuddle': ['cuddle', 'cuddles', 'cuddwe', 'cuddwes'],
-                'hug': ['hug', 'hugs', 'hwug', 'hwugs'],
-                'kiss': ['kiss', 'kisses', 'kwiss', 'kwisses'],
-                'pat': ['pat', 'pet', 'pats', 'pets', 'pwat', 'pwet', 'pwats', 'pwets'],
-                'snuggle': ['snuggle', 'snuggles', 'snuggwe', 'snuggwes'],
-                'poke': ['poke', 'pokes', 'pwoke', 'pwokes'],
-                'slap': ['slap', 'slaps'],
-                'shy': ['shy', 'shies', 'shwy', 'shwies', 'shwiesh'],
-                'handhold': ['handhold', 'handholds', 'handhowd', 'handhowds'],
-                'lick': ['lick', 'licks', 'wick', 'wicks'],
-                'tickle': ['tickle', 'tickles', 'tickwe', 'tickwes'],
-                'cheekkiss': ['cheekkiss', 'kiss_cheek', 'kisscheek', 'kwisscheek', 'cheekkwiss', 'kwiss_cheek'],
-                'boop': ['boop', 'boops', 'bwoop', 'bwoops'],
-                'nuzzle': ['nuzzle', 'nuzzwe'],
-                'huggle': ['huggle', 'huggles', 'huggwe', 'huggwes'],
-                'smile': ['smile'],
-                'hide': ['hide', 'hides', 'hwide', 'hwides'],
-                'nibble': ['nibble', 'nibbles', 'nibbwe', 'nibbwes'],
-                'flick': ["flick", "fwick"]
-            }
+            if cmd == 'helpp':
+                await tools.help_cmd(message)
 
-            react_msg = {
-                'cuddle': ['Ah, s-senpai, thank you for your c-cuddle..! _Smiles and  cuddles back._',
-                           'Mmmm~ Senpai, thank chuu!~  _Smiles and cuddles {0} back._',
-                           "_Rubs {0}'s back softly_  Your cuddles are always the b-best, senpai~",
-                           "_Blushes and cuddles into {user} as well._ Cuddlesss for the best senpai!~ _Giggles._",
-                           "_Cuddles back into {0}._ Mmm~  You must l-l-love m-me, s-senpai...!~"],
-
-                'hug': ["Huggiess!~ _Giggles and hugs {0} back._",
-                        "_Hugs and cuddles {0} back._  T-thank chu for a hug.. I needed it!~",
-                        "_Smiles and nuzzle-hugs {0}._  Ah, I missed hugs from y-you, senpai!~",
-                        "_Embraces {0} in a hug as well._  H-here, let m-me hug you b-back..!",
-                        "H-huh..? Aaaah..!  S-senpai..! What an unexpected h-hug..! _Blushes._"],
-
-                'kiss': ["_Blushes bright red._  S-senpai..! Y-you kissed me..!",
-                         "_Blushes in a shock._  W-wha..? _Hides her face, shy._",
-                         "S-senpai...! W-why you k-k-kiss... m-me..? _Looks away, embarrassed by your kiss._",
-                         "H-huhh...? Aaaah~ S-senpai...! _Blushes and hides after {0}'s kiss._",
-                         "_Blushes and kisses back, blushing afterwards._ D-don't tell anyone, o-okay..? _Smiles "
-                         "cutely._"],
-
-                'pat': ["_Looks at {0} confused._  W-what are you d-doing, s-senpai..?~",
-                        "_Blushes and looks shily at {0}._  T-thank chu for a pat~",
-                        "S-senpai~  _Giggles_  Thank you for a pat!!~",
-                        "_Smiles at {0}._  Thank you~  _Giggles and smiles some more._",
-                        "Ahhhh~ _Smiles happily,_  M-more, s-senpai...!~"],
-
-                'snuggle': ["Snugglesss~  _Chuckles and snuggles back into {0}._",
-                            "_Snuggles back into {0} with a blush and a smile_  Snuggles for my senpai!~",
-                            "Awwh, senpai~  _Smiles and snuggles back._",
-                            "T-thank you, senpai~  _Smiles and snuggles {0} softly._",
-                            "Awwwwh, more, pwease..!~  _Snuggles softly into {0}._"],
-
-                'poke': ["H-huh..? W-what do you n-need...? _Looks at you._",
-                         "Oh, s-senpai..! Didn't notice you there..! Do you need anything? _Smiles at you._",
-                         "Senpai..! _Smiles_  Do you need anything?~",
-                         "_Jumps a little_  Y-yes..? W-what is it? Need something..? You could've just sent an E-Mail...",
-                         "_Looks away for a moment before turning back to you_  Y-yes..? "],
-
-                'slap': ["_Looks at you and runs away._",
-                         "_Stares at you_  W-what did I do to y-you...  _Leaves._",
-                         "W-what..? _Look at you confused about what just happened._ ",
-                         "W-what...? W-why, s-senpai...? _Looks sad, tear rolling down her cheek._",
-                         "Why would you...? _Looks at you through tear in her eyes._"],
-
-                'shy': ["Ah, you cute little sweetheart~  _Smiles and huggles {0} softly._",
-                        "_Wraps her arms around {0}_  Senpai~  What made you so shy?~",
-                        "O-oh..? Is aught w-wrong, senpai..? _Smiles as you shy into her._",
-                        "Hmm? What.. Oh, s-senpai..! _Looks a bit surprised and hugs you softly._",
-                        "_Hugs you softly and shily._  S-senpai~ Why so shy?~ _Blushes._"],
-
-                'handhold': ["_Holds your hand as well, blushing a little_.",
-                             "Aaah, m-my hand..! _Blushes and looks away, shy._",
-                             "S-senpai..? W-what are you doing? This is n-not really a-appropriate.. _Blushes._",
-                             "_Smiles at you as you hold her hand_  S-senpai, we s-shouldn't...",
-                             "_Jumps a little as you touched her hand_  H-huh.. oh.. you are... _Blushes and stares "
-                             "into your "
-                             "eyes._"],
-
-                'lick': ["_Looks at you in a shock_  S-senpai..! W-what are y-you doing..??",
-                         "H-huh..? W-what did you do..? Eww..!  _Blushes and turns away._",
-                         "H-hey..! D-don't lick me! _Pouts a little, being shy and cute_",
-                         "S-senpai..! W-why would you l-lick me..? That is a very l-l-lewd thing to do..!",
-                         "N-no..! D-don't do this a-again, s-senpai..! _Looks at you cutely, wiping off the place you "
-                         "licked._"],
-
-                'tickle': [
-                    "Aaah..! Ahahahah..! S-senpai.. Hehh.. Y-you can't do t-this to.. Ahahahh.. to me..! _Laughs as "
-                    "you tickle her._",
-                    "N-nooo..! _Giggles_  S-senpai..! T-that is e-enough.. Aahhhahahh.. S-stoop it..! _Squirms around "
-                    "as you tickle her relentlessly._",
-                    "H-huh..? N-noo..! Ahahahah s-senpai..! P-please stoooop..! _Laughs uncontrollably_",
-                    "O-oh, s-senpai.. N-nuh uh.. Aahahhah.. Noo..! S-stop.. _Giggles_  S-stop pwease..! Ahahahah..!",
-                    "_Laughs happily, squirming around as you tickle her._  S-senpai.. Ahahahah.. s-stop pwease..! "],
-
-                'cheekkiss': ["_Smiles and blushes cutely as you kiss her cheek._",
-                              "Oh s-senpai~  _Smiles at you cutely, hugging you afterwards._",
-                              "_Blushes as you kiss her cheek, kissing your cheek as well._",
-                              "Awwh, t-thank you, senpai~  _Smiles cutely at you._",
-                              "_Quickly leans to {0} and kisses their cheek as well._  T-there you go, s-senpai!~ _Smiles._"],
-
-                'boop': ["H-huh..? _Looks at you confused as you booped her nose._",
-                         "Uwa... W-what..? W-why..?  _Looks at you confused and embarrassed._",
-                         "_Looks shily away as you booped her nose, turning her cute and embarrassed._",
-                         "Hyaaan.. W-what was that..? S-senpai..! _Looks away, shy._  M-my nose..",
-                         "S-senpai..! W-why would you... _Cuts off the sentence, looking away shily._"],
-
-                'smile': ["_Smiles back at you._  Your smile is very nice today, s-senpai~",
-                          "_Smiles back at {0}, cheeks going slightly red._",
-                          "Oh, s-senpai~ _Returns the smile._",
-                          "_Returns the smile with a slight blush._",
-                          "What a s-sweet senpai you are~ _Smiles at {0}, blushing slightly as well._"],
-
-                'nuzzle': ["Ah, s-senpai..! D-don't embarrass m-me.. _Blushes and hugs you as you nuzzle into her._",
-                           "H-huh..? What are you doing, s-senpai..? Oh well, c-come here~  _Wraps her arms around you as you "
-                           "nuzzle into her._",
-                           "Hehe, senpai~  _Nuzzles back into you as well._  You always k-know what I n-need~",
-                           "_Smiles and snuggles into you as you nuzzle into her._  Mmmm~  Senpai~",
-                           "W-what's w-wrong..? W-why are you s-smiling at me..? _Asks in an embarrassed tone._"],
-
-                'huggle': ["Ah, s-senpai~  _Giggles and smiles a little as she returns the huggle._",
-                           "_Huggles you back, blushing a little_  Huggwes anytime f-for my s-senpai~",
-                           "Uh-uhhh? S-senpai, w-what are you doing? Oh.. I s-see.. _Huggles {0} back, cuddling a little as "
-                           "well~_",
-                           "_Giggles._  Ah, senpai~  You're like a big child sometimes, you know that?~  _Huggles back~_",
-                           "Senpai~ A-again?~ Ah well, c-come here~ _Huggles into you softly, stroking your back a little._"],
-
-                'flick': ["Awww aw oh.. oh.. s-senpai..! _Holds her forehead after the flick._",
-                          "Awwhh...! _She looks shy and embarrassed after you flicked her forehead._",
-                          "_Holds her forehead, looking down in an embarrassment._",
-                          "_Gasps in a surprise as you flick her forehead._  S-senpai..!",
-                          "_Blushes in an embarrassment after you flick her forehead_  Nawww~ d-don't do thaaat!~"],
-
-                'hide': ["_Giggles as you hide behind her._  It's okay, you're safe with me~",
-                         "_Blushes as you hide behind her, standing still._  H-huh..? W-what is going on h-here..?",
-                         "H-huh..? S-senpai..?  _Looks at you as you were hiding behind her._ W-what's wrong..?",
-                         "_Gasps as she suddenly finds you behind her._  W-what is going on..?",
-                         "W-what happened..? D-did Hazuki-senpai try to dress y-you in some w-weird clothes again..?"],
-
-                'nibble': ["_Stares at you with a scared expression._  W-what are you d-doing, s-senpai..??",
-                           "N-no s-senpai..! N-not there..! _Squirms as you nibble on her, making her blush_",
-                           "_Gasps at your action._  S-senpai..! W-w-what are you d-doing..! N-not here..! Noo..",
-                           "S-senpai, s-stoop..! I'm n-not your f-food..! _Looks away embarrassed._",
-                           "H-huh..? S-senpai n-noo..! S-sojiro, p-protect me..! _Blushes brighly red._"]
-            }
+        elif message.content.startswith(f"${react_cmd} <@!641409330888835083>"):
 
             print(react_cmd)
             for cmd_type in emote_msg:
@@ -278,6 +302,17 @@ async def reload_modules():
 
 def current_time():
     return int(time.time())
+
+
+async def extract_emoji(message):
+    content = message.content
+    emoji_id = content.split("<")[1].split(">")[0].split(":")[2]
+
+    if content.split("<")[1].split(":")[0] == "a":
+        emoji_url = f"https://cdn.discordapp.com/emojis/{emoji_id}.gif"
+    else:
+        emoji_url = f"https://cdn.discordapp.com/emojis/{emoji_id}.png"
+    return emoji_url
 
 
 currencies = {
@@ -310,6 +345,7 @@ async def convert(message):
         url = f'https://prime.exchangerate-api.com/v5/81f453a13268228658567d13/latest/{cur1}'
         response = requests.get(url)
         result = response.json()
+
         if result['result'] == 'error':
             if result['error'] == 'unknown-code':
                 await message.channel.send(f"{cur1} is not a valid currency code!")
@@ -328,7 +364,7 @@ async def convert(message):
 
         embed = discord.Embed(description=desc, title=f"Converting {currencies[cur1]} into {currencies[cur2]}",
                               color=0xce3a9b)
-        embed.set_footer(text=f"{dt.utcnow().strftime('%d/%m/%Y %H:%M:%S')} UTC\nUse the command h!currencies for a "
+        embed.set_footer(text=f"{dt.utcnow().strftime('%d/%m/%Y %H:%M:%S')} UTC\nUse the command h?currencies for a "
                               f"list of currencies available for conversion")
         await message.channel.send(embed=embed)
 
@@ -353,17 +389,51 @@ async def currency_codes(message):
     for i in range(3):
         embed.add_field(name='\u200b', value=columns[i])
     await message.channel.send(embed=embed)
-
+# 0xce3a9b
 
 async def description():
     pass
+
+
+async def sauce(message):
+    sauce = SauceNao(api_key=None, testmode=0, dbmask=None, dbmaski=None,
+                     db=DB.ALL, numres=6, hide=Hide.NONE, bgcolor=Bgcolor.NONE)
+
+    url = message.content.split()[1]
+    # url = "https://cdn.discordapp.com/attachments/551588329003548683/715332085572829184/73375795_p0_master1200.jpg"
+
+    r = requests.get(
+        url, stream=True, headers={
+            'User-agent': 'Mozilla/5.0'})
+
+    with open(f"files/test_sauce.png", 'wb') as f:
+        r.raw.decode_content = True
+        shutil.copyfileobj(r.raw, f)
+
+    results = sauce.from_url(url)
+
+    if results[0].author is not None:
+        desc = f"[Link to image by {results[0].author}]({results[0].url})"
+    else:
+        desc = None
+
+    embed = discord.Embed(title=results[0].title, description=desc, colour=0xce3a9b)
+    embed.set_footer(text=f"Similarity: {results[0].similarity}%  ")
+
+    await message.channel.send(embed=embed)
 
 
 async def emoji(message):
     if message.author.guild_permissions.manage_emojis:
         try:
             content = message.content.split()
-            name, url = content[1], content[2]
+            name = content[1]
+
+            if content[2].startswith("<"):
+                url = await extract_emoji(message)
+            else:
+                url = content[2]
+
             print(len(name))
             if len(name) > 32:
                 await message.channel.send("Don't you think that name is a bit too long?..")
@@ -393,28 +463,36 @@ async def emoji(message):
                 print(Path(f"emojis/{name}.{img_type}").stat().st_size)
                 print(img_type)
 
-                if Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and img_type == "jpg" or img_type == "png":
+                if Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and img_type == "jpg" or \
+                        Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and img_type == "png":
                     basewidth = 128
                     img = Image.open(f"emojis/{name}.{img_type}")
                     wpercent = (basewidth / float(img.size[0]))
                     hsize = int((float(img.size[1]) * float(wpercent)))
                     img = img.resize((basewidth, hsize), Image.ANTIALIAS)
                     img.save(f"emojis/{name}_resized.{img_type}")
+                    print("Succeffully resized img")
+
+                    with open(f"emojis/{name}_resized.{img_type}", "rb") as picture:
+                        emoji = await message.guild.create_custom_emoji(name=name, image=picture.read())
 
                 elif Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and img_type == "gif":
                     await pillow.resize_gif(message, f"emojis/{name}.{img_type}", f"emojis/{name}_resized.{img_type}",
                                             (128, 128))
-                print("Successfully resized gif!")
+                    print("Successfully resized gif!")
 
-                if Path(f"emojis/{name}_resized.{img_type}").stat().st_size > 256000 and img_type == "gif":
+                    with open(f"emojis/{name}_resized.{img_type}", "rb") as picture:
+                        emoji = await message.guild.create_custom_emoji(name=name, image=picture.read())
+
+                else:
+                    with open(f"emojis/{name}.{img_type}", "rb") as picture:
+                        emoji = await message.guild.create_custom_emoji(name=name, image=picture.read())
+
+                if os.path.isfile(f"emojis/{name}_resized.{img_type}") and \
+                        Path(f"emojis/{name}_resized.{img_type}").stat().st_size > 256000 and img_type == "gif":
                     await message.channel.send("Even after being resized to 128px your gif is still too big.. ")
                     print(Path(f"emojis/{name}_resized.{img_type}").stat().st_size)
-
-                with open(
-                        f"emojis/{name}_resized.{img_type}", "rb") as picture:
-
-                    emoji = await message.guild.create_custom_emoji(
-                        name=name, image=picture.read())
+                    return
 
                 if emoji and img_type != "gif":
                     msg = f'<:{emoji.name}:{emoji.id}>'
@@ -425,7 +503,8 @@ async def emoji(message):
                 await message.channel.send(msg)
 
             os.remove(f"emojis/{name}.{img_type}")
-            os.remove(f"emojis/{name}_resized.{img_type}")
+            if os.path.isfile(f"emojis/{name}_resized.{img_type}"):
+                os.remove(f"emojis/{name}_resized.{img_type}")
 
         except discord.errors.Forbidden:
             await message.channel.send("I don't have the permissions for this!")
@@ -435,21 +514,6 @@ async def emoji(message):
             await error_log(message, e)
     else:
         await message.channel.send("Insufficient Permissions!!")
-
-
-def getsizes(url):
-    file = urllib.request.urlopen(url)
-    size = int(file.headers.get("content-length"))
-    p = ImageFile.Parser()
-    while True:
-        data = file.read(1024)
-        if not data:
-            break
-        p.feed(data)
-        if p.image:
-            return size
-    file.close()
-    return size
 
 
 async def avatar(message):
