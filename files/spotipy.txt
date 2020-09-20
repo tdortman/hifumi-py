@@ -1,0 +1,3 @@
+49bcda85108442ccb26549d91da2abad
+aadd26575f3c4cbc9e3122fd68a21d0f
+http://localhost:8888/callback/

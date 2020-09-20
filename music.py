@@ -3,8 +3,23 @@ import os
 import youtube_dl
 from discord.utils import get
 from tools import error_log
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+from spotipy.oauth2 import SpotifyOAuth
 
-bot = discord.Client()
+file = open(r"files/spotipy.txt", "r")
+lines = file.readlines()
+SPOTIPY_CLIENT_ID = lines[0]
+SPOTIPY_CLIENT_SECRET = lines[1]
+SPOTIPY_REDIRECT_URI = lines[2]
+file.close()
+
+bot = None
+
+
+def passClientVar(client):
+    global bot
+    bot = client
 
 
 async def join(message):
@@ -41,7 +56,7 @@ async def leave(message):
             await message.channel.send("Not currently in a voice channel!")
     except AttributeError:
         await message.channel.send("We both have to be in the same voice channel "
-                       "for this!")
+                                   "for this!")
     except Exception as e:
         await error_log(message, e)
 
@@ -86,3 +101,16 @@ async def play(message, url: str):
         voice.source.volume = 1
     except Exception as e:
         await error_log(message, e)
+
+
+async def spotify(message):
+    scope = "user-library-read"
+
+    auth_manager = SpotifyOAuth(scope=scope, client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET,
+                                redirect_uri=SPOTIPY_REDIRECT_URI)
+    auth_manager.get_access_token(-1)
+
+    sp = spotipy.Spotify(auth=auth_manager)
+
+    artist = sp.artist("spotify:artist:0bAsR2unSRpn6BQPEnNlZm")
+    await message.channel.send(artist)

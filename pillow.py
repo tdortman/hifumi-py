@@ -6,8 +6,7 @@ import os
 from imgurpython import ImgurClient
 from tools import error_log
 import pytesseract
-import main
-
+from tools import download_url, extract_emoji
 bot = None
 
 
@@ -16,27 +15,34 @@ def passClientVar(client):
     bot = client
 
 
-client_id = 'e6520e1c5f89fea'
-client_secret = '38894f326220d5f45e6d7b2adea5635408e6fe71'
+CLIENT_ID = 'e6520e1c5f89fea'
+CLIENT_SECRET = '38894f326220d5f45e6d7b2adea5635408e6fe71'
 
-im = ImgurClient(client_id, client_secret)
+im = ImgurClient(CLIENT_ID, CLIENT_SECRET)
 
 
 async def beautiful(message):
     try:
+        content = message.content.split()
         beautiful_img = Image.open('files/background.png', 'r')
+
+        if len(content) == 1:
+            await message.channel.send("Seems like you didn't mention anyone!")
+            return
+        elif not content[1].isdigit():
+            await message.channel.send("Invalid ID! Use numbers only please")
+            return
+        elif len(str(content[1])) != 18:
+            await message.channel.send("Invalid ID! It has to be exactly 18 digits long")
+            return
+
         if message.mentions:
             user = message.mentions[0]
         else:
-            user = await bot.fetch_user(int(message.content.split()[1]))
+            user = await bot.fetch_user(int(content[1]))
 
         user_avatar = str(user.avatar_url).replace("webp", "png")
-        r = requests.get(
-            user_avatar, stream=True, headers={
-                'User-agent': 'Mozilla/5.0'})
-        with open(f"files/{user.id}.png", 'wb') as f:
-            r.raw.decode_content = True
-            shutil.copyfileobj(r.raw, f)
+        await download_url(user_avatar, f"files/{user.id}.png")
 
         img = await resize(f"files/{user.id}.png", 180, f'files/{user.id}_resized.png')
 
@@ -53,10 +59,7 @@ async def beautiful(message):
         os.remove(f"files/{user.id}.png")
         os.remove(f"files/{user.id}_resized.png")
         os.remove(f"files/beautiful.png")
-    except ValueError:
-        await message.channel.send("Invalid ID! Use numbers only please!")
-    except IndexError:
-        await message.channel.send("Seems like you didn't mention anyone!")
+
     except discord.errors.NotFound:
         await message.channel.send("That's not a valid ID!")
     except Exception as e:
@@ -76,17 +79,23 @@ async def resize(file_location: str, width: int, save_location: str = None):
     return img
 
 
-async def resize_img(message):
+async def resize_img(message, url=None, img_width=None):
     try:
         content = message.content.split()
-        width = int(content[1])
+
+        if img_width is not None:
+            width = img_width
+        else:
+            width = int(content[1])
 
         if width >= 5000:
             await message.channel.send("Don't you think that's a bit too much?..")
             return
 
-        if content[2].startswith("<"):
-            img_url = await main.extract_emoji(message)
+        if url is not None:
+            img_url = url
+        elif content[2].startswith("<"):
+            img_url = await extract_emoji(message)
         else:
             img_url = content[2]
 
@@ -97,17 +106,10 @@ async def resize_img(message):
         elif 'gif' in img_url:
             img_type = 'gif'
 
-        r = requests.get(
-            img_url, stream=True, headers={
-                'User-agent': 'Mozilla/5.0'})
-
-        with open(f"files/unknown.{img_type}", 'wb') as f:
-            r.raw.decode_content = True
-            shutil.copyfileobj(r.raw, f)
+        await download_url(img_url, f"files/unknown.{img_type}")
 
         image = Image.open(f"files/unknown.{img_type}")
         width_res, height_res = image.size
-        print(width_res, height_res)
 
         if img_type != 'gif':
             await resize(f"files/unknown.{img_type}", width, f"files/unknown_resized.{img_type}")
@@ -250,13 +252,7 @@ async def imgur(message, url=None):
         elif 'gif' in img_url:
             img_type = 'gif'
 
-        r = requests.get(
-            img_url, stream=True, headers={
-                'User-agent': 'Mozilla/5.0'})
-
-        with open(f"files/imgur.{img_type}", 'wb') as f:
-            r.raw.decode_content = True
-            shutil.copyfileobj(r.raw, f)
+        await download_url(img_url, f"files/imgur.{img_type}")
 
         if os.stat(f"files/imgur.{img_type}").st_size > 10000000:
             await message.channel.send("Your image is over 10MB big, try resizing it first.")

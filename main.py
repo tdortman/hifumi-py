@@ -4,20 +4,19 @@ import discord
 import qrcode
 from udpy import UrbanClient
 import asyncio
-import importlib
+from importlib import reload
 from PIL import Image
 import requests
-import shutil
 import os
 from pathlib import Path
 from datetime import datetime as dt
-import time
+from math import pi, sqrt, log, e
 import reddit
 import music
 import encryption
 import pillow
 import tools
-from tools import error_log
+from tools import error_log, download_url, extract_emoji
 
 bot = None
 
@@ -27,154 +26,7 @@ def passClientVar(client):
     bot = client
 
 
-bot_owner = 258993932262834188
-
-emote_msg = {
-    'cuddle': ['cuddle', 'cuddles', 'cuddwe', 'cuddwes'],
-    'hug': ['hug', 'hugs', 'hwug', 'hwugs'],
-    'kiss': ['kiss', 'kisses', 'kwiss', 'kwisses'],
-    'pat': ['pat', 'pet', 'pats', 'pets', 'pwat', 'pwet', 'pwats', 'pwets'],
-    'snuggle': ['snuggle', 'snuggles', 'snuggwe', 'snuggwes'],
-    'poke': ['poke', 'pokes', 'pwoke', 'pwokes'],
-    'slap': ['slap', 'slaps'],
-    'shy': ['shy', 'shies', 'shwy', 'shwies', 'shwiesh'],
-    'handhold': ['handhold', 'handholds', 'handhowd', 'handhowds'],
-    'lick': ['lick', 'licks', 'wick', 'wicks'],
-    'tickle': ['tickle', 'tickles', 'tickwe', 'tickwes'],
-    'cheekkiss': ['cheekkiss', 'kiss_cheek', 'kisscheek', 'kwisscheek', 'cheekkwiss', 'kwiss_cheek'],
-    'boop': ['boop', 'boops', 'bwoop', 'bwoops'],
-    'nuzzle': ['nuzzle', 'nuzzwe'],
-    'huggle': ['huggle', 'huggles', 'huggwe', 'huggwes'],
-    'smile': ['smile'],
-    'hide': ['hide', 'hides', 'hwide', 'hwides'],
-    'nibble': ['nibble', 'nibbles', 'nibbwe', 'nibbwes'],
-    'flick': ["flick", "fwick"]
-}
-
-react_msg = {
-    'cuddle': ['Ah, s-senpai, thank you for your c-cuddle..! _Smiles and  cuddles back._',
-               'Mmmm~ Senpai, thank chuu!~  _Smiles and cuddles {0} back._',
-               "_Rubs {0}'s back softly_  Your cuddles are always the b-best, senpai~",
-               "_Blushes and cuddles into {user} as well._ Cuddlesss for the best senpai!~ _Giggles._",
-               "_Cuddles back into {0}._ Mmm~  You must l-l-love m-me, s-senpai...!~"],
-
-    'hug': ["Huggiess!~ _Giggles and hugs {0} back._",
-            "_Hugs and cuddles {0} back._  T-thank chu for a hug.. I needed it!~",
-            "_Smiles and nuzzle-hugs {0}._  Ah, I missed hugs from y-you, senpai!~",
-            "_Embraces {0} in a hug as well._  H-here, let m-me hug you b-back..!",
-            "H-huh..? Aaaah..!  S-senpai..! What an unexpected h-hug..! _Blushes._"],
-
-    'kiss': ["_Blushes bright red._  S-senpai..! Y-you kissed me..!",
-             "_Blushes in a shock._  W-wha..? _Hides her face, shy._",
-             "S-senpai...! W-why you k-k-kiss... m-me..? _Looks away, embarrassed by your kiss._",
-             "H-huhh...? Aaaah~ S-senpai...! _Blushes and hides after {0}'s kiss._",
-             "_Blushes and kisses back, blushing afterwards._ D-don't tell anyone, o-okay..? _Smiles "
-             "cutely._"],
-
-    'pat': ["_Looks at {0} confused._  W-what are you d-doing, s-senpai..?~",
-            "_Blushes and looks shily at {0}._  T-thank chu for a pat~",
-            "S-senpai~  _Giggles_  Thank you for a pat!!~",
-            "_Smiles at {0}._  Thank you~  _Giggles and smiles some more._",
-            "Ahhhh~ _Smiles happily,_  M-more, s-senpai...!~"],
-
-    'snuggle': ["Snugglesss~  _Chuckles and snuggles back into {0}._",
-                "_Snuggles back into {0} with a blush and a smile_  Snuggles for my senpai!~",
-                "Awwh, senpai~  _Smiles and snuggles back._",
-                "T-thank you, senpai~  _Smiles and snuggles {0} softly._",
-                "Awwwwh, more, pwease..!~  _Snuggles softly into {0}._"],
-
-    'poke': ["H-huh..? W-what do you n-need...? _Looks at you._",
-             "Oh, s-senpai..! Didn't notice you there..! Do you need anything? _Smiles at you._",
-             "Senpai..! _Smiles_  Do you need anything?~",
-             "_Jumps a little_  Y-yes..? W-what is it? Need something..? You could've just sent an E-Mail...",
-             "_Looks away for a moment before turning back to you_  Y-yes..? "],
-
-    'slap': ["_Looks at you and runs away._",
-             "_Stares at you_  W-what did I do to y-you...  _Leaves._",
-             "W-what..? _Look at you confused about what just happened._ ",
-             "W-what...? W-why, s-senpai...? _Looks sad, tear rolling down her cheek._",
-             "Why would you...? _Looks at you through tear in her eyes._"],
-
-    'shy': ["Ah, you cute little sweetheart~  _Smiles and huggles {0} softly._",
-            "_Wraps her arms around {0}_  Senpai~  What made you so shy?~",
-            "O-oh..? Is aught w-wrong, senpai..? _Smiles as you shy into her._",
-            "Hmm? What.. Oh, s-senpai..! _Looks a bit surprised and hugs you softly._",
-            "_Hugs you softly and shily._  S-senpai~ Why so shy?~ _Blushes._"],
-
-    'handhold': ["_Holds your hand as well, blushing a little_.",
-                 "Aaah, m-my hand..! _Blushes and looks away, shy._",
-                 "S-senpai..? W-what are you doing? This is n-not really a-appropriate.. _Blushes._",
-                 "_Smiles at you as you hold her hand_  S-senpai, we s-shouldn't...",
-                 "_Jumps a little as you touched her hand_  H-huh.. oh.. you are... _Blushes and stares "
-                 "into your "
-                 "eyes._"],
-
-    'lick': ["_Looks at you in a shock_  S-senpai..! W-what are y-you doing..??",
-             "H-huh..? W-what did you do..? Eww..!  _Blushes and turns away._",
-             "H-hey..! D-don't lick me! _Pouts a little, being shy and cute_",
-             "S-senpai..! W-why would you l-lick me..? That is a very l-l-lewd thing to do..!",
-             "N-no..! D-don't do this a-again, s-senpai..! _Looks at you cutely, wiping off the place you "
-             "licked._"],
-
-    'tickle': [
-        "Aaah..! Ahahahah..! S-senpai.. Hehh.. Y-you can't do t-this to.. Ahahahh.. to me..! _Laughs as "
-        "you tickle her._",
-        "N-nooo..! _Giggles_  S-senpai..! T-that is e-enough.. Aahhhahahh.. S-stoop it..! _Squirms around "
-        "as you tickle her relentlessly._",
-        "H-huh..? N-noo..! Ahahahah s-senpai..! P-please stoooop..! _Laughs uncontrollably_",
-        "O-oh, s-senpai.. N-nuh uh.. Aahahhah.. Noo..! S-stop.. _Giggles_  S-stop pwease..! Ahahahah..!",
-        "_Laughs happily, squirming around as you tickle her._  S-senpai.. Ahahahah.. s-stop pwease..! "],
-
-    'cheekkiss': ["_Smiles and blushes cutely as you kiss her cheek._",
-                  "Oh s-senpai~  _Smiles at you cutely, hugging you afterwards._",
-                  "_Blushes as you kiss her cheek, kissing your cheek as well._",
-                  "Awwh, t-thank you, senpai~  _Smiles cutely at you._",
-                  "_Quickly leans to {0} and kisses their cheek as well._  T-there you go, s-senpai!~ _Smiles._"],
-
-    'boop': ["H-huh..? _Looks at you confused as you booped her nose._",
-             "Uwa... W-what..? W-why..?  _Looks at you confused and embarrassed._",
-             "_Looks shily away as you booped her nose, turning her cute and embarrassed._",
-             "Hyaaan.. W-what was that..? S-senpai..! _Looks away, shy._  M-my nose..",
-             "S-senpai..! W-why would you... _Cuts off the sentence, looking away shily._"],
-
-    'smile': ["_Smiles back at you._  Your smile is very nice today, s-senpai~",
-              "_Smiles back at {0}, cheeks going slightly red._",
-              "Oh, s-senpai~ _Returns the smile._",
-              "_Returns the smile with a slight blush._",
-              "What a s-sweet senpai you are~ _Smiles at {0}, blushing slightly as well._"],
-
-    'nuzzle': ["Ah, s-senpai..! D-don't embarrass m-me.. _Blushes and hugs you as you nuzzle into her._",
-               "H-huh..? What are you doing, s-senpai..? Oh well, c-come here~  _Wraps her arms around you as you "
-               "nuzzle into her._",
-               "Hehe, senpai~  _Nuzzles back into you as well._  You always k-know what I n-need~",
-               "_Smiles and snuggles into you as you nuzzle into her._  Mmmm~  Senpai~",
-               "W-what's w-wrong..? W-why are you s-smiling at me..? _Asks in an embarrassed tone._"],
-
-    'huggle': ["Ah, s-senpai~  _Giggles and smiles a little as she returns the huggle._",
-               "_Huggles you back, blushing a little_  Huggwes anytime f-for my s-senpai~",
-               "Uh-uhhh? S-senpai, w-what are you doing? Oh.. I s-see.. _Huggles {0} back, cuddling a little as "
-               "well~_",
-               "_Giggles._  Ah, senpai~  You're like a big child sometimes, you know that?~  _Huggles back~_",
-               "Senpai~ A-again?~ Ah well, c-come here~ _Huggles into you softly, stroking your back a little._"],
-
-    'flick': ["Awww aw oh.. oh.. s-senpai..! _Holds her forehead after the flick._",
-              "Awwhh...! _She looks shy and embarrassed after you flicked her forehead._",
-              "_Holds her forehead, looking down in an embarrassment._",
-              "_Gasps in a surprise as you flick her forehead._  S-senpai..!",
-              "_Blushes in an embarrassment after you flick her forehead_  Nawww~ d-don't do thaaat!~"],
-
-    'hide': ["_Giggles as you hide behind her._  It's okay, you're safe with me~",
-             "_Blushes as you hide behind her, standing still._  H-huh..? W-what is going on h-here..?",
-             "H-huh..? S-senpai..?  _Looks at you as you were hiding behind her._ W-what's wrong..?",
-             "_Gasps as she suddenly finds you behind her._  W-what is going on..?",
-             "W-what happened..? D-did Hazuki-senpai try to dress y-you in some w-weird clothes again..?"],
-
-    'nibble': ["_Stares at you with a scared expression._  W-what are you d-doing, s-senpai..??",
-               "N-no s-senpai..! N-not there..! _Squirms as you nibble on her, making her blush_",
-               "_Gasps at your action._  S-senpai..! W-w-what are you d-doing..! N-not here..! Noo..",
-               "S-senpai, s-stoop..! I'm n-not your f-food..! _Looks away embarrassed._",
-               "H-huh..? S-senpai n-noo..! S-sojiro, p-protect me..! _Blushes brighly red._"]
-}
+BOT_OWNER = 258993932262834188
 
 
 async def message_in(message):
@@ -223,7 +75,10 @@ async def message_in(message):
                 await emoji(message)
 
             if cmd in ["pfp", "avatar"]:
-                await avatar(message)
+                if sub_cmd in ['server', 's', 'serve', 'serv']:
+                    await server_icon(message)
+                else:
+                    await avatar(message)
 
             if cmd == "bye":
                 await bye(message)
@@ -238,7 +93,7 @@ async def message_in(message):
                 await message.channel.send("Sorry, this command is currently unavailable!")
 
             if cmd == "urban":
-                await message.channel.send("An error occurred! Please try again later")
+                await message.channel.send("Sorry, this command is currently unavailable!")
 
             if cmd == "calc":
                 await calc(message)
@@ -247,7 +102,7 @@ async def message_in(message):
                 await coinflip(message)
 
             if cmd == "numguess":
-                await message.channel.send("An error occurred! Please try again later")
+                await numguess(message)
 
             if cmd == "cuddle":
                 await cuddle(message)
@@ -273,15 +128,25 @@ async def message_in(message):
             if cmd in ['currencies', 'currency', 'cur', 'cu']:
                 await currency_codes(message)
 
-            if cmd == 'test':
+            if cmd in ['commands', 'command', 'comm', 'com']:
                 await tools.help_cmd(message)
 
-        elif message.content.startswith(f"${react_cmd} <@!641409330888835083>"):
+            if cmd == 'py':
+                await py_eval(message)
+
+            if cmd == 'ping':
+                await ping(message)
+
+            if cmd == "test":
+                await test_cmd(message)
+
+        elif message.content.startswith(f"${react_cmd} <@!641409330888835083>") or \
+                message.content.startswith(f"${react_cmd} <@641409330888835083>"):
 
             print(react_cmd)
-            for cmd_type in emote_msg:
-                if react_cmd in emote_msg[cmd_type]:
-                    msg = random.choice(react_msg[cmd_type])
+            for cmd_type in tools.emote_msg:
+                if react_cmd in tools.emote_msg[cmd_type]:
+                    msg = random.choice(tools.react_msg[cmd_type])
                     print(msg)
                     await asyncio.sleep(1)
                     await message.channel.send(msg.format(message.author.name))
@@ -291,26 +156,11 @@ async def message_in(message):
 
 
 async def reload_modules():
-    importlib.reload(encryption)
-    importlib.reload(music)
-    importlib.reload(reddit)
-    importlib.reload(pillow)
-    importlib.reload(tools)
-
-
-def current_time():
-    return int(time.time())
-
-
-async def extract_emoji(message):
-    content = message.content
-    emoji_id = content.split("<")[1].split(">")[0].split(":")[2]
-
-    if content.split("<")[1].split(":")[0] == "a":
-        emoji_url = f"https://cdn.discordapp.com/emojis/{emoji_id}.gif"
-    else:
-        emoji_url = f"https://cdn.discordapp.com/emojis/{emoji_id}.png"
-    return emoji_url
+    reload(encryption)
+    reload(music)
+    reload(reddit)
+    reload(pillow)
+    reload(tools)
 
 
 currencies = {
@@ -328,6 +178,27 @@ currencies = {
     'THB': 'Thai Baht', 'TRY': 'Turkish Lira', 'TWD': 'New Taiwan Dollar', 'UAH': 'Ukrainian Hryvnia',
     'USD': 'United States Dollar', 'UYU': 'Uruguayan Peso', 'ZAR': 'South African Rand'
 }
+
+
+async def test_cmd(message):
+    pass
+
+
+async def ping(message):
+    latency = round(bot.latency * 1000)
+    await message.channel.send(f"Latency: **{latency}ms**")
+
+
+async def py_eval(message):
+    try:
+        if message.author.id == BOT_OWNER:
+            cmd = " ".join(x for x in message.content.split()[1:])
+            rslt = eval(cmd)
+            await message.channel.send(rslt)
+        else:
+            await message.channel.send("Insufficient permissions!")
+    except Exception as e:
+        await error_log(message, e)
 
 
 async def convert(message):
@@ -356,13 +227,14 @@ async def convert(message):
         if cur2 not in data:
             await message.channel.send(f"{cur2} is not a valid currency code!")
             return
+
         rslt = round(val * data[cur2], 2)
-        desc = f"**{round(val)} {cur1} ≈ {rslt} {cur2}**\n\n" \
+        desc = f"**{val} {cur1} ≈ {rslt} {cur2}**\n\n" \
                f"Exchange rate:\n1 {cur1} ≈ {data[cur2]} {cur2}"
 
         embed = discord.Embed(description=desc, title=f"Converting {currencies[cur1]} into {currencies[cur2]}",
                               color=0xce3a9b)
-        embed.set_footer(text=f"{dt.utcnow().strftime('%d/%m/%Y %H:%M:%S')} UTC\nUse the command h?currencies for a "
+        embed.set_footer(text=f"{dt.utcnow().strftime('%d/%m/%Y %H:%M:%S')} UTC\nUse the command h!currencies for a "
                               f"list of currencies available for conversion")
         await message.channel.send(embed=embed)
 
@@ -395,12 +267,15 @@ async def emoji(message):
             content = message.content.split()
             name = content[1]
 
+            if content[1].startswith("<") or "http" in content[1]:
+                await message.channel.send("You didn't specify a name for the emoji!")
+                return
+
             if content[2].startswith("<"):
                 url = await extract_emoji(message)
             else:
                 url = content[2]
 
-            print(len(name))
             if len(name) > 32:
                 await message.channel.send("Don't you think that name is a bit too long?..")
                 return
@@ -408,7 +283,6 @@ async def emoji(message):
                 await message.channel.send("That name is too short! Try again with a longer one")
                 return
 
-            print("Got past the check!")
             if 'jpg' in url:
                 img_type = 'jpg'
             elif 'png' in url:
@@ -416,57 +290,42 @@ async def emoji(message):
             elif 'gif' in url:
                 img_type = 'gif'
 
-            r = requests.get(
-                url, stream=True, headers={
-                    'User-agent': 'Mozilla/5.0'})
-            if r.status_code == 200:
-                emoji = None
-                with open(f"emojis/{name}.{img_type}", 'wb') as f:
+            await download_url(url, f"emojis/{name}.{img_type}")
 
-                    r.raw.decode_content = True
-                    shutil.copyfileobj(r.raw, f)
-                    print("Successfully downloaded image!")
-                print(Path(f"emojis/{name}.{img_type}").stat().st_size)
-                print(img_type)
+            if Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and img_type == "jpg" or \
+                    Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and img_type == "png":
 
-                if Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and img_type == "jpg" or \
-                        Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and img_type == "png":
-                    basewidth = 128
-                    img = Image.open(f"emojis/{name}.{img_type}")
-                    wpercent = (basewidth / float(img.size[0]))
-                    hsize = int((float(img.size[1]) * float(wpercent)))
-                    img = img.resize((basewidth, hsize), Image.ANTIALIAS)
-                    img.save(f"emojis/{name}_resized.{img_type}")
-                    print("Succeffully resized img")
+                await pillow.resize(f"emojis/{name}.{img_type}", 128, f"emojis/{name}_resized.{img_type}")
 
-                    with open(f"emojis/{name}_resized.{img_type}", "rb") as picture:
-                        emoji = await message.guild.create_custom_emoji(name=name, image=picture.read())
-
-                elif Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and img_type == "gif":
-                    await pillow.resize_gif(message, f"emojis/{name}.{img_type}", f"emojis/{name}_resized.{img_type}",
-                                            (128, 128))
-                    print("Successfully resized gif!")
-
-                    with open(f"emojis/{name}_resized.{img_type}", "rb") as picture:
-                        emoji = await message.guild.create_custom_emoji(name=name, image=picture.read())
-
-                else:
-                    with open(f"emojis/{name}.{img_type}", "rb") as picture:
-                        emoji = await message.guild.create_custom_emoji(name=name, image=picture.read())
-
-                if os.path.isfile(f"emojis/{name}_resized.{img_type}") and \
-                        Path(f"emojis/{name}_resized.{img_type}").stat().st_size > 256000 and img_type == "gif":
-                    await message.channel.send("Even after being resized to 128px your gif is still too big.. ")
-                    print(Path(f"emojis/{name}_resized.{img_type}").stat().st_size)
+                if Path(f"emojis/{name}_resized.{img_type}").stat().st_size > 256000:
+                    await message.channel.send("Even after being resized to 128px your image is still too big.. ")
                     return
-
-                if emoji and img_type != "gif":
-                    msg = f'<:{emoji.name}:{emoji.id}>'
-                elif emoji and img_type == "gif":
-                    msg = f"<a:{emoji.name}:{emoji.id}>"
                 else:
-                    msg = 'Emoji object not retrieved!'
-                await message.channel.send(msg)
+                    with open(f"emojis/{name}_resized.{img_type}", "rb") as picture:
+                        emoji = await message.guild.create_custom_emoji(name=name, image=picture.read())
+
+            elif Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and img_type == "gif":
+                await pillow.resize_gif(message, f"emojis/{name}.{img_type}", f"emojis/{name}_resized.{img_type}",
+                                        (128, 128))
+
+                if Path(f"emojis/{name}_resized.{img_type}").stat().st_size > 256000:
+                    await message.channel.send("Even after being resized to 128px your gif is still too big.. ")
+                    return
+                else:
+                    with open(f"emojis/{name}_resized.{img_type}", "rb") as picture:
+                        emoji = await message.guild.create_custom_emoji(name=name, image=picture.read())
+
+            else:
+                with open(f"emojis/{name}.{img_type}", "rb") as picture:
+                    emoji = await message.guild.create_custom_emoji(name=name, image=picture.read())
+
+            if emoji and img_type != "gif":
+                msg = f'<:{emoji.name}:{emoji.id}>'
+            elif emoji and img_type == "gif":
+                msg = f"<a:{emoji.name}:{emoji.id}>"
+            else:
+                msg = 'Emoji object not retrieved!'
+            await message.channel.send(msg)
 
             os.remove(f"emojis/{name}.{img_type}")
             if os.path.isfile(f"emojis/{name}_resized.{img_type}"):
@@ -474,8 +333,8 @@ async def emoji(message):
 
         except discord.errors.Forbidden:
             await message.channel.send("I don't have the permissions for this!")
-        except IndexError:
-            await message.channel.send("You didn't specify a name for the emoji!")
+        except discord.errors.HTTPException:
+            await message.channel.send("You've reached the maximum amount of emojis for this server!")
         except Exception as e:
             await error_log(message, e)
     else:
@@ -484,24 +343,62 @@ async def emoji(message):
 
 async def avatar(message):
     try:
-        if len(message.content.split()) == 1:
+        content = message.content.split()
+        if len(content) == 1:
             user = message.author
         elif message.mentions:
             user = message.mentions[0]
         else:
-            user = await bot.fetch_user(int(message.content.split()[1]))
+            if not content[1].isdigit():
+                await message.channel.send("Invalid ID! Use numbers only please")
+                return
+            elif len(str(content[1])) != 18:
+                await message.channel.send("Invalid ID! It has to be exactly 18 digits long")
+                return
+            else:
+                user = await bot.fetch_user(int(message.content.split()[1]))
+
         pfp = str(user.avatar_url).replace(".webp", ".png")
         desc = f"*{user.name}'s avatar*"
         embed = discord.Embed(description=desc, color=0xce3a9b)
         embed.set_image(url=pfp)
         await message.channel.send(embed=embed)
 
-    except ValueError:
-        await message.channel.send("Invalid ID! Use numbers only please!")
-    except IndexError:
-        await message.channel.send("Seems like you didn't mention anyone!")
     except discord.errors.NotFound:
         await message.channel.send("That's not a valid ID!")
+    except Exception as e:
+        await error_log(message, e)
+
+
+async def server_icon(message):
+    try:
+        server = message.guild
+        icon = str(server.icon_url).replace(".webp", ".png")
+        desc = f"*{server.name}'s icon*"
+
+        await download_url(icon, f"files/{server.id}.png")
+
+        img = Image.open(f"files/{server.id}.png")
+
+        embed = discord.Embed(description=desc, color=0xce3a9b)
+
+        if int(img.size[0]) <= 512:
+            await pillow.resize(f"files/{server.id}.png", 1024, f"files/{server.id}_resized.png")
+            file = discord.File(f"files/{server.id}_resized.png", filename="image.png")
+
+            embed.set_image(url="attachment://image.png")
+            await message.channel.send(file=file, embed=embed)
+            file.close()
+
+        else:
+            embed.set_image(url=server.icon_url)
+            await message.channel.send(embed=embed)
+
+        img.close()
+        os.remove(f"files/{server.id}.png")
+        if os.path.isfile(f"files/{server.id}_resized.png"):
+            os.remove(f"files/{server.id}_resized.png")
+
     except Exception as e:
         await error_log(message, e)
 
@@ -518,13 +415,19 @@ async def bye(message):
 async def urban(message):
     try:
         client = UrbanClient()
-        if message.content.split()[1] == "random":
+
+        if len(message.content.split()) == 1:
+            await message.channel.send("Make sure you enter a valid word to search for!")
+            return
+
+        if message.content.split()[1] in ["random", 'rand', 'r']:
             defs = client.get_random_definition()
         else:
             urban_word = " ".join(message.content.split()[1:])
-            defs = client.get_definition(urban_word)
+            defs = client.get_definition(urban_word)[:5]
 
-        defs_sliced = defs[:5]
+        defs_sliced = list(reversed(sorted(defs, key=lambda x: x.upvotes)))
+
         pages = []
         for i in range(5):
             desc = f"**Definition**:\n{str(defs_sliced[i].definition).replace('[', '').replace(']', '')}\n\n" \
@@ -541,13 +444,14 @@ async def urban(message):
 
         await message.add_reaction("\u2B05")
         await message.add_reaction("\u27A1")
+
         i = 0
         emoji = ""
         while True:
             if emoji == "\u2B05" and i == 0:
                 i += 4
                 await message.edit(embed=pages[i])
-            if emoji == "\u2B05" and i > 0:
+            if emoji == "\u2B05" and 0 < i <= 4:
                 i -= 1
                 await message.edit(embed=pages[i])
             if emoji == "\u27A1" and i == 4:
@@ -563,8 +467,6 @@ async def urban(message):
             if str(res[1].id) != 665224627353681921:
                 emoji = str(res[0].emoji)
                 await message.remove_reaction(res[0].emoji, res[1])
-    except IndexError:
-        await message.channel.send("Make sure you enter a valid word to search for!")
     except asyncio.TimeoutError:
         return
     except Exception as e:
@@ -573,22 +475,12 @@ async def urban(message):
 
 async def calc(message):
     try:
-        num1 = message.content.split()[1]
-        operation = message.content.split()[2]
-        num2 = message.content.split()[3]
-
-        operators = {
-            '+': operator.add,
-            '-': operator.sub,
-            '*': operator.mul,
-            '%': operator.mod,
-            '/': operator.truediv,
-            '//': operator.floordiv,
-            '**': operator.pow
-        }
-
-        if operation in operators:
-            await message.channel.send(operators[operation](int(num1), int(num2)))
+        cmd = " ".join(x for x in message.content.split()[1:])
+        if all(x in "0123456789+-*%/(). " for x in cmd):
+            rslt = eval(cmd)
+            await message.channel.send(round(rslt, 3))
+        else:
+            return
     except Exception as e:
         await error_log(message, e)
 
@@ -627,10 +519,6 @@ async def qr(message):
 
     except Exception as e:
         await error_log(message, e)
-
-
-async def test(message):
-    await message.channel.send('Learning Python is fun!!')
 
 
 async def cuddle(message):

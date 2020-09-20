@@ -4,14 +4,10 @@ import discord
 import main
 import tools
 import pillow
+import music
 
 bot = discord.Client()
-
-start_time = main.current_time()
-main.passClientVar(bot)
-tools.passClientVar(bot)
-pillow.passClientVar(bot)
-
+start_time = tools.current_time()
 
 file = open(r"files/token.txt", "r")
 TOKEN = file.readline()
@@ -22,10 +18,14 @@ file.close()
 async def on_message(message):
     restart_shortcut = "hr~~~"
     if message.content.startswith(restart_shortcut):
-        if message.author.id == 258993932262834188:
+        if message.author.id == main.BOT_OWNER:
             try:
                 reload(main)
                 await main.reload_modules()
+                main.passClientVar(bot)
+                tools.passClientVar(bot)
+                pillow.passClientVar(bot)
+                music.passClientVar(bot)
                 msg = "Reload successful!"
             except Exception as e:
                 msg = f"Reload failed!\n{e}"
@@ -39,8 +39,8 @@ async def on_message(message):
 
 @bot.event
 async def on_ready():
-    time = dt.utcnow().strftime("%d/%m/%Y %H:%M:%S UTC")
-    done_loading_time = main.current_time()
+    time = dt.utcnow().strftime("%d/%m/%Y %H:%M:%S")
+    done_loading_time = tools.current_time()
 
     print(f'Started up in {done_loading_time - start_time} seconds on {time} UTC')
     print('Logged in as:')
@@ -53,5 +53,11 @@ async def on_ready():
                        f"--------------------------")
     game = discord.Game("with best girl Annie!")
     await bot.change_presence(activity=game)
+
+    main.passClientVar(bot)
+    tools.passClientVar(bot)
+    pillow.passClientVar(bot)
+    music.passClientVar(bot)
+
 
 bot.run(TOKEN)
