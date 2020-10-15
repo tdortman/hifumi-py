@@ -3,8 +3,6 @@ from importlib import reload
 import discord
 import main
 import tools
-import pillow
-import music
 
 bot = discord.Client()
 start_time = tools.current_time()
@@ -22,10 +20,7 @@ async def on_message(message):
             try:
                 reload(main)
                 await main.reload_modules()
-                main.passClientVar(bot)
-                tools.passClientVar(bot)
-                pillow.passClientVar(bot)
-                music.passClientVar(bot)
+                main.init_vars(bot)
                 msg = "Reload successful!"
             except Exception as e:
                 msg = f"Reload failed!\n{e}"
@@ -52,12 +47,7 @@ async def on_ready():
     await channel.send(f"Logged in as:\n{bot.user.name}\nTime: {time}\n"
                        f"--------------------------")
     game = discord.Game("with best girl Annie!")
+    main.init_vars(bot)
     await bot.change_presence(activity=game)
-
-    main.passClientVar(bot)
-    tools.passClientVar(bot)
-    pillow.passClientVar(bot)
-    music.passClientVar(bot)
-
 
 bot.run(TOKEN)

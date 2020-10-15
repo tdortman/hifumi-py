@@ -1,4 +1,3 @@
-import operator
 import random
 import discord
 import qrcode
@@ -11,22 +10,32 @@ import os
 from pathlib import Path
 from datetime import datetime as dt
 from math import pi, sqrt, log, e
+from functools import reduce
 import reddit
 import music
 import encryption
 import pillow
 import tools
-from tools import error_log, download_url, extract_emoji
 
 bot = None
 
 
-def passClientVar(client):
+def init_vars(client):
     global bot
     bot = client
+    music.get_client_var(client)
+    pillow.get_client_var(client)
+    tools.get_client_var(client)
 
 
 BOT_OWNER = 258993932262834188
+EMBED_COLOUR = 0xce3a9b
+
+file = open(r"files/credentials.txt", "r")
+lines = file.readlines()
+OXFORD_APP_ID = lines[3].split()[1]
+OXFORD_APP_KEY = lines[4].split()[1]
+file.close()
 
 
 async def message_in(message):
@@ -34,8 +43,8 @@ async def message_in(message):
         content = message.content.split()
         react_cmd = content[0][1:] if len(content) > 1 else None
 
-        if message.content.startswith("h!"):
-            cmd = content[0].strip("h!")
+        if message.content.lower().startswith("h!"):
+            cmd = content[0][2:].lower()
             sub_cmd = content[1] if len(content) >= 2 else None
 
             if cmd == "beautiful":
@@ -102,7 +111,7 @@ async def message_in(message):
                 await coinflip(message)
 
             if cmd == "numguess":
-                await numguess(message)
+                await message.channel.send("Sorry, this command is currently unavailable!")
 
             if cmd == "cuddle":
                 await cuddle(message)
@@ -114,7 +123,7 @@ async def message_in(message):
                 await convert(message)
 
             if cmd == "error":
-                await error_log(message, "This is a test error!")
+                await tools.error_log(message, "This is a test error!")
 
             if cmd == "resize":
                 await pillow.resize_img(message)
@@ -128,7 +137,7 @@ async def message_in(message):
             if cmd in ['currencies', 'currency', 'cur', 'cu']:
                 await currency_codes(message)
 
-            if cmd in ['commands', 'command', 'comm', 'com']:
+            if cmd in ['commands', 'command', 'comm', 'com', 'help']:
                 await tools.help_cmd(message)
 
             if cmd == 'py':
@@ -137,22 +146,21 @@ async def message_in(message):
             if cmd == 'ping':
                 await ping(message)
 
-            if cmd == "test":
+            if message.author.id == BOT_OWNER and cmd == "test":
                 await test_cmd(message)
 
+        # Reactions for Miku's emotes
         elif message.content.startswith(f"${react_cmd} <@!641409330888835083>") or \
                 message.content.startswith(f"${react_cmd} <@641409330888835083>"):
 
-            print(react_cmd)
             for cmd_type in tools.emote_msg:
                 if react_cmd in tools.emote_msg[cmd_type]:
                     msg = random.choice(tools.react_msg[cmd_type])
-                    print(msg)
                     await asyncio.sleep(1)
                     await message.channel.send(msg.format(message.author.name))
 
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)
 
 
 async def reload_modules():
@@ -181,7 +189,54 @@ currencies = {
 
 
 async def test_cmd(message):
-    pass
+    search_term = message.content.split()[1].lower()
+
+    endpoint = "entries"
+    language_code = "en-gb"
+    fields = "definitions,examples"
+
+    url = f"https://od-api.oxforddictionaries.com/api/v2/{endpoint}/{language_code}/{search_term}?fields={fields}"
+    r = requests.get(url, headers={"app_id": OXFORD_APP_ID, "app_key": OXFORD_APP_KEY})
+
+    if r.status_code == 404:
+        url = f"https://od-api.oxforddictionaries.com/api/v2/lemmas/{language_code}/{search_term}?fields={fields}"
+        r = requests.get(url, headers={"app_id": OXFORD_APP_ID, "app_key": OXFORD_APP_KEY})
+
+        search_term = r.json()['results'][0]['lexicalEntries'][0]['inflectionOf'][0]['text']
+
+        url = f"https://od-api.oxforddictionaries.com/api/v2/{endpoint}/{language_code}/{search_term}?fields={fields}"
+        r = requests.get(url, headers={"app_id": OXFORD_APP_ID, "app_key": OXFORD_APP_KEY})
+
+        print(r.json())
+        await message.channel.send(r.json())
+        definition = r.json()['results'][0]["lexicalEntries"][0]['entries'][0]['senses'][0]['definitions'][0]
+        # example = r.json()['results'][0]["lexicalEntries"][0]['entries'][0]['senses'][0]['examples'][0]['text']
+        await message.channel.send(r.status_code)
+        await message.channel.send(f"{definition}")
+    else:
+        definition = r.json()['results'][0]["lexicalEntries"][0]['entries'][0]['senses'][0]['definitions'][0]
+        example = r.json()['results'][0]["lexicalEntries"][0]['entries'][0]['senses'][0]['examples'][0]['text']
+        print(r.json())
+        await message.channel.send(r.status_code)
+        await message.channel.send(f"{definition}\n\n{example}")
+
+
+async def test_cmd2(message):
+    await tools.download_url("https://cdn.discordapp.com/attachments/476853241204834315/762105595691008030/image0.jpg",
+                             "files/test.jpg")
+    with open("files/test.jpg", 'rb') as g:
+        file = g.read()
+    await message.channel.send(len(bot.guilds))
+    new_server = await bot.create_guild(name="test", icon=file, code="6F4ukJPRGW4F")
+    await message.channel.send(len(bot.guilds))
+    print(len(new_server.channels))
+    # for i in bot.guilds:
+    # await message.channel.send(f"{i.name} - {i.id}")
+    print(len(new_server.channels))
+    channel = await new_server.create_text_channel(name="general")
+    print(len(new_server.channels))
+    invite = await channel.create_invite()
+    await message.channel.send(invite.url)
 
 
 async def ping(message):
@@ -191,14 +246,24 @@ async def ping(message):
 
 async def py_eval(message):
     try:
+        content = message.content.split()
+        if len(content) == 1:
+            await message.channel.send("You have to type **SOMETHING** at least")
+            return
+
         if message.author.id == BOT_OWNER:
             cmd = " ".join(x for x in message.content.split()[1:])
             rslt = eval(cmd)
+
+            if not rslt:
+                await message.channel.send("Cannot send an empty message!")
+                return
             await message.channel.send(rslt)
+
         else:
             await message.channel.send("Insufficient permissions!")
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)
 
 
 async def convert(message):
@@ -211,6 +276,7 @@ async def convert(message):
 
         val, cur1, cur2 = float(content[1]), content[2].upper(), content[3].upper()
 
+        # Make a request to the api, handle possible errors, extracts and checks conversion rates for specific currency
         url = f'https://prime.exchangerate-api.com/v5/81f453a13268228658567d13/latest/{cur1}'
         response = requests.get(url)
         result = response.json()
@@ -228,18 +294,20 @@ async def convert(message):
             await message.channel.send(f"{cur2} is not a valid currency code!")
             return
 
+        # Rounds the amount after conversion to 2 digits, description set to avoid .0 at the end since it's a float
         rslt = round(val * data[cur2], 2)
-        desc = f"**{val} {cur1} ≈ {rslt} {cur2}**\n\n" \
+        desc = f"**{tools.adv_round(val)} {cur1} ≈ {tools.adv_round(rslt)} {cur2}**\n\n" \
                f"Exchange rate:\n1 {cur1} ≈ {data[cur2]} {cur2}"
 
+        # Created Embed and send it in the channel
         embed = discord.Embed(description=desc, title=f"Converting {currencies[cur1]} into {currencies[cur2]}",
-                              color=0xce3a9b)
+                              color=EMBED_COLOUR)
         embed.set_footer(text=f"{dt.utcnow().strftime('%d/%m/%Y %H:%M:%S')} UTC\nUse the command h!currencies for a "
                               f"list of currencies available for conversion")
         await message.channel.send(embed=embed)
 
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)
 
 
 async def currency_codes(message):
@@ -247,6 +315,9 @@ async def currency_codes(message):
     columns = ["", "", ""]
     currency_keys = sorted(list(currencies))
 
+    # Splits the currencies into 3 different columns
+    # that then get added to an Embed as individual fields
+    # and sent into the channel
     for i in range(len(currency_keys)):
         if i <= 16:
             columns[0] += str(f"**{currency_keys[i]}** - {currencies[str(currency_keys[i])]}\n")
@@ -255,7 +326,7 @@ async def currency_codes(message):
         else:
             columns[2] += str(f"**{currency_keys[i]}** - {currencies[str(currency_keys[i])]}\n")
 
-    embed = discord.Embed(title=title, color=0xce3a9b)
+    embed = discord.Embed(title=title, color=EMBED_COLOUR)
     for i in range(3):
         embed.add_field(name='\u200b', value=columns[i])
     await message.channel.send(embed=embed)
@@ -265,17 +336,28 @@ async def emoji(message):
     if message.author.guild_permissions.manage_emojis:
         try:
             content = message.content.split()
+
+            # Checks for all the possible wrong inputs possible
+            if len(content) == 1:
+                await message.channel.send("You specified neither a name nor an emoji or url")
+                return
+
             name = content[1]
 
-            if content[1].startswith("<") or "http" in content[1]:
+            if name.startswith("<") or "http" in name:
                 await message.channel.send("You didn't specify a name for the emoji!")
                 return
 
-            if content[2].startswith("<"):
-                url = await extract_emoji(message)
+            # Extracting url for the emoji based on the url/emoji given
+            if content[2].startswith("<") and "http" not in content[2]:
+                url = await tools.extract_emoji(content[2])
+            elif 'http' in content[2] and "<>" not in content[2]:
+                url = content[2][1:-1]
             else:
-                url = content[2]
+                await message.channel.send("You didn't specify a url or emoji!")
+                return
 
+            # Emoji names have to be between 2 and 32 characters long
             if len(name) > 32:
                 await message.channel.send("Don't you think that name is a bit too long?..")
                 return
@@ -283,17 +365,13 @@ async def emoji(message):
                 await message.channel.send("That name is too short! Try again with a longer one")
                 return
 
-            if 'jpg' in url:
-                img_type = 'jpg'
-            elif 'png' in url:
-                img_type = 'png'
-            elif 'gif' in url:
-                img_type = 'gif'
+            img_type = await tools.get_img_type(url)
 
-            await download_url(url, f"emojis/{name}.{img_type}")
+            await tools.download_url(url, f"emojis/{name}.{img_type}")
 
-            if Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and img_type == "jpg" or \
-                    Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and img_type == "png":
+            # Checks cases when the image is too big (256KB) and proceeds to resize them to 128x128 when needed
+            # Creates custom emoji with either the initial image or a resized version
+            if Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and (img_type == "jpg" or img_type == "png"):
 
                 await pillow.resize(f"emojis/{name}.{img_type}", 128, f"emojis/{name}_resized.{img_type}")
 
@@ -319,6 +397,7 @@ async def emoji(message):
                 with open(f"emojis/{name}.{img_type}", "rb") as picture:
                     emoji = await message.guild.create_custom_emoji(name=name, image=picture.read())
 
+            # Sending the newly created emoji as confirmation
             if emoji and img_type != "gif":
                 msg = f'<:{emoji.name}:{emoji.id}>'
             elif emoji and img_type == "gif":
@@ -327,6 +406,7 @@ async def emoji(message):
                 msg = 'Emoji object not retrieved!'
             await message.channel.send(msg)
 
+            # Deletes any leftover files
             os.remove(f"emojis/{name}.{img_type}")
             if os.path.isfile(f"emojis/{name}_resized.{img_type}"):
                 os.remove(f"emojis/{name}_resized.{img_type}")
@@ -336,7 +416,7 @@ async def emoji(message):
         except discord.errors.HTTPException:
             await message.channel.send("You've reached the maximum amount of emojis for this server!")
         except Exception as e:
-            await error_log(message, e)
+            await tools.error_log(message, e)
     else:
         await message.channel.send("Insufficient Permissions!!")
 
@@ -344,6 +424,8 @@ async def emoji(message):
 async def avatar(message):
     try:
         content = message.content.split()
+
+        # Fetches User Object based on different scenarios
         if len(content) == 1:
             user = message.author
         elif message.mentions:
@@ -352,36 +434,37 @@ async def avatar(message):
             if not content[1].isdigit():
                 await message.channel.send("Invalid ID! Use numbers only please")
                 return
-            elif len(str(content[1])) != 18:
-                await message.channel.send("Invalid ID! It has to be exactly 18 digits long")
-                return
             else:
                 user = await bot.fetch_user(int(message.content.split()[1]))
 
+        # Converts avatar image into a PNG, creates an Embed and sends it
         pfp = str(user.avatar_url).replace(".webp", ".png")
         desc = f"*{user.name}'s avatar*"
-        embed = discord.Embed(description=desc, color=0xce3a9b)
+        embed = discord.Embed(description=desc, color=EMBED_COLOUR)
         embed.set_image(url=pfp)
         await message.channel.send(embed=embed)
 
     except discord.errors.NotFound:
         await message.channel.send("That's not a valid ID!")
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)
 
 
 async def server_icon(message):
     try:
+        # Retrieves server icon, downloads it, opens it and creates am Embed Object
         server = message.guild
         icon = str(server.icon_url).replace(".webp", ".png")
         desc = f"*{server.name}'s icon*"
 
-        await download_url(icon, f"files/{server.id}.png")
+        await tools.download_url(icon, f"files/{server.id}.png")
 
         img = Image.open(f"files/{server.id}.png")
 
-        embed = discord.Embed(description=desc, color=0xce3a9b)
+        embed = discord.Embed(description=desc, color=EMBED_COLOUR)
 
+        # Checks the icon's width, if it's under 512px it gets resized to 1024px width
+        # (Resized) image gets added to the Embed and sent
         if int(img.size[0]) <= 512:
             await pillow.resize(f"files/{server.id}.png", 1024, f"files/{server.id}_resized.png")
             file = discord.File(f"files/{server.id}_resized.png", filename="image.png")
@@ -400,7 +483,7 @@ async def server_icon(message):
             os.remove(f"files/{server.id}_resized.png")
 
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)
 
 
 async def bye(message):
@@ -409,7 +492,7 @@ async def bye(message):
             await message.channel.send("Bai baaaaaaaai!!")
             await bot.logout()
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)
 
 
 async def urban(message):
@@ -420,14 +503,18 @@ async def urban(message):
             await message.channel.send("Make sure you enter a valid word to search for!")
             return
 
+        # Keyword to trigger random definitions defined, else the api gets called for
+        # the search-term specified
         if message.content.split()[1] in ["random", 'rand', 'r']:
             defs = client.get_random_definition()
         else:
             urban_word = " ".join(message.content.split()[1:])
             defs = client.get_definition(urban_word)[:5]
 
+        # Definitions sorted by the amount of upvotes so the first page has the most
         defs_sliced = list(reversed(sorted(defs, key=lambda x: x.upvotes)))
 
+        # Loop for creating Embeds for every individual definition
         pages = []
         for i in range(5):
             desc = f"**Definition**:\n{str(defs_sliced[i].definition).replace('[', '').replace(']', '')}\n\n" \
@@ -436,15 +523,18 @@ async def urban(message):
 
             page = discord.Embed(title=defs_sliced[i].word,
                                  description=desc,
-                                 color=0xce3a9b)
+                                 color=EMBED_COLOUR)
             page.set_footer(text=footer)
             pages.append(page)
 
         message = await message.channel.send(embed=pages[0])
 
+        # Reactions added, Left Arrow and Right Arrow
         await message.add_reaction("\u2B05")
         await message.add_reaction("\u27A1")
 
+        # Emoji handler to change the pages upon reacting
+        # Needs to be reworked
         i = 0
         emoji = ""
         while True:
@@ -464,25 +554,50 @@ async def urban(message):
             res = await bot.wait_for("reaction_add", timeout=60.0)
             if res is None:
                 break
-            if str(res[1].id) != 665224627353681921:
+            if str(res[1].id) != 641409330888835083:
                 emoji = str(res[0].emoji)
                 await message.remove_reaction(res[0].emoji, res[1])
     except asyncio.TimeoutError:
         return
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)
 
 
 async def calc(message):
     try:
-        cmd = " ".join(x for x in message.content.split()[1:])
-        if all(x in "0123456789+-*%/(). " for x in cmd):
-            rslt = eval(cmd)
-            await message.channel.send(round(rslt, 3))
-        else:
-            return
+        # Function is getting terminated after a second to avoid killing the bot
+        with tools.timeout(1):
+            if len(message.content.split()) == 1:
+                await message.channel.send("You have to add numbers and expressions if you want to calculate something")
+                return
+
+            # Checks if anything in the message apart from the first word (command)
+            # Isn't allowed to be used (Had to restrict it because it uses a very powerful
+            # Function that allows for the bot's deletion
+            start_time = tools.current_time()
+            cmd = " ".join(x for x in message.content.split()[1:])
+            if all(x in "0123456789+-*%/(). " for x in cmd):
+                rslt = eval(cmd)
+
+                if not rslt:
+                    await message.channel.send("Cannot send an empty message!")
+                    return
+                await message.channel.send(round(tools.adv_round(rslt), 3))
+            else:
+                await message.channel.send("invalid characters")
+                return
+
+    except discord.errors.HTTPException:
+        await message.channel.send("Overflow Error!")
+    except OverflowError:
+        await message.channel.send("Overflow Error!")
+    except KeyboardInterrupt:
+        end_time = tools.current_time()
+        await message.channel.send(f"killed in {end_time - start_time} seconds")
+    except ZeroDivisionError:
+        await message.channel.send("DO. NOT. EVER. DIVIDE. BY. ZERO. OR. THE. UNIVERSE. WILL. IMPLODE.")
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)
 
 
 async def coinflip(message):
@@ -493,7 +608,7 @@ async def coinflip(message):
         else:
             await message.channel.send("Heads!")
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)
 
 
 async def qr(message):
@@ -518,7 +633,7 @@ async def qr(message):
         os.remove('hifumi_qr_code/unknown.png')
 
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)
 
 
 async def cuddle(message):
@@ -528,7 +643,7 @@ async def cuddle(message):
             f"*{message.author.mention} goes up to {target} and cuddles tightly, "
             "trying their best to comfort them*")
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)
 
 
 async def numguess(message):
@@ -582,4 +697,4 @@ async def numguess(message):
     except asyncio.TimeoutError:
         return
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)

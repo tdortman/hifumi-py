@@ -1,13 +1,17 @@
-from datetime import datetime
+from datetime import datetime as dt
 import traceback
 import discord
 import requests
 import shutil
-from time import time
+import time
+import threading
+import _thread
+from typing import Union
+
 bot = None
 
 
-def passClientVar(client):
+def get_client_var(client):
     global bot
     bot = client
 
@@ -158,7 +162,16 @@ react_msg = {
 
 
 async def error_log(message=None, error_msg=None, cmd=None):
-    now = datetime.now()
+    """
+    Error Log to be able to monitor the bot's status within discord and
+    to be notified as soon as something goes wrong wrong.
+
+    :param message: standard discord message object, needed to gain access to a lot of data
+    :param error_msg: optional error message that can be passed as an argument for debugging purposes
+    :param cmd: the specific command that triggered the error
+    :return: None
+    """
+    now = dt.now()
     current_time = now.strftime("%d/%m/%Y %H:%M:%S")
 
     if cmd is None and message is not None:
@@ -185,7 +198,7 @@ async def error_log(message=None, error_msg=None, cmd=None):
 
     if message is None:
         channel = bot.get_channel(655484804405657642)
-    elif message.channel.id in [655484859405303809, 551588329003548683]:
+    elif message.channel.id in [655484859405303809, 551588329003548683, 506834186540154890]:
         channel = message.channel
     else:
         channel = bot.get_channel(655484804405657642)
@@ -198,38 +211,32 @@ async def error_log(message=None, error_msg=None, cmd=None):
         print(msg)
 
 
-async def download_attachments(message):
-    if message.attachments and not message.author.bot:
-        for item in message.attachments:
-            attach = await item.to_file(use_cached=True)
-            await message.channel.send(file=attach)
-
-
 async def help_cmd(message):
-    msgs = ["**h!avatar @user/user-id** - take a nice look at that cool avatar "
-            "your friend or even a stranger has\n\n**h!avatar server** - gives you the icon for the server you're "
-            "currently in\n\n**h!emoji <name> <emoji/url>** - lets you quickly add any "
-            "emoji/image as an emoji in your server\n\n**h!convert <amount> <currency1> <currency2>** - for all those "
-            "occasions where you might wanna quickly convert money from one currency to another\n\n**h!currencies** - "
-            "gives you a nice list of all the currencies you can use for conversion\n\n**h!qr <text>** - for whenever "
-            "you want to generate a QR-code from any text\n\n**h!calc <num1> <operator> <num2>** - a simple "
-            "calculator to play around with for fun\n\n**h!coinflip** - for all those indecisive people who can't "
-            "decide what to eat for dinner\n\n**h!urban <term>** - gives you the first five definitions"
-            " on Urban Dictionary for your search term\n\n**h!cipher <text> <num>** - a nice and simple encryption"
-            " method if you want to send secret messages\n\n**h!numguess** - let's you guess a number"
-            " between 1 and 100\n\n"
-            "**h!beautiful @user/user-id** - shows your friend how beautiful they are, even if they don't want to"
-            " admit it\n\n**h!resize <width> <emoji/url>** - let's you resize any emoji or image/gif you want\n\n"
-            "**h!imgur <url>** - let's you upload any image to imgur\n\n**h!ping** - in case you ever wonder about "
-            "Hifumi's latency\n\n**h!commands** - brings up the help command you're currently looking at",
+    msgs = [
+        "**h!avatar @user/user-id** - take a nice look at that cool avatar "
+        "your friend or even a stranger has\n\n**h!avatar server** - gives you the icon for the server you're "
+        "currently in\n\n**h!emoji <name> <emoji/url>** - lets you quickly add any "
+        "emoji/image as an emoji in your server\n\n**h!convert <amount> <currency1> <currency2>** - for all those "
+        "occasions where you might wanna quickly convert money from one currency to another\n\n**h!currencies** - "
+        "gives you a nice list of all the currencies you can use for conversion\n\n**h!qr <text>** - for whenever "
+        "you want to generate a QR-code from any text\n\n**h!calc <num1> <operator> <num2>** - a simple "
+        "calculator to play around with for fun\n\n**h!coinflip** - for all those indecisive people who can't "
+        "decide what to eat for dinner\n\n**h!urban <term>** - gives you the first five definitions"
+        " on Urban Dictionary for your search term\n\n**h!cipher <text> <num>** - a nice and simple encryption"
+        " method if you want to send secret messages\n\n**h!numguess** - let's you guess a number"
+        " between 1 and 100\n\n"
+        "**h!beautiful @user/user-id** - shows your friend how beautiful they are, even if they don't want to"
+        " admit it\n\n**h!resize <width> <emoji/url>** - let's you resize any emoji or image/gif you want\n\n"
+        "**h!imgur <url>** - let's you upload any image to imgur",
 
-            "**h!sub <name>** - gives you one of the hot or top rated image posts from a "
-            "specific subreddit\n\n**h!sub text <name>** - gives you one of the hot or top rated text posts from a "
-            "specific subreddit\n\n**h!kitsune** - fox girls, who doesn't love them\n\n"
-            "**h!neko** - for all you cat girl lovers (nsfw)\n\n**h!wholesome** - your daily dose of wholesome"
-            " anime memes\n\n**h!bunny** - bunny girls, what were you expecting\n\n**h!thicc** - for all you thigh"
-            " connoisseurs out there (nsfw)\n\n**h!animegirl** - sometimes simple girls are best girls\n\n"
-            "**h!redditor <name>** - for a nice breakdown of someone's reddit profile"]
+        "**h!sub <name>** - gives you one of the hot or top rated image posts from a "
+        "specific subreddit\n\n**h!sub text <name>** - gives you one of the hot or top rated text posts from a "
+        "specific subreddit\n\n**h!kitsune** - fox girls, who doesn't love them\n\n"
+        "**h!neko** - for all you cat girl lovers (nsfw)\n\n**h!wholesome** - your daily dose of wholesome"
+        " anime memes\n\n**h!bunny** - bunny girls, what were you expecting\n\n**h!thicc** - for all you thigh"
+        " connoisseurs out there (nsfw)\n\n**h!animegirl** - sometimes simple girls are best girls\n\n"
+        "**h!redditor <name>** - for a nice breakdown of someone's reddit profile"
+    ]
 
     titles = ["**List of Hifumi's commands**", "**Reddit commands**"]
 
@@ -238,7 +245,30 @@ async def help_cmd(message):
         await message.channel.send(embed=embed)
 
 
+
+async def download_attachments(message):
+    """
+    Checks a specific message and downloads the attachment when someone
+    uploads something before sending it in the same channel
+
+    :param message: discord message object
+    :return: None
+    """
+    if message.attachments and not message.author.bot:
+        for item in message.attachments:
+            attach = await item.to_file(use_cached=True)
+            await message.channel.send(file=attach)
+
+
 async def download_url(url: str, save_location: str):
+    """
+    Makes a request and downloads whatever url you are passing
+    as an argument
+
+    :param url: the direct link to the object you want to download
+    :param save_location: path to the location where you want your file to be saved
+    :return: None
+    """
     r = requests.get(
         url, stream=True, headers={
             'User-agent': 'Mozilla/5.0'})
@@ -249,14 +279,63 @@ async def download_url(url: str, save_location: str):
 
 
 def current_time():
-    return int(time())
+    return int(time.time())
 
 
-async def extract_emoji(message):
-    emoji_id = message.content.split(":")[2][:-1]
+async def extract_emoji(emoji_str: str) -> str:
+    """
+    Extracts the url of a specific emoji through its ID
 
-    if message.content.split()[1].split(":")[0][1] == "a":
+    :param emoji_str: the string that contains the emoji (usually a string from a split message)
+    :return: CDN asset of the emoji (url)
+    """
+    emoji_id = emoji_str.split(":")[2][:-1]
+
+    if emoji_str[1] == "a":
         emoji_url = f"https://cdn.discordapp.com/emojis/{emoji_id}.gif"
     else:
         emoji_url = f"https://cdn.discordapp.com/emojis/{emoji_id}.png"
     return emoji_url
+
+
+class timeout:
+    def __init__(self, time):
+        self.time = time
+        self.exit = False
+
+    def __enter__(self):
+        threading.Thread(target=self.callme).start()
+
+    def callme(self):
+        time.sleep(self.time)
+        if not self.exit:
+            _thread.interrupt_main()
+
+    def __exit__(self, a, b, c):
+        self.exit = True
+
+
+async def get_img_type(url: str) -> str:
+    """
+    Returns the file extension based on the image url
+
+    :param url: url to the direct image that's to be analysed
+    :return: returns the corresponding file extension to the image
+    """
+    if '.png' in url:
+        return "png"
+    elif '.jpg' in url or '.jpeg' in url:
+        return 'jpg'
+    elif '.bmp' in url:
+        return 'bmp'
+    elif '.gif' in url:
+        return 'gif'
+
+
+def adv_round(x: Union[int, float]) -> Union[int, float]:
+    """
+    Returns either int or float of original number, depending if it
+    contains floating-point part or not
+    """
+    return int(x) if x // 1 + x % 1 == int(x) else round(x, 8)
+

@@ -3,7 +3,7 @@ import praw
 import datetime
 import random
 import prawcore
-from tools import error_log
+from tools import error_log, adv_round
 
 reddit = praw.Reddit(client_id='ra7W9w_QZhwRaA',
                      client_secret='DFRuha1D_QLYm-AdCfQW54uiq1M',
@@ -19,7 +19,7 @@ async def profile(message):
         user = reddit.redditor(message.content.split()[1])
         user_url = f"https://www.reddit.com/user/{user.name}"
         created_on = datetime.datetime.utcfromtimestamp(
-            user.created_utc).strftime('%d/%m/%y')
+            user.created_utc).strftime('%d/%m/%Y')
         desc = f"[Link to profile]({user_url})\n" \
                f"Post Karma: {user.link_karma}\n" \
                f"Comment Karma: {user.comment_karma}\n" \
@@ -52,18 +52,23 @@ async def sub(message, subreddit: str = None):
 
                 for i in range(100):
                     submission = next(x for x in submissions)
-                    if submission.url.split("/")[2] == "i.redd.it":
+                    if submission.over_18 and not reddit.subreddit(name).over18:
+                        continue
+
+                    elif submission.url.split("/")[2] == "i.redd.it":
                         sub_cache_img[name].append((submission.url, submission.title))
 
                 submissions = reddit.subreddit(name).top('all')
 
                 for i in range(100):
                     submission = next(x for x in submissions)
-                    if submission.url.split("/")[2] == "i.redd.it":
+                    if submission.over_18 and not reddit.subreddit(name).over18:
+                        continue
+
+                    elif submission.url.split("/")[2] == "i.redd.it":
                         sub_cache_img[name].append((submission.url, submission.title))
 
-                await message.channel.send(
-                    'Results found: {}'.format(len(sub_cache_img[name])))
+                await message.channel.send(f'Results found: {len(sub_cache_img[name])}')
 
             picture, name = random.choice(sub_cache_img[name])
 
@@ -77,6 +82,7 @@ async def sub(message, subreddit: str = None):
             embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
             embed.set_image(url=picture)
             await message.channel.send(embed=embed)
+
     except prawcore.exceptions.Redirect:
         await message.channel.send("That's not a valid subreddit!")
     except prawcore.exceptions.Forbidden:
@@ -87,7 +93,7 @@ async def sub(message, subreddit: str = None):
 
 async def self_posts(message):
     try:
-        name = message.content.split()[-1]
+        name = message.content.split()[2]
         if reddit.subreddit(name).over18 and not message.channel.is_nsfw():
             await message.channel.send("You can't access NSFW subreddits outside of NSFW channels!")
             return
@@ -98,7 +104,9 @@ async def self_posts(message):
 
                 for i in range(100):
                     submission = next(x for x in submissions)
-                    if submission.is_self and len(submission.selftext) <= 2048:
+                    if submission.over_18 and not reddit.subreddit(name).over18:
+                        continue
+                    elif submission.is_self and len(submission.selftext) <= 2048:
                         sub_cache_text[name].append((submission.url, submission.title, submission.selftext,
                                                      submission.score, submission.upvote_ratio, submission.author.name))
 
@@ -106,7 +114,9 @@ async def self_posts(message):
 
                 for i in range(100):
                     submission = next(x for x in submissions)
-                    if submission.is_self and len(submission.selftext) <= 2048:
+                    if submission.over_18 and not reddit.subreddit(name).over18:
+                        continue
+                    elif submission.is_self and len(submission.selftext) <= 2048:
                         sub_cache_text[name].append((submission.url, submission.title, submission.selftext,
                                                      submission.score, submission.upvote_ratio, submission.author.name))
                 await message.channel.send(f"Results found: {len(sub_cache_text[name])}")
@@ -115,7 +125,7 @@ async def self_posts(message):
 
             embed = discord.Embed(title=title, description=f"[Link to post by u/{author}]({url})\n\n{selftext}",
                                   color=0xce3a9b)
-            embed.set_footer(text=f"Upvotes: {upvotes}  Ratio: {ratio * 100}%")
+            embed.set_footer(text=f"Upvotes: {upvotes}  Ratio: {adv_round(ratio * 100)}%")
             await message.channel.send(embed=embed)
     except AttributeError:
         await self_posts(message)
@@ -125,6 +135,3 @@ async def self_posts(message):
         await message.channel.send("Seems like this subreddit is set to private.")
     except Exception as e:
         await error_log(message, e)
-
-
-

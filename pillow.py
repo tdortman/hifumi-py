@@ -4,13 +4,13 @@ import shutil
 import discord
 import os
 from imgurpython import ImgurClient
-from tools import error_log
 import pytesseract
-from tools import download_url, extract_emoji
+import tools
+
 bot = None
 
 
-def passClientVar(client):
+def get_client_var(client):
     global bot
     bot = client
 
@@ -18,22 +18,17 @@ def passClientVar(client):
 CLIENT_ID = 'e6520e1c5f89fea'
 CLIENT_SECRET = '38894f326220d5f45e6d7b2adea5635408e6fe71'
 
-im = ImgurClient(CLIENT_ID, CLIENT_SECRET)
-
 
 async def beautiful(message):
     try:
         content = message.content.split()
-        beautiful_img = Image.open('files/background.png', 'r')
+        background = Image.open('files/background.png', 'r')
 
         if len(content) == 1:
             await message.channel.send("Seems like you didn't mention anyone!")
             return
-        elif not content[1].isdigit():
+        elif not content[1].isdigit() and not message.mentions:
             await message.channel.send("Invalid ID! Use numbers only please")
-            return
-        elif len(str(content[1])) != 18:
-            await message.channel.send("Invalid ID! It has to be exactly 18 digits long")
             return
 
         if message.mentions:
@@ -42,18 +37,18 @@ async def beautiful(message):
             user = await bot.fetch_user(int(content[1]))
 
         user_avatar = str(user.avatar_url).replace("webp", "png")
-        await download_url(user_avatar, f"files/{user.id}.png")
+        await tools.download_url(user_avatar, f"files/{user.id}.png")
 
         img = await resize(f"files/{user.id}.png", 180, f'files/{user.id}_resized.png')
 
         canvas = Image.new("RGBA", (640, 674))
         canvas.paste(img, (422, 35))
         canvas.paste(img, (430, 377))
-        canvas.paste(beautiful_img, None, beautiful_img)
+        canvas.paste(background, None, background)
         canvas.save(f"files/beautiful.png")
 
         with open(f"files/beautiful.png", "rb") as g:
-            picture = discord.File(g)
+            picture = discord.File(g, "unknown.png")
             await message.channel.send(file=picture)
 
         os.remove(f"files/{user.id}.png")
@@ -63,7 +58,7 @@ async def beautiful(message):
     except discord.errors.NotFound:
         await message.channel.send("That's not a valid ID!")
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)
 
 
 async def resize(file_location: str, width: int, save_location: str = None):
@@ -83,6 +78,14 @@ async def resize_img(message, url=None, img_width=None):
     try:
         content = message.content.split()
 
+        if len(content) == 1:
+            await message.channel.send("You specified neither the image nor the size you want to resize it to")
+            return
+
+        if not content[1].isdigit():
+            await message.channel.send("You didn't specify a number!")
+            return
+
         if img_width is not None:
             width = img_width
         else:
@@ -94,19 +97,19 @@ async def resize_img(message, url=None, img_width=None):
 
         if url is not None:
             img_url = url
-        elif content[2].startswith("<"):
-            img_url = await extract_emoji(message)
+        elif content[1].isdigit() and len(content) == 2:
+            await message.channel.send("You also have to specify the image you want to resize!")
+            return
+        elif content[2].startswith("<:"):
+            img_url = await tools.extract_emoji(content[2])
+        elif "http" in content[2] and "<>" in content[2]:
+            img_url = content[2][1:-1]
         else:
             img_url = content[2]
 
-        if 'jpg' in img_url:
-            img_type = 'jpg'
-        elif 'png' in img_url:
-            img_type = 'png'
-        elif 'gif' in img_url:
-            img_type = 'gif'
+        img_type = await tools.get_img_type(img_url)
 
-        await download_url(img_url, f"files/unknown.{img_type}")
+        await tools.download_url(img_url, f"files/unknown.{img_type}")
 
         image = Image.open(f"files/unknown.{img_type}")
         width_res, height_res = image.size
@@ -126,14 +129,14 @@ async def resize_img(message, url=None, img_width=None):
             return
         else:
             with open(f"files/unknown_resized.{img_type}", "rb") as g:
-                picture = discord.File(g)
+                picture = discord.File(g, filename=f'unknown_resized.{img_type}')
                 await message.channel.send(file=picture)
 
         image.close()
         os.remove(f"files/unknown.{img_type}")
         os.remove(f"files/unknown_resized.{img_type}")
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)
 
 
 async def resize_gif(message, path, save_as=None, resize_to=None):
@@ -240,19 +243,16 @@ def extract_and_resize_frames(path, resize_to=None):
 
 async def imgur(message, url=None):
     try:
+        im = ImgurClient(CLIENT_ID, CLIENT_SECRET)
+
         if url:
             img_url = url
         else:
             img_url = message.content.split()[1]
 
-        if 'jpg' in img_url:
-            img_type = 'jpg'
-        elif 'png' in img_url:
-            img_type = 'png'
-        elif 'gif' in img_url:
-            img_type = 'gif'
+        img_type = tools.get_img_type(img_url)
 
-        await download_url(img_url, f"files/imgur.{img_type}")
+        await tools.download_url(img_url, f"files/imgur.{img_type}")
 
         if os.stat(f"files/imgur.{img_type}").st_size > 10000000:
             await message.channel.send("Your image is over 10MB big, try resizing it first.")
@@ -263,7 +263,7 @@ async def imgur(message, url=None):
         os.remove(f"files/imgur.{img_type}")
 
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)
 
 
 async def download_from_url(url):

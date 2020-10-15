@@ -2,22 +2,22 @@ import discord
 import os
 import youtube_dl
 from discord.utils import get
-from tools import error_log
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from spotipy.oauth2 import SpotifyOAuth
+import tools
 
-file = open(r"files/spotipy.txt", "r")
+file = open(r"files/credentials.txt", "r")
 lines = file.readlines()
-SPOTIPY_CLIENT_ID = lines[0]
-SPOTIPY_CLIENT_SECRET = lines[1]
-SPOTIPY_REDIRECT_URI = lines[2]
+SPOTIPY_CLIENT_ID = lines[0].split()[1]
+SPOTIPY_CLIENT_SECRET = lines[1].split()[1]
+SPOTIPY_REDIRECT_URI = lines[2].split()[1]
 file.close()
 
 bot = None
 
 
-def passClientVar(client):
+def get_client_var(client):
     global bot
     bot = client
 
@@ -40,7 +40,7 @@ async def join(message):
         except AttributeError:
             await message.channel.send("You have to join a voice channel first!")
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)
 
 
 async def leave(message):
@@ -58,7 +58,7 @@ async def leave(message):
         await message.channel.send("We both have to be in the same voice channel "
                                    "for this!")
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)
 
 
 async def play(message, url: str):
@@ -100,7 +100,7 @@ async def play(message, url: str):
         voice.source = discord.PCMVolumeTransformer(voice.source)
         voice.source.volume = 1
     except Exception as e:
-        await error_log(message, e)
+        await tools.error_log(message, e)
 
 
 async def spotify(message):
@@ -108,7 +108,7 @@ async def spotify(message):
 
     auth_manager = SpotifyOAuth(scope=scope, client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET,
                                 redirect_uri=SPOTIPY_REDIRECT_URI)
-    auth_manager.get_access_token(-1)
+    auth_manager.get_access_token()
 
     sp = spotipy.Spotify(auth=auth_manager)
 
