@@ -351,8 +351,10 @@ async def emoji(message):
             # Extracting url for the emoji based on the url/emoji given
             if content[2].startswith("<") and "http" not in content[2]:
                 url = await tools.extract_emoji(content[2])
-            elif 'http' in content[2] and "<>" not in content[2]:
+            elif 'http' in content[2] and "<>" in content[2]:
                 url = content[2][1:-1]
+            elif 'http' in content[2]:
+                url = content[2]
             else:
                 await message.channel.send("You didn't specify a url or emoji!")
                 return
