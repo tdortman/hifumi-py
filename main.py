@@ -54,7 +54,7 @@ async def message_in(message):
                 await reddit.profile(message)
 
             if cmd == "kitsune":
-                await reddit.sub(message, "kitsunemimi")
+                await reddit.sub(message, "kitsunemimi+touchfluffytail")
 
             if cmd == "sub":
                 if sub_cmd == "text":

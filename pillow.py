@@ -1,6 +1,4 @@
 from PIL import Image
-import requests
-import shutil
 import discord
 import os
 from imgurpython import ImgurClient
@@ -13,10 +11,15 @@ bot = None
 def get_client_var(client):
     global bot
     bot = client
+    tools.get_client_var(client)
 
 
-CLIENT_ID = 'e6520e1c5f89fea'
-CLIENT_SECRET = '38894f326220d5f45e6d7b2adea5635408e6fe71'
+file = open(r"files/credentials.txt", "r")
+lines = file.readlines()
+
+IMGUR_CLIENT_ID = lines[7].split()[1]
+IMGUR_CLIENT_SECRET = lines[8].split()[1]
+file.close()
 
 
 async def beautiful(message):
@@ -243,15 +246,15 @@ def extract_and_resize_frames(path, resize_to=None):
 
 async def imgur(message, url=None):
     try:
-        im = ImgurClient(CLIENT_ID, CLIENT_SECRET)
+        im = ImgurClient(IMGUR_CLIENT_ID, IMGUR_CLIENT_SECRET)
 
         if url:
             img_url = url
         else:
             img_url = message.content.split()[1]
 
-        img_type = tools.get_img_type(img_url)
-
+        img_type = await tools.get_img_type(img_url)
+        print(img_url)
         await tools.download_url(img_url, f"files/imgur.{img_type}")
 
         if os.stat(f"files/imgur.{img_type}").st_size > 10000000:
@@ -264,16 +267,6 @@ async def imgur(message, url=None):
 
     except Exception as e:
         await tools.error_log(message, e)
-
-
-async def download_from_url(url):
-    r = requests.get(
-        url, stream=True, headers={
-            'User-agent': 'Mozilla/5.0'})
-
-    with open(f"files/attachment.png", 'wb') as f:
-        r.raw.decode_content = True
-        shutil.copyfileobj(r.raw, f)
 
 
 async def extract_string_image(message):
