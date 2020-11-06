@@ -214,27 +214,28 @@ async def error_log(message=None, error_msg=None, cmd=None):
 async def help_cmd(message):
     msgs = [
         "**h!avatar @user/user-id** - take a nice look at that cool avatar "
-        "your friend or even a stranger has\n\n**h!avatar server** - gives you the icon for the server you're "
-        "currently in\n\n**h!emoji <name> <emoji/url>** - lets you quickly add any "
-        "emoji/image as an emoji in your server\n\n**h!convert <amount> <currency1> <currency2>** - for all those "
-        "occasions where you might wanna quickly convert money from one currency to another\n\n**h!currencies** - "
-        "gives you a nice list of all the currencies you can use for conversion\n\n**h!qr <text>** - for whenever "
-        "you want to generate a QR-code from any text\n\n**h!calc <num1> <operator> <num2>** - a simple "
-        "calculator to play around with for fun\n\n**h!coinflip** - for all those indecisive people who can't "
-        "decide what to eat for dinner\n\n**h!urban <term>** - gives you the first five definitions"
-        " on Urban Dictionary for your search term\n\n**h!cipher <text> <num>** - a nice and simple encryption"
-        " method if you want to send secret messages\n\n**h!numguess** - let's you guess a number"
-        " between 1 and 100\n\n"
+        "your friend or even a stranger has\n**h!avatar server** - gives you the icon for the server you're "
+        "currently in\n**h!emoji add <name> <emoji/url>** - lets you quickly add any "
+        "emoji/image as an emoji in your server\n**h!emoji delete <name> <emoji/url>** - lets you quickly "
+        "remove a particular emoji from a server\n**h!convert <amount> <cur1> <cur2>** - for all those "
+        "occasions where you might wanna quickly convert money from one currency to another\n**h!currencies** - "
+        "gives you a nice list of all the currencies you can use for conversion\n**h!qr <text>** - for whenever "
+        "you want to generate a QR-code from any text\n**h!calc <num1> <operator> <num2>** - a simple "
+        "calculator to play around with for fun\n**h!coinflip** - for all those indecisive people who can't "
+        "decide what to eat for dinner\n**h!urban <term>** - gives you the first five definitions"
+        " on Urban Dictionary for your search term\n**h!cipher <text> <num>** - a nice and simple encryption"
+        " method if you want to send secret messages\n**h!numguess** - let's you guess a number"
+        " between 1 and 100\n"
         "**h!beautiful @user/user-id** - shows your friend how beautiful they are, even if they don't want to"
-        " admit it\n\n**h!resize <width> <emoji/url>** - let's you resize any emoji or image/gif you want\n\n"
+        " admit it\n**h!resize <width> <emoji/url>** - let's you resize any emoji or image/gif you want\n"
         "**h!imgur <url>** - let's you upload any image to imgur",
 
         "**h!sub <name>** - gives you one of the hot or top rated image posts from a "
-        "specific subreddit\n\n**h!sub text <name>** - gives you one of the hot or top rated text posts from a "
-        "specific subreddit\n\n**h!kitsune** - fox girls, who doesn't love them\n\n"
-        "**h!neko** - for all you cat girl lovers (nsfw)\n\n**h!wholesome** - your daily dose of wholesome"
-        " anime memes\n\n**h!bunny** - bunny girls, what were you expecting\n\n**h!thicc** - for all you thigh"
-        " connoisseurs out there (nsfw)\n\n**h!animegirl** - sometimes simple girls are best girls\n\n"
+        "specific subreddit\n**h!sub text <name>** - gives you one of the hot or top rated text posts from a "
+        "specific subreddit\n**h!kitsune** - fox girls, who doesn't love them\n"
+        "**h!neko** - for all you cat girl lovers (nsfw)\n**h!wholesome** - your daily dose of wholesome"
+        " anime memes\n**h!bunny** - bunny girls, what were you expecting\n**h!thicc** - for all you thigh"
+        " connoisseurs out there (nsfw)\n**h!animegirl** - sometimes simple girls are best girls\n"
         "**h!redditor <name>** - for a nice breakdown of someone's reddit profile"
     ]
 
@@ -243,7 +244,6 @@ async def help_cmd(message):
     for i in range(2):
         embed = discord.Embed(title=f"{titles[i]}", description=f"{msgs[i]}", colour=0xce3a9b)
         await message.channel.send(embed=embed)
-
 
 
 async def download_attachments(message):
@@ -282,14 +282,19 @@ def current_time():
     return int(time.time())
 
 
-async def extract_emoji(emoji_str: str) -> str:
+async def extract_emoji(emoji_str: str, id: bool = False) -> Union[int, str]:
     """
     Extracts the url of a specific emoji through its ID
 
+    :param id: Optional parameter to directly pass an emoji's ID
     :param emoji_str: the string that contains the emoji (usually a string from a split message)
     :return: CDN asset of the emoji (url)
     """
+
     emoji_id = emoji_str.split(":")[2][:-1]
+
+    if id:
+        return int(emoji_id)
 
     if emoji_str[1] == "a":
         emoji_url = f"https://cdn.discordapp.com/emojis/{emoji_id}.gif"

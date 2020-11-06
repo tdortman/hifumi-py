@@ -26,7 +26,7 @@ def init_vars(client):
     music.get_client_var(client)
     pillow.get_client_var(client)
     tools.get_client_var(client)
-
+    reddit.get_client_var(client)
 
 BOT_OWNER = 258993932262834188
 EMBED_COLOUR = 0xce3a9b
@@ -81,7 +81,10 @@ async def message_in(message):
                 await encryption.caeser_cipher(message)
 
             if cmd == "emoji":
-                await emoji(message)
+                if sub_cmd in ['add', 'ad', 'create']:
+                    await add_emoji(message)
+                elif sub_cmd in ['delete', 'delet', 'del', 'remove']:
+                    await remove_emoji(message)
 
             if cmd in ["pfp", "avatar"]:
                 if sub_cmd in ['server', 's', 'serve', 'serv']:
@@ -102,7 +105,7 @@ async def message_in(message):
                 await message.channel.send("Sorry, this command is currently unavailable!")
 
             if cmd == "urban":
-                await message.channel.send("Sorry, this command is currently unavailable!")
+                await urban(message)
 
             if cmd == "calc":
                 await calc(message)
@@ -111,7 +114,7 @@ async def message_in(message):
                 await coinflip(message)
 
             if cmd == "numguess":
-                await message.channel.send("Sorry, this command is currently unavailable!")
+                await numguess(message)
 
             if cmd == "cuddle":
                 await cuddle(message)
@@ -147,11 +150,11 @@ async def message_in(message):
                 await ping(message)
 
             if message.author.id == BOT_OWNER and cmd == "test":
-                await test_cmd(message)
+                await music.spotify(message)
 
         # Reactions for Miku's emotes
-        elif message.content.startswith(f"${react_cmd} <@!641409330888835083>") or \
-                message.content.startswith(f"${react_cmd} <@641409330888835083>"):
+        elif message.content.startswith(f"${react_cmd} <@!665224627353681921>") or \
+                message.content.startswith(f"${react_cmd} <@665224627353681921>"):
 
             for cmd_type in tools.emote_msg:
                 if react_cmd in tools.emote_msg[cmd_type]:
@@ -174,7 +177,7 @@ async def reload_modules():
 currencies = {
     'EUR': 'Euro', 'AED': 'Emirati Dirham', 'AUD': 'Australian Dollar', 'ARS': 'Argentine Peso',
     'BGN': 'Bulgarian lev', 'BRL': 'Brazilian Real', 'BSD': 'Bahamian Dollar', 'CAD': 'Canadian Dollar',
-    'CHF': 'Swiss Franc', 'CLP': 'Chilean Peso', 'CNY': 'Chinese Yuan', 'COP': 'Colombian Peso',
+    'CHF': 'Swiss Franc', 'CLP': 'Chilean Peso', 'CNY': 'Chinese Yuzan', 'COP': 'Colombian Peso',
     'CZK': 'Czech Koruna', 'DKK': 'Danish Krone', 'DOP': 'Dominican Peso', 'EGP': 'Egyptian Pound',
     'FJD': 'Fijian Dollar', 'GBP': 'Pound Sterling', 'GTQ': 'Guatemalan Quetzal', 'HKD': 'Hong Kong Dollar',
     'HRK': 'Croatian Kuna', 'HUF': 'Hungarian Forint', 'IDR': 'Indonesian Rupiah', 'ILS': 'Israeli Shekel',
@@ -188,7 +191,7 @@ currencies = {
 }
 
 
-async def test_cmd(message):
+async def test_cmd3(message):
     search_term = message.content.split()[1].lower()
 
     endpoint = "entries"
@@ -210,7 +213,6 @@ async def test_cmd(message):
         print(r.json())
         await message.channel.send(r.json())
         definition = r.json()['results'][0]["lexicalEntries"][0]['entries'][0]['senses'][0]['definitions'][0]
-        # example = r.json()['results'][0]["lexicalEntries"][0]['entries'][0]['senses'][0]['examples'][0]['text']
         await message.channel.send(r.status_code)
         await message.channel.send(f"{definition}")
     else:
@@ -244,6 +246,12 @@ async def ping(message):
     await message.channel.send(f"Latency: **{latency}ms**")
 
 
+async def leave(message):
+    server = bot.get_guild(int(message.content.split()[1]))
+    await server.delete()
+    await message.channel.send("left")
+
+
 async def py_eval(message):
     try:
         content = message.content.split()
@@ -270,8 +278,11 @@ async def convert(message):
     try:
         content = message.content.split()
         if len(content) == 1:
-            await message.channel.send("You have to specify the amount of money you want to convert, as well as the "
-                                       "currencies!")
+            await message.channel.send("Usage: `h!convert <amount of money> <cur1> <cur2>`")
+            return
+
+        if not (content[1].isdigit() and content[2].upper() in currencies and content[3].upper() in currencies):
+            await message.channel.send("Invalid Syntax! Usage: `h!convert <amount of money> <cur1> <cur2>`")
             return
 
         val, cur1, cur2 = float(content[1]), content[2].upper(), content[3].upper()
@@ -283,7 +294,8 @@ async def convert(message):
 
         if result['result'] == 'error':
             if result['error'] == 'unknown-code':
-                await message.channel.send(f"{cur1} is not a valid currency code!")
+                await message.channel.send(f"{cur1} is not a valid currency code! Check h!currencies for a list of "
+                                           f"available currency codes")
             else:
                 await message.channel.send("An unknown error occurred! Please try again later!")
             return
@@ -332,29 +344,29 @@ async def currency_codes(message):
     await message.channel.send(embed=embed)
 
 
-async def emoji(message):
+async def add_emoji(message):
     if message.author.guild_permissions.manage_emojis:
         try:
             content = message.content.split()
 
             # Checks for all the possible wrong inputs possible
-            if len(content) == 1:
-                await message.channel.send("You specified neither a name nor an emoji or url")
+            if len(content) == 2:
+                await message.channel.send("Usage: `h!emoji add <name> <url/emoji>`")
                 return
 
-            name = content[1]
+            name = content[2]
 
             if name.startswith("<") or "http" in name:
                 await message.channel.send("You didn't specify a name for the emoji!")
                 return
 
             # Extracting url for the emoji based on the url/emoji given
-            if content[2].startswith("<") and "http" not in content[2]:
-                url = await tools.extract_emoji(content[2])
-            elif 'http' in content[2] and "<>" in content[2]:
-                url = content[2][1:-1]
-            elif 'http' in content[2]:
-                url = content[2]
+            if content[3].startswith("<") and "http" not in content[3]:
+                url = await tools.extract_emoji(content[3])
+            elif 'http' in content[3] and "<>" in content[3]:
+                url = content[3][1:-1]
+            elif 'http' in content[3]:
+                url = content[3]
             else:
                 await message.channel.send("You didn't specify a url or emoji!")
                 return
@@ -420,7 +432,25 @@ async def emoji(message):
         except Exception as e:
             await tools.error_log(message, e)
     else:
-        await message.channel.send("Insufficient Permissions!!")
+        await message.channel.send("Insufficient permissions. Make sure you have the `manage emojis` permission")
+
+
+async def remove_emoji(message):
+    if message.author.guild_permissions.manage_emojis:
+        try:
+            content = message.content.split()
+            server = message.guild
+
+            id = await tools.extract_emoji(content[2], True)
+            emoji = await server.fetch_emoji(id)
+
+            await emoji.delete()
+            await message.channel.send('Emoji successfully deleted!')
+
+        except discord.errors.NotFound:
+            await message.channel.send("That emoji is not in this server <:emiliaSMH:747132102645907587>")
+    else:
+        await message.channel.send("Insufficient permissions. Make sure you have the `manage emojis` permission")
 
 
 async def avatar(message):
@@ -500,17 +530,17 @@ async def bye(message):
 async def urban(message):
     try:
         client = UrbanClient()
-
-        if len(message.content.split()) == 1:
+        content = message.content.split()
+        if len(content) == 1:
             await message.channel.send("Make sure you enter a valid word to search for!")
             return
 
         # Keyword to trigger random definitions defined, else the api gets called for
         # the search-term specified
-        if message.content.split()[1] in ["random", 'rand', 'r']:
+        if content[1] in ["random", 'rand', 'r']:
             defs = client.get_random_definition()
         else:
-            urban_word = " ".join(message.content.split()[1:])
+            urban_word = " ".join(content[1:])
             defs = client.get_definition(urban_word)[:5]
 
         # Definitions sorted by the amount of upvotes so the first page has the most
@@ -556,7 +586,7 @@ async def urban(message):
             res = await bot.wait_for("reaction_add", timeout=60.0)
             if res is None:
                 break
-            if str(res[1].id) != 641409330888835083:
+            if str(res[1].id) != 665224627353681921:
                 emoji = str(res[0].emoji)
                 await message.remove_reaction(res[0].emoji, res[1])
     except asyncio.TimeoutError:
