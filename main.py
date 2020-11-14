@@ -153,8 +153,8 @@ async def message_in(message):
                 await music.spotify(message)
 
         # Reactions for Miku's emotes
-        elif message.content.startswith(f"${react_cmd} <@!665224627353681921>") or \
-                message.content.startswith(f"${react_cmd} <@665224627353681921>"):
+        elif message.content.startswith(f"${react_cmd} <@!641409330888835083>") or \
+                message.content.startswith(f"${react_cmd} <@641409330888835083>"):
 
             for cmd_type in tools.emote_msg:
                 if react_cmd in tools.emote_msg[cmd_type]:
