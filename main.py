@@ -150,11 +150,11 @@ async def message_in(message):
             if cmd == 'ping':
                 await ping(message)
 
-                if cmd == 'invite':
-                    await invite(message)
+            if cmd == 'invite':
+                await invite(message)
 
-                if message.author.id == BOT_OWNER and cmd == "test":
-                    await test_cmd(message)
+            if message.author.id == BOT_OWNER and cmd == "test":
+                await test_cmd(message)
 
                 # Reactions for Miku's emotes
             elif message.content.startswith(f"${react_cmd} <@!665224627353681921>") or \
