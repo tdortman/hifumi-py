@@ -28,6 +28,7 @@ def init_vars(client):
     tools.get_client_var(client)
     reddit.get_client_var(client)
 
+
 BOT_OWNER = 258993932262834188
 EMBED_COLOUR = 0xce3a9b
 
@@ -149,46 +150,56 @@ async def message_in(message):
             if cmd == 'ping':
                 await ping(message)
 
-            if message.author.id == BOT_OWNER and cmd == "test":
-                await music.spotify(message)
+                if cmd == 'invite':
+                    await invite(message)
 
-        # Reactions for Miku's emotes
-        elif message.content.startswith(f"${react_cmd} <@!641409330888835083>") or \
-                message.content.startswith(f"${react_cmd} <@641409330888835083>"):
+                if message.author.id == BOT_OWNER and cmd == "test":
+                    await test_cmd(message)
 
-            for cmd_type in tools.emote_msg:
-                if react_cmd in tools.emote_msg[cmd_type]:
-                    msg = random.choice(tools.react_msg[cmd_type])
-                    await asyncio.sleep(1)
-                    await message.channel.send(msg.format(message.author.name))
+                # Reactions for Miku's emotes
+            elif message.content.startswith(f"${react_cmd} <@!665224627353681921>") or \
+                    message.content.startswith(f"${react_cmd} <@665224627353681921>"):
+
+                for cmd_type in tools.emote_msg:
+                    if react_cmd in tools.emote_msg[cmd_type]:
+                        msg = random.choice(tools.react_msg[cmd_type])
+                        await asyncio.sleep(1)
+                        await message.channel.send(msg.format(message.author.name))
 
     except Exception as e:
         await tools.error_log(message, e)
 
+    async def reload_modules():
+        reload(encryption)
+        reload(music)
+        reload(reddit)
+        reload(pillow)
+        reload(tools)
 
-async def reload_modules():
-    reload(encryption)
-    reload(music)
-    reload(reddit)
-    reload(pillow)
-    reload(tools)
+    currencies = {
+        'EUR': 'Euro', 'AED': 'Emirati Dirham', 'AUD': 'Australian Dollar', 'ARS': 'Argentine Peso',
+        'BGN': 'Bulgarian lev', 'BRL': 'Brazilian Real', 'BSD': 'Bahamian Dollar', 'CAD': 'Canadian Dollar',
+        'CHF': 'Swiss Franc', 'CLP': 'Chilean Peso', 'CNY': 'Chinese Yuzan', 'COP': 'Colombian Peso',
+        'CZK': 'Czech Koruna', 'DKK': 'Danish Krone', 'DOP': 'Dominican Peso', 'EGP': 'Egyptian Pound',
+        'FJD': 'Fijian Dollar', 'GBP': 'Pound Sterling', 'GTQ': 'Guatemalan Quetzal', 'HKD': 'Hong Kong Dollar',
+        'HRK': 'Croatian Kuna', 'HUF': 'Hungarian Forint', 'IDR': 'Indonesian Rupiah', 'ILS': 'Israeli Shekel',
+        'INR': 'Indian Rupee', 'ISK': 'Icelandic Króna', 'JPY': 'Japanese Yen', 'KRW': 'South Korean Won',
+        'KZT': 'Kazakhstani Tenge', 'MVR': 'Maldivian Rufiyaa', 'MXN': 'Mexican Peso', 'MYR': 'Malaysian Ringgit',
+        'NOK': 'Norwegian Krone', 'NZD': 'New Zealand Dollar', 'PEN': 'Peruvian Sol', 'PHP': 'Philippine Peso',
+        'PKR': 'Pakistani Rupee', 'PLN': 'Polish Złoty', 'PYG': 'Paraguayan Guaraní', 'RON': 'Romanian Leu',
+        'RUB': 'Russian Rouble', 'SAR': 'Saudi Riyal', 'SEK': 'Swedish Krona', 'SGD': 'Singapore Dollar',
+        'THB': 'Thai Baht', 'TRY': 'Turkish Lira', 'TWD': 'New Taiwan Dollar', 'UAH': 'Ukrainian Hryvnia',
+        'USD': 'United States Dollar', 'UYU': 'Uruguayan Peso', 'ZAR': 'South African Rand'
+    }
 
 
-currencies = {
-    'EUR': 'Euro', 'AED': 'Emirati Dirham', 'AUD': 'Australian Dollar', 'ARS': 'Argentine Peso',
-    'BGN': 'Bulgarian lev', 'BRL': 'Brazilian Real', 'BSD': 'Bahamian Dollar', 'CAD': 'Canadian Dollar',
-    'CHF': 'Swiss Franc', 'CLP': 'Chilean Peso', 'CNY': 'Chinese Yuzan', 'COP': 'Colombian Peso',
-    'CZK': 'Czech Koruna', 'DKK': 'Danish Krone', 'DOP': 'Dominican Peso', 'EGP': 'Egyptian Pound',
-    'FJD': 'Fijian Dollar', 'GBP': 'Pound Sterling', 'GTQ': 'Guatemalan Quetzal', 'HKD': 'Hong Kong Dollar',
-    'HRK': 'Croatian Kuna', 'HUF': 'Hungarian Forint', 'IDR': 'Indonesian Rupiah', 'ILS': 'Israeli Shekel',
-    'INR': 'Indian Rupee', 'ISK': 'Icelandic Króna', 'JPY': 'Japanese Yen', 'KRW': 'South Korean Won',
-    'KZT': 'Kazakhstani Tenge', 'MVR': 'Maldivian Rufiyaa', 'MXN': 'Mexican Peso', 'MYR': 'Malaysian Ringgit',
-    'NOK': 'Norwegian Krone', 'NZD': 'New Zealand Dollar', 'PEN': 'Peruvian Sol', 'PHP': 'Philippine Peso',
-    'PKR': 'Pakistani Rupee', 'PLN': 'Polish Złoty', 'PYG': 'Paraguayan Guaraní', 'RON': 'Romanian Leu',
-    'RUB': 'Russian Rouble', 'SAR': 'Saudi Riyal', 'SEK': 'Swedish Krona', 'SGD': 'Singapore Dollar',
-    'THB': 'Thai Baht', 'TRY': 'Turkish Lira', 'TWD': 'New Taiwan Dollar', 'UAH': 'Ukrainian Hryvnia',
-    'USD': 'United States Dollar', 'UYU': 'Uruguayan Peso', 'ZAR': 'South African Rand'
-}
+async def test_cmd(message):
+    pass
+
+
+async def invite(message):
+    await message.channel.send("You can invite me using this link:\nhttps://discord.com/api/oauth2/authorize?"
+                               "client_id=641409330888835083&permissions=8&scope=bot")
 
 
 async def test_cmd3(message):
