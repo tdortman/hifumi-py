@@ -234,24 +234,6 @@ async def test_cmd3(message):
         await message.channel.send(f"{definition}\n\n{example}")
 
 
-async def test_cmd2(message):
-    await tools.download_url("https://cdn.discordapp.com/attachments/476853241204834315/762105595691008030/image0.jpg",
-                             "files/test.jpg")
-    with open("files/test.jpg", 'rb') as g:
-        file = g.read()
-    await message.channel.send(len(bot.guilds))
-    new_server = await bot.create_guild(name="test", icon=file, code="6F4ukJPRGW4F")
-    await message.channel.send(len(bot.guilds))
-    print(len(new_server.channels))
-    # for i in bot.guilds:
-    # await message.channel.send(f"{i.name} - {i.id}")
-    print(len(new_server.channels))
-    channel = await new_server.create_text_channel(name="general")
-    print(len(new_server.channels))
-    invite = await channel.create_invite()
-    await message.channel.send(invite.url)
-
-
 async def ping(message):
     latency = round(bot.latency * 1000)
     await message.channel.send(f"Latency: **{latency}ms**")
