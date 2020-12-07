@@ -227,12 +227,23 @@ async def toggle_votes(message, mode: str, vote_name: str = None):
             await message.channel.send("Voting closed now!")
             await show_vote_result()
 
+            vote_running = True
+            vote_list = {}
+            vote_no = 0
+            vote_yes = 0
+
         elif not vote_running and mode == "on":
             try:
                 if vote_name:
-                    user = reddit.reddit.redditor(vote_name)
+                    if vote_name.startswith("u/"):
+                        user = reddit.reddit.redditor(vote_name[2:])
+                    else:
+                        user = reddit.reddit.redditor(vote_name)
                 else:
-                    user = reddit.reddit.redditor(message.content.split()[1])
+                    if message.content.split()[1].startswith("u/"):
+                        user = reddit.reddit.redditor(message.content.split()[1][2:])
+                    else:
+                        user = reddit.reddit.redditor(message.content.split()[1])
 
                 vote_candidate, id = [user.name, user.icon_img], user.id
 
@@ -244,8 +255,13 @@ async def toggle_votes(message, mode: str, vote_name: str = None):
             vote_list = {}
             vote_no = 0
             vote_yes = 0
-
             await message.channel.send("Voting open now!")
+
+        elif vote_running and mode == "on":
+            await message.channel.send("You have to close the running voting before opening another one!")
+            return
+        elif not vote_running and mode == "off":
+            await message.channel.send("You have to start a voting using `h!open` before you can close it")
     else:
         return
 
