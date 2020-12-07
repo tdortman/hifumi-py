@@ -9,6 +9,7 @@ import requests
 import os
 from pathlib import Path
 from datetime import datetime as dt
+import prawcore
 from math import pi, sqrt, log, e
 from functools import reduce
 import reddit
@@ -31,6 +32,11 @@ def init_vars(client):
 
 BOT_OWNER = 258993932262834188
 EMBED_COLOUR = 0xce3a9b
+vote_running = False
+vote_list = {}
+vote_yes = 0
+vote_no = 0
+vote_candidate = []
 
 file = open(r"files/credentials.txt", "r")
 lines = file.readlines()
@@ -40,6 +46,7 @@ file.close()
 
 
 async def message_in(message):
+    global vote_yes, vote_no
     try:
         content = message.content.split()
         react_cmd = content[0][1:] if len(content) > 1 else None
@@ -82,7 +89,7 @@ async def message_in(message):
                 await encryption.caeser_cipher(message)
 
             if cmd == "emoji":
-                if sub_cmd in ['add', 'ad', 'create']:
+                if sub_cmd in ['add', 'ad']:
                     await add_emoji(message)
                 elif sub_cmd in ['delete', 'delet', 'del', 'remove']:
                     await remove_emoji(message)
@@ -154,47 +161,118 @@ async def message_in(message):
                 await invite(message)
 
             if message.author.id == BOT_OWNER and cmd == "test":
-                await test_cmd(message)
+                pass
 
-                # Reactions for Miku's emotes
-            elif message.content.startswith(f"${react_cmd} <@!665224627353681921>") or \
-                    message.content.startswith(f"${react_cmd} <@665224627353681921>"):
+            if cmd == "open":
+                await toggle_votes(message, "on")
 
-                for cmd_type in tools.emote_msg:
-                    if react_cmd in tools.emote_msg[cmd_type]:
-                        msg = random.choice(tools.react_msg[cmd_type])
-                        await asyncio.sleep(1)
-                        await message.channel.send(msg.format(message.author.name))
+            if cmd == "close":
+                await toggle_votes(message, "off")
+
+        # Reactions for Miku's emotes
+        elif message.content.startswith(f"${react_cmd} <@!665224627353681921>") or \
+                message.content.startswith(f"${react_cmd} <@665224627353681921>"):
+
+            for cmd_type in tools.emote_msg:
+                if react_cmd in tools.emote_msg[cmd_type]:
+                    msg = random.choice(tools.react_msg[cmd_type])
+                    await asyncio.sleep(1)
+                    await message.channel.send(msg.format(message.author.name))
+
+        # Elite Weebs voting
+        elif vote_running:
+            if message.channel.id == 785238165799567410 and not message.author.bot:
+                if content[-1].lower() == "yes" and message.author.name not in vote_list:
+                    vote_yes += 1
+                    vote_list[message.author.name] = "Yes"
+                elif content[-1].lower() == "no" and message.author.name not in vote_list:
+                    vote_no += 1
+                    vote_list[message.author.name] = "No"
+                await message.delete()
 
     except Exception as e:
         await tools.error_log(message, e)
 
-    async def reload_modules():
-        reload(encryption)
-        reload(music)
-        reload(reddit)
-        reload(pillow)
-        reload(tools)
 
-    currencies = {
-        'EUR': 'Euro', 'AED': 'Emirati Dirham', 'AUD': 'Australian Dollar', 'ARS': 'Argentine Peso',
-        'BGN': 'Bulgarian lev', 'BRL': 'Brazilian Real', 'BSD': 'Bahamian Dollar', 'CAD': 'Canadian Dollar',
-        'CHF': 'Swiss Franc', 'CLP': 'Chilean Peso', 'CNY': 'Chinese Yuzan', 'COP': 'Colombian Peso',
-        'CZK': 'Czech Koruna', 'DKK': 'Danish Krone', 'DOP': 'Dominican Peso', 'EGP': 'Egyptian Pound',
-        'FJD': 'Fijian Dollar', 'GBP': 'Pound Sterling', 'GTQ': 'Guatemalan Quetzal', 'HKD': 'Hong Kong Dollar',
-        'HRK': 'Croatian Kuna', 'HUF': 'Hungarian Forint', 'IDR': 'Indonesian Rupiah', 'ILS': 'Israeli Shekel',
-        'INR': 'Indian Rupee', 'ISK': 'Icelandic Króna', 'JPY': 'Japanese Yen', 'KRW': 'South Korean Won',
-        'KZT': 'Kazakhstani Tenge', 'MVR': 'Maldivian Rufiyaa', 'MXN': 'Mexican Peso', 'MYR': 'Malaysian Ringgit',
-        'NOK': 'Norwegian Krone', 'NZD': 'New Zealand Dollar', 'PEN': 'Peruvian Sol', 'PHP': 'Philippine Peso',
-        'PKR': 'Pakistani Rupee', 'PLN': 'Polish Złoty', 'PYG': 'Paraguayan Guaraní', 'RON': 'Romanian Leu',
-        'RUB': 'Russian Rouble', 'SAR': 'Saudi Riyal', 'SEK': 'Swedish Krona', 'SGD': 'Singapore Dollar',
-        'THB': 'Thai Baht', 'TRY': 'Turkish Lira', 'TWD': 'New Taiwan Dollar', 'UAH': 'Ukrainian Hryvnia',
-        'USD': 'United States Dollar', 'UYU': 'Uruguayan Peso', 'ZAR': 'South African Rand'
-    }
+async def reload_modules():
+    reload(encryption)
+    reload(music)
+    reload(reddit)
+    reload(pillow)
+    reload(tools)
 
 
-async def test_cmd(message):
-    pass
+currencies = {
+    'EUR': 'Euro', 'AED': 'Emirati Dirham', 'AUD': 'Australian Dollar', 'ARS': 'Argentine Peso',
+    'BGN': 'Bulgarian lev', 'BRL': 'Brazilian Real', 'BSD': 'Bahamian Dollar', 'CAD': 'Canadian Dollar',
+    'CHF': 'Swiss Franc', 'CLP': 'Chilean Peso', 'CNY': 'Chinese Yuzan', 'COP': 'Colombian Peso',
+    'CZK': 'Czech Koruna', 'DKK': 'Danish Krone', 'DOP': 'Dominican Peso', 'EGP': 'Egyptian Pound',
+    'FJD': 'Fijian Dollar', 'GBP': 'Pound Sterling', 'GTQ': 'Guatemalan Quetzal', 'HKD': 'Hong Kong Dollar',
+    'HRK': 'Croatian Kuna', 'HUF': 'Hungarian Forint', 'IDR': 'Indonesian Rupiah', 'ILS': 'Israeli Shekel',
+    'INR': 'Indian Rupee', 'ISK': 'Icelandic Króna', 'JPY': 'Japanese Yen', 'KRW': 'South Korean Won',
+    'KZT': 'Kazakhstani Tenge', 'MVR': 'Maldivian Rufiyaa', 'MXN': 'Mexican Peso', 'MYR': 'Malaysian Ringgit',
+    'NOK': 'Norwegian Krone', 'NZD': 'New Zealand Dollar', 'PEN': 'Peruvian Sol', 'PHP': 'Philippine Peso',
+    'PKR': 'Pakistani Rupee', 'PLN': 'Polish Złoty', 'PYG': 'Paraguayan Guaraní', 'RON': 'Romanian Leu',
+    'RUB': 'Russian Rouble', 'SAR': 'Saudi Riyal', 'SEK': 'Swedish Krona', 'SGD': 'Singapore Dollar',
+    'THB': 'Thai Baht', 'TRY': 'Turkish Lira', 'TWD': 'New Taiwan Dollar', 'UAH': 'Ukrainian Hryvnia',
+    'USD': 'United States Dollar', 'UYU': 'Uruguayan Peso', 'ZAR': 'South African Rand'
+}
+
+
+async def toggle_votes(message, mode: str, vote_name: str = None):
+    if message.author.guild_permissions.kick_members:
+        global vote_running, vote_list, vote_no, vote_yes, vote_candidate
+        if vote_running and mode == "off":
+            vote_running = False
+            await message.channel.send("Voting closed now!")
+            await show_vote_result()
+
+        elif not vote_running and mode == "on":
+            try:
+                if vote_name:
+                    user = reddit.reddit.redditor(vote_name)
+                else:
+                    user = reddit.reddit.redditor(message.content.split()[1])
+
+                vote_candidate, id = [user.name, user.icon_img], user.id
+
+            except prawcore.exceptions.NotFound:
+                await message.channel.send("User not found! Make sure you enter the name correctly!")
+                return
+
+            vote_running = True
+            vote_list = {}
+            vote_no = 0
+            vote_yes = 0
+
+            await message.channel.send("Voting open now!")
+    else:
+        return
+
+
+async def show_vote_result():
+    global vote_candidate
+
+    channel = bot.get_channel(785351105240236042)
+
+    raw_columns = [f"{k} voted **{vote_list[k]}**" for k in vote_list]
+    columns = ["\n".join(line for line in raw_columns[0:int(round(len(raw_columns) / 2))]),
+               "\n".join(line for line in raw_columns[int(round(len(raw_columns) / 2)):])]
+
+    if vote_yes > vote_no:
+        footer = f"{vote_yes} / {vote_no} -> APPROVED"
+    elif vote_yes < vote_no:
+        footer = f"{vote_yes} / {vote_no} -> REJECTED"
+    elif vote_yes == vote_no:
+        footer = f"{vote_yes} / {vote_no} -> TIEBREAKER"
+
+    embed = discord.Embed(title=f"Vote Results for Candidate {vote_candidate[0]}", color=EMBED_COLOUR)
+    for column in columns:
+        embed.add_field(name='\u200b', value=column)
+    embed.set_thumbnail(url=vote_candidate[1])
+    embed.set_footer(text=footer)
+
+    await channel.send(embed=embed)
 
 
 async def invite(message):
