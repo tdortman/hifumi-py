@@ -170,8 +170,8 @@ async def message_in(message):
                 await toggle_votes(message, "off")
 
         # Reactions for Miku's emotes
-        elif message.content.startswith(f"${react_cmd} <@!665224627353681921>") or \
-                message.content.startswith(f"${react_cmd} <@665224627353681921>"):
+        elif message.content.startswith(f"${react_cmd} <@!641409330888835083>") or \
+                message.content.startswith(f"${react_cmd} <@641409330888835083>"):
 
             for cmd_type in tools.emote_msg:
                 if react_cmd in tools.emote_msg[cmd_type]:
@@ -259,7 +259,6 @@ async def toggle_votes(message, mode: str, vote_name: str = None):
 
         elif vote_running and mode == "on":
             await message.channel.send("You have to close the running voting before opening another one!")
-            return
         elif not vote_running and mode == "off":
             await message.channel.send("You have to start a voting using `h!open` before you can close it")
     else:
