@@ -17,15 +17,19 @@ async def on_message(message):
     restart_shortcut = "hr~~~"
     if message.content.startswith(restart_shortcut):
         if message.author.id == main.BOT_OWNER:
-            try:
-                reload(main)
-                await main.reload_modules()
-                main.init_vars(bot)
-                msg = "Reload successful!"
-            except Exception as e:
-                msg = f"Reload failed!\n{e}"
-            print(msg)
-            await message.channel.send(msg)
+            if main.vote_running:
+                await message.channel.send("There is a voting running, close it before reloading!")
+                return
+            else:
+                try:
+                    reload(main)
+                    await main.reload_modules()
+                    main.init_vars(bot)
+                    msg = "Reload successful!"
+                except Exception as e:
+                    msg = f"Reload failed!\n{e}"
+                print(msg)
+                await message.channel.send(msg)
         else:
             await message.channel.send("Insufficient Permissions!")
     else:
