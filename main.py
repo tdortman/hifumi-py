@@ -227,7 +227,7 @@ async def toggle_votes(message, mode: str, vote_name: str = None):
             await message.channel.send("Voting closed now!")
             await show_vote_result()
 
-            vote_running = True
+            vote_running = False
             vote_list = {}
             vote_no = 0
             vote_yes = 0
