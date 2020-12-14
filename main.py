@@ -363,12 +363,16 @@ async def py_eval(message):
 async def convert(message):
     try:
         content = message.content.split()
-        if len(content) == 1:
+        if 1 <= len(content) <= 3:
             await message.channel.send("Usage: `h!convert <amount of money> <cur1> <cur2>`")
             return
 
-        if not (content[1].isdigit() and content[2].upper() in currencies and content[3].upper() in currencies):
-            await message.channel.send("Invalid Syntax! Usage: `h!convert <amount of money> <cur1> <cur2>`")
+        if not (tools.isint(content[1]) or tools.isfloat(content[1])):
+            await message.channel.send("Invalid Value! Usage: `h!convert <amount of money> <cur1> <cur2>`")
+            return
+
+        if not (content[2].upper() in currencies and content[3].upper() in currencies):
+            await message.channel.send("Invalid currency codes! Check `h!currencies` for a list of available options")
             return
 
         val, cur1, cur2 = float(content[1]), content[2].upper(), content[3].upper()
@@ -400,8 +404,7 @@ async def convert(message):
         # Created Embed and send it in the channel
         embed = discord.Embed(description=desc, title=f"Converting {currencies[cur1]} into {currencies[cur2]}",
                               color=EMBED_COLOUR)
-        embed.set_footer(text=f"{dt.utcnow().strftime('%d/%m/%Y %H:%M:%S')} UTC\nUse the command h!currencies for a "
-                              f"list of currencies available for conversion")
+        embed.set_footer(text=f"{dt.utcnow().strftime('%d/%m/%Y %H:%M:%S')} UTC")
         await message.channel.send(embed=embed)
 
     except Exception as e:

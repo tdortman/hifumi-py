@@ -346,3 +346,20 @@ def adv_round(x: Union[int, float]) -> Union[int, float]:
     """
     return int(x) if x // 1 + x % 1 == int(x) else round(x, 8)
 
+
+def isfloat(x):
+    try:
+        a = float(x)
+    except (TypeError, ValueError):
+        return False
+    else:
+        return True
+
+
+def isint(x):
+    try:
+        a = int(x)
+    except (TypeError, ValueError):
+        return False
+    else:
+        return True
