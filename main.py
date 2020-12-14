@@ -116,7 +116,7 @@ async def message_in(message):
                 await urban(message)
 
             if cmd == "calc":
-                await calc(message)
+                await message.channel.send("Sorry, this command is currently unavailable!")
 
             if cmd == "coinflip":
                 await coinflip(message)
