@@ -57,7 +57,7 @@ async def sub(message, subreddit: str = None):
     :param subreddit: Subreddit to be accessed that allows for certain Subreddits to get their own "Command"
     :return: None
     """
-    global sub_running
+    global sub_running, sub_cache_img
     try:
         sub_running = True
         if subreddit:
@@ -80,6 +80,9 @@ async def sub(message, subreddit: str = None):
                                            "please move into a NSFW channel!")
                 return
             else:
+                if len(sub_cache_img) == 10:
+                    sub_cache_img = {}
+
                 if sub_name1 not in sub_cache_img:
                     fetch_submissions(sub_name1, limit=50)
                     fetch_submissions(sub_name2, limit=50, name=sub_name1)
@@ -102,6 +105,9 @@ async def sub(message, subreddit: str = None):
                 await message.channel.send("You can't access NSFW subreddits outside of NSFW channels!")
                 return
             else:
+                if len(sub_cache_img) == 10:
+                    sub_cache_img = {}
+
                 if sub_name not in sub_cache_img:
                     fetch_submissions(sub_name, 50)
                     await message.channel.send(f'Results found: {len(sub_cache_img[sub_name])}')
@@ -119,18 +125,20 @@ async def sub(message, subreddit: str = None):
                 embed.set_image(url=picture)
                 await message.channel.send(embed=embed)
 
+            sub_running = False
+
     except prawcore.exceptions.Redirect:
         await message.channel.send("That's not a valid subreddit!")
     except (prawcore.exceptions.Forbidden, prawcore.exceptions.NotFound):
         await message.channel.send("Seems like this subreddit is either set to private or has been suspended.")
     except (KeyError, IndexError):
-        await message.channel.send("No images found.")
+        await message.channel.send("No images found")
     except Exception as e:
         await error_log(message, e)
 
 
 async def self_posts(message, subreddit: str = None):
-    global self_posts_running
+    global self_posts_running, sub_cache_text
     self_posts_running = True
     try:
         if subreddit:
@@ -142,6 +150,8 @@ async def self_posts(message, subreddit: str = None):
             await message.channel.send("You can't access NSFW subreddits outside of NSFW channels!")
             return
         else:
+            if len(sub_cache_text) == 10:
+                sub_cache_text = {}
             if sub_name not in sub_cache_text:
                 fetch_submissions(sub_name)
                 await message.channel.send(f"Results found: {len(sub_cache_text[sub_name])}")
@@ -152,6 +162,8 @@ async def self_posts(message, subreddit: str = None):
                                   color=0xce3a9b)
             embed.set_footer(text=f"Upvotes: {upvotes}  Ratio: {adv_round(ratio * 100)}%")
             await message.channel.send(embed=embed)
+
+        self_posts_running = False
 
     except AttributeError:
         await self_posts(message)
