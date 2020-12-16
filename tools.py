@@ -230,7 +230,7 @@ async def help_cmd(message):
         " admit it\n**h!resize <width> <emoji/url>** - let's you resize any emoji or image/gif you want\n"
         "**h!imgur <url>** - let's you upload any image to imgur\n**h!ping** - check Hifumi's ping to Discord\n"
         "**h!invite** - gives you a handy link to invite Hifumi to whatever Server you'd like to\n"
-        "**h!commands** - shows you all the avaliable commands, as you can see right now",
+        "**h!help** - shows you all the available commands, as you can see right now",
 
         "**h!sub <name>** - gives you one of the hot or top rated image posts from a "
         "specific subreddit\n**h!sub text <name>** - gives you one of the hot or top rated text posts from a "
