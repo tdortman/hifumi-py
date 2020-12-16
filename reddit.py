@@ -52,6 +52,7 @@ async def sub(message, subreddit: str = None):
     """
     Grabs image posts from a specified Subreddit and caches them for users to be able to
     Spam the command and look at what they want
+
     :param message: Default Discord Message Object (the Message that triggered the command)
     :param subreddit: Subreddit to be accessed that allows for certain Subreddits to get their own "Command"
     :return: None
@@ -84,25 +85,25 @@ async def sub(message, subreddit: str = None):
                     fetch_submissions(sub_name2, limit=50, name=sub_name1)
                     await message.channel.send(f'Results found: {len(sub_cache_img[sub_name1])}')
 
-                picture, name = random.choice(sub_cache_img[sub_name1])
+                    picture, name = random.choice(sub_cache_img[sub_name1])
 
-                try:
-                    title, desc = name.split('[')
-                    desc = '[' + desc
-                except ValueError:
-                    title = name
-                    desc = None
+                    try:
+                        title, desc = name.split('[')
+                        desc = '[' + desc
+                    except ValueError:
+                        title = name
+                        desc = None
 
-                embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
-                embed.set_image(url=picture)
-                await message.channel.send(embed=embed)
+                    embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
+                    embed.set_image(url=picture)
+                    await message.channel.send(embed=embed)
         else:
             if reddit.subreddit(sub_name).over18 and not message.channel.is_nsfw():
                 await message.channel.send("You can't access NSFW subreddits outside of NSFW channels!")
                 return
             else:
                 if sub_name not in sub_cache_img:
-                    fetch_submissions(sub_name)
+                    fetch_submissions(sub_name, 50)
                     await message.channel.send(f'Results found: {len(sub_cache_img[sub_name])}')
 
                 picture, name = random.choice(sub_cache_img[sub_name])
@@ -120,8 +121,10 @@ async def sub(message, subreddit: str = None):
 
     except prawcore.exceptions.Redirect:
         await message.channel.send("That's not a valid subreddit!")
-    except prawcore.exceptions.Forbidden:
-        await message.channel.send("Seems like this subreddit is set to private.")
+    except (prawcore.exceptions.Forbidden, prawcore.exceptions.NotFound):
+        await message.channel.send("Seems like this subreddit is either set to private or has been suspended.")
+    except (KeyError, IndexError):
+        await message.channel.send("No images found.")
     except Exception as e:
         await error_log(message, e)
 
