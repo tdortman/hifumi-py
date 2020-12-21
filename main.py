@@ -245,7 +245,8 @@ async def toggle_votes(message, mode: str, vote_name: str = None):
                     else:
                         user = reddit.reddit.redditor(message.content.split()[1])
 
-                vote_candidate, id = [user.name, user.icon_img], user.id
+                id = user.id
+                vote_candidate = [user.name, user.icon_img]
 
             except prawcore.exceptions.NotFound:
                 await message.channel.send("User not found! Make sure you enter the name correctly!")
@@ -268,7 +269,7 @@ async def toggle_votes(message, mode: str, vote_name: str = None):
 async def show_vote_result():
     global vote_candidate
 
-    channel = bot.get_channel(785351105240236042)
+    channel = bot.get_channel(790448900774297630)
 
     raw_columns = [f"{k} voted **{vote_list[k]}**" for k in vote_list]
     columns = ["\n".join(line for line in raw_columns[0:int(round(len(raw_columns) / 2))]),
@@ -288,6 +289,11 @@ async def show_vote_result():
     embed.set_footer(text=footer)
 
     await channel.send(embed=embed)
+
+    if vote_yes == vote_no:
+        server = bot.get_guild(558679823094906880)
+        role = server.get_role(790449349234655232)
+        await channel.send(role.mention)
 
 
 async def invite(message):
