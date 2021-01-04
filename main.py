@@ -12,6 +12,7 @@ from datetime import datetime as dt
 import prawcore
 from math import pi, sqrt, log, e
 from functools import reduce
+import json
 import reddit
 import music
 import encryption
@@ -32,6 +33,7 @@ def init_vars(client):
 
 BOT_OWNER = 258993932262834188
 EMBED_COLOUR = 0xce3a9b
+
 vote_running = False
 vote_list = {}
 vote_yes = 0
@@ -116,7 +118,7 @@ async def message_in(message):
                 await urban(message)
 
             if cmd == "calc":
-                await message.channel.send("Sorry, this command is currently unavailable!")
+                await calc(message)
 
             if cmd == "coinflip":
                 await coinflip(message)
@@ -161,7 +163,7 @@ async def message_in(message):
                 await invite(message)
 
             if message.author.id == BOT_OWNER and cmd == "test":
-                pass
+                await test_cmd(message)
 
             if cmd == "open":
                 await toggle_votes(message, "on")
@@ -170,8 +172,8 @@ async def message_in(message):
                 await toggle_votes(message, "off")
 
         # Reactions for Miku's emotes
-        elif message.content.startswith(f"${react_cmd} <@!641409330888835083>") or \
-                message.content.startswith(f"${react_cmd} <@641409330888835083>"):
+        elif message.content.startswith(f"${react_cmd} <@!665224627353681921>") or \
+                message.content.startswith(f"${react_cmd} <@665224627353681921>"):
 
             for cmd_type in tools.emote_msg:
                 if react_cmd in tools.emote_msg[cmd_type]:
@@ -219,6 +221,10 @@ currencies = {
 }
 
 
+async def test_cmd(message):
+    pass
+
+
 async def toggle_votes(message, mode: str, vote_name: str = None):
     if message.author.guild_permissions.kick_members:
         global vote_running, vote_list, vote_no, vote_yes, vote_candidate
@@ -245,8 +251,7 @@ async def toggle_votes(message, mode: str, vote_name: str = None):
                     else:
                         user = reddit.reddit.redditor(message.content.split()[1])
 
-                id = user.id
-                vote_candidate = [user.name, user.icon_img]
+                vote_candidate, id = [user.name, user.icon_img], user.id
 
             except prawcore.exceptions.NotFound:
                 await message.channel.send("User not found! Make sure you enter the name correctly!")
@@ -301,7 +306,7 @@ async def invite(message):
                                "client_id=641409330888835083&permissions=8&scope=bot")
 
 
-async def test_cmd3(message):
+async def oxford_dic(message):
     search_term = message.content.split()[1].lower()
 
     endpoint = "entries"
@@ -311,10 +316,13 @@ async def test_cmd3(message):
     url = f"https://od-api.oxforddictionaries.com/api/v2/{endpoint}/{language_code}/{search_term}?fields={fields}"
     r = requests.get(url, headers={"app_id": OXFORD_APP_ID, "app_key": OXFORD_APP_KEY})
 
+    print(json.dumps(r.json(), sort_keys=True, indent=4))
+
+    # await message.channel.send(f"***REMOVED***{json.dumps(r.json(), sort_keys=True, indent=4)}***REMOVED***")
+
     if r.status_code == 404:
         url = f"https://od-api.oxforddictionaries.com/api/v2/lemmas/{language_code}/{search_term}?fields={fields}"
         r = requests.get(url, headers={"app_id": OXFORD_APP_ID, "app_key": OXFORD_APP_KEY})
-
         search_term = r.json()['results'][0]['lexicalEntries'][0]['inflectionOf'][0]['text']
 
         url = f"https://od-api.oxforddictionaries.com/api/v2/{endpoint}/{language_code}/{search_term}?fields={fields}"
@@ -333,6 +341,24 @@ async def test_cmd3(message):
         await message.channel.send(f"{definition}\n\n{example}")
 
 
+async def test_cmd2(message):
+    await tools.download_url("https://cdn.discordapp.com/attachments/476853241204834315/762105595691008030/image0.jpg",
+                             "files/test.jpg")
+    with open("files/test.jpg", 'rb') as g:
+        file = g.read()
+    await message.channel.send(len(bot.guilds))
+    new_server = await bot.create_guild(name="test", icon=file, code="6F4ukJPRGW4F")
+    await message.channel.send(len(bot.guilds))
+    print(len(new_server.channels))
+    # for i in bot.guilds:
+    # await message.channel.send(f"{i.name} - {i.id}")
+    print(len(new_server.channels))
+    channel = await new_server.create_text_channel(name="general")
+    print(len(new_server.channels))
+    invite = await channel.create_invite()
+    await message.channel.send(invite.url)
+
+
 async def ping(message):
     latency = round(bot.latency * 1000)
     await message.channel.send(f"Latency: **{latency}ms**")
@@ -347,11 +373,11 @@ async def leave(message):
 async def py_eval(message):
     try:
         content = message.content.split()
-        if len(content) == 1:
-            await message.channel.send("You have to type **SOMETHING** at least")
-            return
-
         if message.author.id == BOT_OWNER:
+            if len(content) == 1:
+                await message.channel.send("You have to type **SOMETHING** at least")
+                return
+
             cmd = " ".join(x for x in message.content.split()[1:])
             rslt = eval(cmd)
 
@@ -378,7 +404,7 @@ async def convert(message):
             return
 
         if not (content[2].upper() in currencies and content[3].upper() in currencies):
-            await message.channel.send("Invalid currency codes! Check `h!currencies` for a list of available options")
+            await message.channel.send("Invalid currency codes! Check `h!currencies` for a list")
             return
 
         val, cur1, cur2 = float(content[1]), content[2].upper(), content[3].upper()

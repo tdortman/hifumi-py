@@ -1,4 +1,6 @@
-from PIL import Image
+from PIL import Image, ImageSequence
+import requests
+import shutil
 import discord
 import os
 from imgurpython import ImgurClient
@@ -94,7 +96,7 @@ async def resize_img(message, url=None, img_width=None):
         else:
             width = int(content[1])
 
-        if width >= 5000:
+        if width >= 7500 and not message.author.id == 258993932262834188:
             await message.channel.send("Don't you think that's a bit too much?..")
             return
 
@@ -121,7 +123,6 @@ async def resize_img(message, url=None, img_width=None):
             await resize(f"files/unknown.{img_type}", width, f"files/unknown_resized.{img_type}")
         elif img_type == 'gif' and width >= width_res:
             await message.channel.send("Sorry, but you can't use this command for upscaling gifs")
-            return
         else:
             await resize_gif(message, f"files/unknown.{img_type}", f"files/unknown_resized.{img_type}", (width, width))
 
@@ -129,7 +130,6 @@ async def resize_img(message, url=None, img_width=None):
             await imgur(message, img_url)
         elif os.stat(f"files/unknown_resized.{img_type}").st_size > 10000000:
             await message.channel.send("Your image is over 10MB big, try resizing it first.")
-            return
         else:
             with open(f"files/unknown_resized.{img_type}", "rb") as g:
                 picture = discord.File(g, filename=f'unknown_resized.{img_type}')
@@ -140,6 +140,38 @@ async def resize_img(message, url=None, img_width=None):
         os.remove(f"files/unknown_resized.{img_type}")
     except Exception as e:
         await tools.error_log(message, e)
+
+
+async def resize_gif_test(message):
+    content = message.content.split()
+
+    await tools.download_url(content[1], "files/test.gif")
+    size = tools.get_aspect_ratio("files/test.gif", int(content[2]))
+
+    # Open source
+    im = Image.open("files/test.gif")
+
+    # Get sequence iterator
+    frames = ImageSequence.Iterator(im)
+
+    # Wrap on-the-fly thumbnail generator
+    def thumbnails(frame_iterator):
+        for frame in frame_iterator:
+            thumbnail = frame.copy()
+            thumbnail.thumbnail(size, Image.ANTIALIAS)
+            print(thumbnail)
+            yield thumbnail
+
+    frames = thumbnails(frames)
+
+    # Save output
+    om = next(frames)
+    om.info = im.info
+    om.save("files/test_resized.gif", save_all=True, append_images=list(frames))
+
+    with open(f"files/test.gif", "rb") as g:
+        picture = discord.File(g, filename=f'unknown_resized.gif')
+        await message.channel.send(file=picture)
 
 
 async def resize_gif(message, path, save_as=None, resize_to=None):
@@ -254,7 +286,7 @@ async def imgur(message, url=None):
             img_url = message.content.split()[1]
 
         img_type = await tools.get_img_type(img_url)
-        print(img_url)
+
         await tools.download_url(img_url, f"files/imgur.{img_type}")
 
         if os.stat(f"files/imgur.{img_type}").st_size > 10000000:

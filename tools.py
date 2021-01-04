@@ -271,9 +271,15 @@ async def download_url(url: str, save_location: str):
     :param save_location: path to the location where you want your file to be saved
     :return: None
     """
-    r = requests.get(
-        url, stream=True, headers={
-            'User-agent': 'Mozilla/5.0'})
+    if "pximg" in url:
+        r = requests.get(
+            url, stream=True, headers={
+                'User-agent': 'Mozilla/5.0',
+                'Referer': "https://www.pixiv.net/"})
+    else:
+        r = requests.get(
+            url, stream=True, headers={
+                'User-agent': 'Mozilla/5.0'})
 
     with open(save_location, 'wb') as f:
         r.raw.decode_content = True
