@@ -1,0 +1,29 @@
+**h!avatar @user/user-id** - take a nice look at that cool avatar your friend has
+**h!avatar server** - gives you the icon for the server you're currently in
+**h!emoji add <name> <emoji/url>** - lets you add any emoji/image as an emoji 
+**h!emoji delete <name> <emoji>** - lets you quickly remove a particular emoji 
+**h!emoji rename <emoji>** - lets you quickly rename a particular emoji
+**h!convert <amount> <cur1> <cur2>** - for quick currency conversion
+**h!currencies** - gives you a nice list of all the currencies you can use for conversion
+**h!qr <text>** - for whenever you want to generate a QR-code from any text
+**h!calc** - handy little calculator you can use
+**h!coinflip** - for all those indecisive people who can't decide what to eat for dinner
+**h!urban <term>** - gives you definitions from Urban Dictionary 
+**h!cipher <text> <num>** - a nice and simple encryption method
+**h!numguess** - let's you guess a number between 1 and 100
+**h!beautiful @user/user-id** - shows your friend how beautiful they are
+**h!resize <width> <emoji/url>** - let's you resize any emoji or image/gif you want
+**h!imgur <url>** - let's you upload any image to imgur
+**h!ping** - check Hifumi's ping to Discord
+**h!invite** - gives you a handy link to invite Hifumi to whatever server you'd like to
+**h!help** - shows you all the available commands, as you can see right now
+
+**h!sub <name>** - gives you one image post from a specific subreddit
+**h!sub text <name>** - gives you one text post from a specific subreddit
+**h!kitsune** - fox girls, who doesn't love them
+**h!neko** - for all you cat girl lovers (nsfw)
+**h!wholesome** - your daily dose of wholesome anime memes
+**h!bunny** - bunny girls, what were you expecting
+**h!thicc** - for all you thigh connoisseurs out there (nsfw)
+**h!animegirl** - sometimes simple girls are best girls
+**h!redditor <name>** - for a quick  breakdown of someone's reddit profile
