@@ -477,9 +477,10 @@ async def handle_emoji(message, sub_cmd: str = None):
 
                 elif sub_cmd == 'rename':
                     name = content[2]
-                    await emoji.edit(name=name)
-                    await message.channel.send('Emoji successfully edited!')
+                    og_name = emoji.name
 
+                    await emoji.edit(name=name)
+                    await message.channel.send(f'Emoji successfully renamed from `{og_name}` to `{name}`!')
             except discord.errors.NotFound:
                 await message.channel.send("That emoji is not in this server <:emiliaSMH:747132102645907587>")
 
