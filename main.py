@@ -92,9 +92,11 @@ async def message_in(message):
 
             if cmd == "emoji":
                 if sub_cmd in ['add', 'ad']:
-                    await add_emoji(message)
+                    await handle_emoji(message, 'add')
                 elif sub_cmd in ['delete', 'delet', 'del', 'remove']:
-                    await remove_emoji(message)
+                    await handle_emoji(message, 'del')
+                elif sub_cmd in ['edit', 'e']:
+                    await handle_emoji(message, 'rename')
 
             if cmd in ["pfp", "avatar"]:
                 if sub_cmd in ['server', 's', 'serve', 'serv']:
@@ -370,6 +372,118 @@ async def leave(message):
     await message.channel.send("left")
 
 
+async def handle_emoji(message, sub_cmd: str = None):
+    if message.author.guild_permissions.manage_emojis:
+        content = message.content.split()
+        server = message.guild
+
+        if sub_cmd == "add":
+            try:
+
+                # Checks for all the possible wrong inputs possible
+                if len(content) == 2:
+                    await message.channel.send("Usage: `h?emoji add <name> <url/emoji>`")
+                    return
+
+                name = content[2]
+
+                if name.startswith("<") or "http" in name:
+                    await message.channel.send("You didn't specify a name for the emoji!")
+                    return
+
+                # Extracting url for the emoji based on the url/emoji given
+                if content[3].startswith("<") and "http" not in content[3]:
+                    url = await tools.extract_emoji(content[3])
+                elif 'http' in content[3] and "<>" in content[3]:
+                    url = content[3][1:-1]
+                elif 'http' in content[3]:
+                    url = content[3]
+                else:
+                    await message.channel.send("You didn't specify a url or emoji!")
+                    return
+
+                # Emoji names have to be between 2 and 32 characters long
+                if len(name) > 32:
+                    await message.channel.send("Don't you think that name is a bit too long?..")
+                    return
+                elif len(name) < 2:
+                    await message.channel.send("That name is too short! Try again with a longer one")
+                    return
+
+                img_type = await tools.get_img_type(url)
+
+                await tools.download_url(url, f"emojis/{name}.{img_type}")
+
+                # Checks cases when the image is too big (256KB) and proceeds to resize them to 128x128 when needed
+                # Creates custom emoji with either the initial image or a resized version
+                if Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and (
+                        img_type == "jpg" or img_type == "png"):
+
+                    await pillow.resize(f"emojis/{name}.{img_type}", 128, f"emojis/{name}_resized.{img_type}")
+
+                    if Path(f"emojis/{name}_resized.{img_type}").stat().st_size > 256000:
+                        await message.channel.send("Even after being resized to 128px your image is still too big.. ")
+                        return
+                    else:
+                        with open(f"emojis/{name}_resized.{img_type}", "rb") as picture:
+                            emoji = await server.create_custom_emoji(name=name, image=picture.read())
+
+                elif Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and img_type == "gif":
+                    await pillow.resize_gif(message, f"emojis/{name}.{img_type}", f"emojis/{name}_resized.{img_type}",
+                                            (128, 128))
+
+                    if Path(f"emojis/{name}_resized.{img_type}").stat().st_size > 256000:
+                        await message.channel.send("Even after being resized to 128px your gif is still too big.. ")
+                        return
+                    else:
+                        with open(f"emojis/{name}_resized.{img_type}", "rb") as picture:
+                            emoji = await server.create_custom_emoji(name=name, image=picture.read())
+
+                else:
+                    with open(f"emojis/{name}.{img_type}", "rb") as picture:
+                        emoji = await server.create_custom_emoji(name=name, image=picture.read())
+
+                # Sending the newly created emoji as confirmation
+                if emoji and img_type != "gif":
+                    msg = f'<:{emoji.name}:{emoji.id}>'
+                elif emoji and img_type == "gif":
+                    msg = f"<a:{emoji.name}:{emoji.id}>"
+                else:
+                    msg = 'Emoji object not retrieved!'
+                await message.channel.send(msg)
+
+                # Deletes any leftover files
+                os.remove(f"emojis/{name}.{img_type}")
+                if os.path.isfile(f"emojis/{name}_resized.{img_type}"):
+                    os.remove(f"emojis/{name}_resized.{img_type}")
+
+            except discord.errors.Forbidden:
+                await message.channel.send("I don't have the permissions for this!")
+            except discord.errors.HTTPException:
+                await message.channel.send("You've reached the maximum amount of emojis for this server!")
+
+        elif sub_cmd == "del" or sub_cmd == "rename":
+            try:
+                if sub_cmd == "del":
+                    id = await tools.extract_emoji(content[2], True)
+                elif sub_cmd == "rename":
+                    id = await tools.extract_emoji(content[3], True)
+
+                emoji = await server.fetch_emoji(id)
+
+                if sub_cmd == "del":
+                    await emoji.delete()
+                    await message.channel.send('Emoji successfully deleted!')
+
+                elif sub_cmd == 'rename':
+                    name = content[2]
+                    await emoji.edit(name=name)
+                    await message.channel.send('Emoji successfully edited!')
+
+            except discord.errors.NotFound:
+                await message.channel.send("That emoji is not in this server <:emiliaSMH:747132102645907587>")
+
+
 async def py_eval(message):
     try:
         content = message.content.split()
@@ -463,115 +577,6 @@ async def currency_codes(message):
     for i in range(3):
         embed.add_field(name='\u200b', value=columns[i])
     await message.channel.send(embed=embed)
-
-
-async def add_emoji(message):
-    if message.author.guild_permissions.manage_emojis:
-        try:
-            content = message.content.split()
-
-            # Checks for all the possible wrong inputs possible
-            if len(content) == 2:
-                await message.channel.send("Usage: `h!emoji add <name> <url/emoji>`")
-                return
-
-            name = content[2]
-
-            if name.startswith("<") or "http" in name:
-                await message.channel.send("You didn't specify a name for the emoji!")
-                return
-
-            # Extracting url for the emoji based on the url/emoji given
-            if content[3].startswith("<") and "http" not in content[3]:
-                url = await tools.extract_emoji(content[3])
-            elif 'http' in content[3] and "<>" in content[3]:
-                url = content[3][1:-1]
-            elif 'http' in content[3]:
-                url = content[3]
-            else:
-                await message.channel.send("You didn't specify a url or emoji!")
-                return
-
-            # Emoji names have to be between 2 and 32 characters long
-            if len(name) > 32:
-                await message.channel.send("Don't you think that name is a bit too long?..")
-                return
-            elif len(name) < 2:
-                await message.channel.send("That name is too short! Try again with a longer one")
-                return
-
-            img_type = await tools.get_img_type(url)
-
-            await tools.download_url(url, f"emojis/{name}.{img_type}")
-
-            # Checks cases when the image is too big (256KB) and proceeds to resize them to 128x128 when needed
-            # Creates custom emoji with either the initial image or a resized version
-            if Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and (img_type == "jpg" or img_type == "png"):
-
-                await pillow.resize(f"emojis/{name}.{img_type}", 128, f"emojis/{name}_resized.{img_type}")
-
-                if Path(f"emojis/{name}_resized.{img_type}").stat().st_size > 256000:
-                    await message.channel.send("Even after being resized to 128px your image is still too big.. ")
-                    return
-                else:
-                    with open(f"emojis/{name}_resized.{img_type}", "rb") as picture:
-                        emoji = await message.guild.create_custom_emoji(name=name, image=picture.read())
-
-            elif Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and img_type == "gif":
-                await pillow.resize_gif(message, f"emojis/{name}.{img_type}", f"emojis/{name}_resized.{img_type}",
-                                        (128, 128))
-
-                if Path(f"emojis/{name}_resized.{img_type}").stat().st_size > 256000:
-                    await message.channel.send("Even after being resized to 128px your gif is still too big.. ")
-                    return
-                else:
-                    with open(f"emojis/{name}_resized.{img_type}", "rb") as picture:
-                        emoji = await message.guild.create_custom_emoji(name=name, image=picture.read())
-
-            else:
-                with open(f"emojis/{name}.{img_type}", "rb") as picture:
-                    emoji = await message.guild.create_custom_emoji(name=name, image=picture.read())
-
-            # Sending the newly created emoji as confirmation
-            if emoji and img_type != "gif":
-                msg = f'<:{emoji.name}:{emoji.id}>'
-            elif emoji and img_type == "gif":
-                msg = f"<a:{emoji.name}:{emoji.id}>"
-            else:
-                msg = 'Emoji object not retrieved!'
-            await message.channel.send(msg)
-
-            # Deletes any leftover files
-            os.remove(f"emojis/{name}.{img_type}")
-            if os.path.isfile(f"emojis/{name}_resized.{img_type}"):
-                os.remove(f"emojis/{name}_resized.{img_type}")
-
-        except discord.errors.Forbidden:
-            await message.channel.send("I don't have the permissions for this!")
-        except discord.errors.HTTPException:
-            await message.channel.send("You've reached the maximum amount of emojis for this server!")
-        except Exception as e:
-            await tools.error_log(message, e)
-    else:
-        await message.channel.send("Insufficient permissions. Make sure you have the `manage emojis` permission")
-
-
-async def remove_emoji(message):
-    if message.author.guild_permissions.manage_emojis:
-        try:
-            content = message.content.split()
-            server = message.guild
-
-            id = await tools.extract_emoji(content[2], True)
-            emoji = await server.fetch_emoji(id)
-
-            await emoji.delete()
-            await message.channel.send('Emoji successfully deleted!')
-
-        except discord.errors.NotFound:
-            await message.channel.send("That emoji is not in this server <:emiliaSMH:747132102645907587>")
-    else:
-        await message.channel.send("Insufficient permissions. Make sure you have the `manage emojis` permission")
 
 
 async def avatar(message):
