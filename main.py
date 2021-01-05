@@ -91,11 +91,11 @@ async def message_in(message):
                 await encryption.caeser_cipher(message)
 
             if cmd == "emoji":
-                if sub_cmd in ['add', 'ad']:
+                if sub_cmd in ['add', 'ad', 'create']:
                     await handle_emoji(message, 'add')
-                elif sub_cmd in ['delete', 'delet', 'del', 'remove']:
+                elif sub_cmd in ['delete', 'delet', 'del', 'remove', 'rm']:
                     await handle_emoji(message, 'del')
-                elif sub_cmd in ['edit', 'e']:
+                elif sub_cmd in ['edit', 'e', 'rename', "rn"]:
                     await handle_emoji(message, 'rename')
 
             if cmd in ["pfp", "avatar"]:
