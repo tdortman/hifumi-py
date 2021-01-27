@@ -2,6 +2,7 @@ import praw
 import datetime
 import random
 import prawcore
+import main
 from tools import *
 from typing import *
 
@@ -88,18 +89,18 @@ async def sub(message, subreddit: str = None):
                     fetch_submissions(sub_name2, limit=50, name=sub_name1)
                     await message.channel.send(f'Results found: {len(sub_cache_img[sub_name1])}')
 
-                    picture, name = random.choice(sub_cache_img[sub_name1])
+                picture, name = random.choice(sub_cache_img[sub_name1])
 
-                    try:
-                        title, desc = name.split('[')
-                        desc = '[' + desc
-                    except ValueError:
-                        title = name
-                        desc = None
+                try:
+                    title, desc = name.split('[')
+                    desc = '[' + desc
+                except ValueError:
+                    title = name
+                    desc = None
 
-                    embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
-                    embed.set_image(url=picture)
-                    await message.channel.send(embed=embed)
+                embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
+                embed.set_image(url=picture)
+                await message.channel.send(embed=embed)
         else:
             if reddit.subreddit(sub_name).over18 and not message.channel.is_nsfw():
                 await message.channel.send("You can't access NSFW subreddits outside of NSFW channels!")
@@ -121,7 +122,7 @@ async def sub(message, subreddit: str = None):
                     title = name
                     desc = None
 
-                embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
+                embed = discord.Embed(title=title, description=desc, color=main.EMBED_COLOUR)
                 embed.set_image(url=picture)
                 await message.channel.send(embed=embed)
 
