@@ -136,7 +136,7 @@ async def message_in(message):
             if cmd == "qr":
                 await qr(message)
 
-            if cmd in ['convert', 'conv', 'con', 'c']:
+            if cmd in ['convert', 'conv', 'c']:
                 await convert(message)
 
             if cmd == "error":
@@ -154,7 +154,7 @@ async def message_in(message):
             if cmd in ['currencies', 'currency', 'cur', 'cu']:
                 await currency_codes(message)
 
-            if cmd in ['commands', 'command', 'comm', 'help']:
+            if cmd in ['commands', 'command', 'comm', 'com', 'help']:
                 await tools.help_cmd(message)
 
             if cmd == 'py':
