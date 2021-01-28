@@ -13,6 +13,8 @@ import prawcore
 from math import pi, sqrt, log, e
 from functools import reduce
 import json
+from subprocess import run, PIPE
+
 import reddit
 import music
 import encryption
@@ -173,6 +175,9 @@ async def message_in(message):
             if cmd == "close":
                 await toggle_votes(message, "off")
 
+            if cmd == "con":
+                await console(message)
+
         # Reactions for Miku's emotes
         elif message.content.startswith(f"${react_cmd} <@!641409330888835083>") or \
                 message.content.startswith(f"${react_cmd} <@641409330888835083>"):
@@ -225,6 +230,28 @@ currencies = {
 
 async def test_cmd(message):
     pass
+
+
+async def console(message):
+    if message.author.id == BOT_OWNER:
+        try:
+            command = ' '.join(x for x in message.content.split()[1:])
+            result = run(command, stdout=PIPE, stderr=PIPE, shell=True)
+            for i in range(30):
+                await asyncio.sleep(0.5)
+                if result.stdout is not None:
+                    msg = f"***REMOVED***{result.stdout.decode('utf-8')}***REMOVED***"
+                    if msg != "***REMOVED******REMOVED***":
+                        await message.channel.send(msg)
+                    else:
+                        await message.channel.send("Command executed!")
+                return
+
+        except IndexError:
+            msg = "Didn't use cmd properly (IndexError)"
+            await message.channel.send(msg)
+        except Exception as e:
+            await tools.error_log(message, e)
 
 
 async def toggle_votes(message, mode: str, vote_name: str = None):
