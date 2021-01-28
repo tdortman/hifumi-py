@@ -514,7 +514,9 @@ async def convert(message):
             await message.channel.send("Usage: `h!convert <amount of money> <cur1> <cur2>`")
             return
 
-        if not (tools.isint(content[1]) or tools.isfloat(content[1])):
+        try:
+            float(content[1].strip("\u202c"))
+        except ValueError:
             await message.channel.send("Invalid Value! Usage: `h!convert <amount of money> <cur1> <cur2>`")
             return
 
@@ -522,7 +524,7 @@ async def convert(message):
             await message.channel.send("Invalid currency codes! Check `h!currencies` for a list")
             return
 
-        val, cur1, cur2 = float(content[1]), content[2].upper(), content[3].upper()
+        val, cur1, cur2 = float(content[1].strip("\u202c")), content[2].upper(), content[3].upper()
 
         # Make a request to the api, handle possible errors, extracts and checks conversion rates for specific currency
         url = f'https://prime.exchangerate-api.com/v5/81f453a13268228658567d13/latest/{cur1}'
