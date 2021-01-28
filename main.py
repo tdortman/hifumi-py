@@ -154,7 +154,7 @@ async def message_in(message):
             if cmd in ['currencies', 'currency', 'cur', 'cu']:
                 await currency_codes(message)
 
-            if cmd in ['commands', 'command', 'comm', 'com', 'help']:
+            if cmd in ['commands', 'command', 'comm', 'help']:
                 await tools.help_cmd(message)
 
             if cmd == 'py':
