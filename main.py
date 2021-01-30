@@ -409,7 +409,7 @@ async def handle_emoji(message, sub_cmd: str = None):
 
                 # Checks for all the possible wrong inputs possible
                 if len(content) == 2:
-                    await message.channel.send("Usage: `h?emoji add <name> <url/emoji>`")
+                    await message.channel.send("Usage: `h!emoji add <name> <url/emoji>`")
                     return
 
                 name = content[2]
@@ -419,12 +419,14 @@ async def handle_emoji(message, sub_cmd: str = None):
                     return
 
                 # Extracting url for the emoji based on the url/emoji given
-                if content[3].startswith("<") and "http" not in content[3]:
-                    url = await tools.extract_emoji(content[3])
+                if message.attachments:
+                    url = message.attachments[0].url
                 elif 'http' in content[3] and "<>" in content[3]:
                     url = content[3][1:-1]
                 elif 'http' in content[3]:
                     url = content[3]
+                elif content[3].startswith("<") and "http" not in content[3]:
+                    url = await tools.extract_emoji(content[3])
                 else:
                     await message.channel.send("You didn't specify a url or emoji!")
                     return
@@ -506,8 +508,16 @@ async def handle_emoji(message, sub_cmd: str = None):
                     name = content[2]
                     og_name = emoji.name
 
+                    if len(name) > 32:
+                        await message.channel.send("Don't you think that name is a bit too long?..")
+                        return
+                    elif len(name) < 2:
+                        await message.channel.send("That name is too short! Try again with a longer one")
+                        return
+
                     await emoji.edit(name=name)
                     await message.channel.send(f'Emoji successfully renamed from `{og_name}` to `{name}`!')
+
             except discord.errors.NotFound:
                 await message.channel.send("That emoji is not in this server <:emiliaSMH:747132102645907587>")
 
