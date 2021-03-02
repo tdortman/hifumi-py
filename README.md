@@ -3,7 +3,7 @@
 - qrcode
 - udpy
 - pillow
-- praw
+- asyncpraw, asyncprawcore
 - youtube_dl
 - imgurpython
 - pytesseract
