@@ -106,7 +106,6 @@ async def sub(message, subreddit: str = None):
                 if sub_name1 not in sub_cache_img:
                     await fetch_submissions(sub_name1, limit=50)
                     await fetch_submissions(sub_name2, limit=50, name=sub_name1)
-                    await reddit.close()
                     await message.channel.send(f'Results found: {len(sub_cache_img[sub_name1])}')
 
                 picture, name = random.choice(sub_cache_img[sub_name1])
