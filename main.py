@@ -178,6 +178,9 @@ async def message_in(message):
             if cmd == "con":
                 await console(message)
 
+            if cmd == "link":
+                await link(message)
+
         # Reactions for Miku's emotes
         elif message.content.startswith(f"${react_cmd} <@!641409330888835083>") or \
                 message.content.startswith(f"${react_cmd} <@641409330888835083>"):
@@ -230,6 +233,11 @@ currencies = {
 
 async def test_cmd(message):
     pass
+
+
+async def link(message):
+    emoji_url = await tools.extract_emoji(message.content.split()[1])
+    await message.channel.send(emoji_url)
 
 
 async def console(message):

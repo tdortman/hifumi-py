@@ -66,6 +66,16 @@ async def beautiful(message):
         await tools.error_log(message, e)
 
 
+async def extract_frames(file_location: str) -> list:
+    im = Image.open(file_location)
+    return [frame.copy() for frame in ImageSequence.Iterator(im)]
+
+
+async def gif_resize_test(file_location: str):
+    im = Image.open(file_location)
+    im.save("out.gif", save_all=True, append_images=resize(extract_frames(file_location)))
+
+
 async def resize(file_location: str, width: int, save_location: str = None):
     img = Image.open(file_location)
     wpercent = (width / float(img.size[0]))
@@ -102,9 +112,11 @@ async def resize_img(message, url=None, img_width=None):
 
         if url is not None:
             img_url = url
-        elif content[1].isdigit() and len(content) == 2:
+        elif content[1].isdigit() and len(content) == 2 and not message.attachments:
             await message.channel.send("You also have to specify the image you want to resize!")
             return
+        elif message.attachments:
+            img_url = message.attachments[0].url
         elif content[2].startswith("<:"):
             img_url = await tools.extract_emoji(content[2])
         elif "http" in content[2] and "<>" in content[2]:
@@ -123,6 +135,7 @@ async def resize_img(message, url=None, img_width=None):
             await resize(f"files/unknown.{img_type}", width, f"files/unknown_resized.{img_type}")
         elif img_type == 'gif' and width >= width_res:
             await message.channel.send("Sorry, but you can't use this command for upscaling gifs")
+            return
         else:
             await resize_gif(message, f"files/unknown.{img_type}", f"files/unknown_resized.{img_type}", (width, width))
 
@@ -282,6 +295,8 @@ async def imgur(message, url=None):
 
         if url:
             img_url = url
+        elif message.attachments:
+            img_url = message.attachments[0].url
         else:
             img_url = message.content.split()[1]
 
