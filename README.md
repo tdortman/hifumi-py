@@ -2,7 +2,7 @@
 - discord.py
 - qrcode
 - udpy
-- pillow
+- pillow, PIL
 - asyncpraw, asyncprawcore
 - youtube_dl
 - imgurpython
