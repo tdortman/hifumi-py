@@ -65,17 +65,13 @@ async def sub(message, subreddit: str = None):
     Spam the command and look at what they want
 
     :param message: Default Discord Message Object (the Message that triggered the command)
-    :param subreddit: Subreddit to be accessed that allows for certain Subreddits to get their own "Command"
+    :param subreddit: Subreddit(s) to be accessed that allows for certain Subreddits to get their own "Command"
     :return: None
     """
     global sub_running, sub_cache_img, last_accessed
     try:
         sub_running = True
-        if subreddit:
-            sub_name = subreddit
-        else:
-            sub_name = message.content.split()[1].lower()
-
+        sub_name = subreddit.lower()
         tmp_accessed = current_time()
 
         if last_accessed is not None:
@@ -88,12 +84,15 @@ async def sub(message, subreddit: str = None):
                 sub_name1 = sub_name.split('+')[0].lower()
                 sub_name2 = sub_name.split('+')[1].lower()
 
-                sub1 = await reddit.subreddit(sub_name.split('+')[0].lower(), fetch=True)
-                sub2 = await reddit.subreddit(sub_name.split('+')[1].lower(), fetch=True)
+                sub1 = await reddit.subreddit(sub_name1, fetch=True)
+                sub2 = await reddit.subreddit(sub_name2, fetch=True)
 
             elif len(message.content.split()) == 3:
-                sub1 = await reddit.subreddit(message.content.split()[1], fetch=True)
-                sub2 = await reddit.subreddit(message.content.split()[2], fetch=True)
+                sub_name1 = message.content.split()[1]
+                sub_name2 = message.content.split()[2]
+
+                sub1 = await reddit.subreddit(sub_name1, fetch=True)
+                sub2 = await reddit.subreddit(sub_name2, fetch=True)
 
             if (sub1.over18 or sub2.over18) and not message.channel.is_nsfw():
                 await message.channel.send("One of the subreddits you're trying to access contains NSFW material, "
@@ -159,15 +158,12 @@ async def sub(message, subreddit: str = None):
         await error_log(message, e)
 
 
+
 async def self_posts(message, subreddit: str = None):
     global self_posts_running, sub_cache_text, last_accessed
     self_posts_running = True
     try:
-        if subreddit:
-            sub_name = subreddit
-        else:
-            sub_name = message.content.split()[2].lower()
-
+        sub_name = subreddit.lower()
         tmp_accessed = current_time()
 
         if last_accessed is not None:

@@ -69,10 +69,10 @@ async def message_in(message):
                 await reddit.sub(message, "kitsunemimi+touchfluffytail")
 
             if cmd == "sub":
-                if sub_cmd == "text":
-                    await reddit.self_posts(message)
+                if sub_cmd in ["text", 'txt']:
+                    await reddit.self_posts(message, content[2])
                 else:
-                    await reddit.sub(message)
+                    await reddit.sub(message, content[1])
 
             if cmd == "wholesome":
                 await reddit.sub(message, "wholesomeanimemes")
