@@ -72,7 +72,7 @@ async def message_in(message):
                 if sub_cmd == "text":
                     await reddit.self_posts(message)
                 else:
-                    await reddit.sub(message, content[1])
+                    await reddit.sub(message)
 
             if cmd == "wholesome":
                 await reddit.sub(message, "wholesomeanimemes")
