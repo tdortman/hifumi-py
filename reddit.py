@@ -158,7 +158,6 @@ async def sub(message, subreddit: str = None):
         await error_log(message, e)
 
 
-
 async def self_posts(message, subreddit: str = None):
     global self_posts_running, sub_cache_text, last_accessed
     self_posts_running = True
