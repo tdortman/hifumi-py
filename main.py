@@ -46,7 +46,7 @@ file = open(r"files/credentials.txt", "r")
 lines = file.readlines()
 OXFORD_APP_ID = lines[3].split()[1]
 OXFORD_APP_KEY = lines[4].split()[1]
-EXCHANGERATE_API_KEY = int(lines[10].split()[1])
+EXCHANGERATE_API_KEY = lines[9].split()[1]
 file.close()
 
 
