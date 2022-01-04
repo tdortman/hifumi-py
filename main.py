@@ -46,6 +46,7 @@ file = open(r"files/credentials.txt", "r")
 lines = file.readlines()
 OXFORD_APP_ID = lines[3].split()[1]
 OXFORD_APP_KEY = lines[4].split()[1]
+EXCHANGERATE_API_KEY = int(lines[10].split()[1])
 file.close()
 
 
@@ -572,7 +573,7 @@ async def convert(message):
         val, cur1, cur2 = float(content[1].strip("\u202c")), content[2].upper(), content[3].upper()
 
         # Make a request to the api, handle possible errors, extracts and checks conversion rates for specific currency
-        url = f'https://prime.exchangerate-api.com/v5/81f453a13268228658567d13/latest/{cur1}'
+        url = f'https://prime.exchangerate-api.com/v5/{EXCHANGERATE_API_KEY}/latest/{cur1}'
         response = requests.get(url)
         result = response.json()
 
