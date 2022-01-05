@@ -421,25 +421,32 @@ async def handle_emoji(message, sub_cmd: str = None):
                     await message.channel.send("Usage: `h!emoji add <name> <url/emoji>`")
                     return
 
-                name = content[2]
+                if content[2].startswith("<"):
+                    name = content[2].split(":")[-2]
+                    url = await tools.extract_emoji(content[2])
+                else:
+                    name = content[2] 
 
-                if name.startswith("<") or "http" in name:
+                if "http" in name:
                     await message.channel.send("You didn't specify a name for the emoji!")
                     return
 
                 # Extracting url for the emoji based on the url/emoji given
                 if message.attachments:
                     url = message.attachments[0].url
-                elif 'http' in content[3] and "<>" in content[3]:
-                    url = content[3][1:-1]
-                elif 'http' in content[3]:
-                    url = content[3]
-                elif content[3].startswith("<") and "http" not in content[3]:
-                    url = await tools.extract_emoji(content[3])
-                else:
-                    await message.channel.send("You didn't specify a url or emoji!")
-                    return
-
+                
+                if len(content) == 4:
+                    if 'http' in content[3] and "<>" in content[3]:
+                        url = content[3][1:-1]
+                    elif 'http' in content[3]:
+                        url = content[3]
+                    elif content[3].startswith("<"):
+                        url = await tools.extract_emoji(content[3])
+                    else:
+                        await message.channel.send("You didn't specify a url or emoji!")
+                        return
+                
+                print(name, url)
                 # Emoji names have to be between 2 and 32 characters long
                 if len(name) > 32:
                     await message.channel.send("Don't you think that name is a bit too long?..")
