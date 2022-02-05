@@ -37,7 +37,8 @@ async def profile(message):
     try:
         user = await reddit.redditor(message.content.split()[1], fetch=True)
         user_url = f"https://www.reddit.com/user/{user.name}"
-        created_on = datetime.datetime.utcfromtimestamp(user.created_utc).strftime('%d/%m/%Y')
+        created_on = datetime.datetime.utcfromtimestamp(
+            user.created_utc).strftime('%d/%m/%Y')
 
         desc = f"[Link to profile]({user_url})\n" \
                f"Post Karma: {user.link_karma}\n" \
@@ -116,7 +117,8 @@ async def sub(message, subreddit: str = None):
                     title = name
                     desc = None
 
-                embed = discord.Embed(title=title, description=desc, color=0xce3a9b)
+                embed = discord.Embed(
+                    title=title, description=desc, color=0xce3a9b)
                 embed.set_image(url=picture)
                 await message.channel.send(embed=embed)
         else:
@@ -142,7 +144,8 @@ async def sub(message, subreddit: str = None):
                     title = name
                     desc = None
 
-                embed = discord.Embed(title=title, description=desc, color=main.EMBED_COLOUR)
+                embed = discord.Embed(
+                    title=title, description=desc, color=main.EMBED_COLOUR)
                 embed.set_image(url=picture)
                 await message.channel.send(embed=embed)
 
@@ -183,11 +186,13 @@ async def self_posts(message, subreddit: str = None):
                 await fetch_submissions(sub_name)
                 await message.channel.send(f"Results found: {len(sub_cache_text[sub_name])}")
 
-            url, title, selftext, upvotes, ratio, author = random.choice(sub_cache_text[sub_name])
+            url, title, selftext, upvotes, ratio, author = random.choice(
+                sub_cache_text[sub_name])
 
             embed = discord.Embed(title=title, description=f"[Link to post by u/{author}]({url})\n\n{selftext}",
                                   color=main.EMBED_COLOUR)
-            embed.set_footer(text=f"Upvotes: {upvotes}  Ratio: {adv_round(ratio * 100)}%")
+            embed.set_footer(
+                text=f"Upvotes: {upvotes}  Ratio: {adv_round(ratio * 100)}%")
             await message.channel.send(embed=embed)
 
         self_posts_running = False
@@ -228,9 +233,11 @@ async def fetch_submissions(subreddit: str, limit: int = 100, name: Optional[str
                 continue
             elif submission.url.split("/")[2] in ["i.redd.it", "i.imgur.com"]:
                 if name:
-                    sub_cache_img[name].append((submission.url, submission.title))
+                    sub_cache_img[name].append(
+                        (submission.url, submission.title))
                 else:
-                    sub_cache_img[sub_name].append((submission.url, submission.title))
+                    sub_cache_img[sub_name].append(
+                        (submission.url, submission.title))
 
         submissions = await reddit.subreddit(sub_name, fetch=True)
         submissions_list = submissions.hot(limit=limit)
@@ -240,9 +247,11 @@ async def fetch_submissions(subreddit: str, limit: int = 100, name: Optional[str
                 continue
             elif submission.url.split("/")[2] in ["i.redd.it", "i.imgur.com"]:
                 if name:
-                    sub_cache_img[name].append((submission.url, submission.title))
+                    sub_cache_img[name].append(
+                        (submission.url, submission.title))
                 else:
-                    sub_cache_img[sub_name].append((submission.url, submission.title))
+                    sub_cache_img[sub_name].append(
+                        (submission.url, submission.title))
 
         submissions = await reddit.subreddit(sub_name, fetch=True)
         submissions_list = submissions.top('all', limit=limit)
@@ -252,9 +261,11 @@ async def fetch_submissions(subreddit: str, limit: int = 100, name: Optional[str
                 continue
             elif submission.url.split("/")[2] in ["i.redd.it", "i.imgur.com"]:
                 if name:
-                    sub_cache_img[name].append((submission.url, submission.title))
+                    sub_cache_img[name].append(
+                        (submission.url, submission.title))
                 else:
-                    sub_cache_img[sub_name].append((submission.url, submission.title))
+                    sub_cache_img[sub_name].append(
+                        (submission.url, submission.title))
 
     elif self_posts_running:
         sub_cache_text[sub_name] = []

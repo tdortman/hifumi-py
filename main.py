@@ -20,6 +20,7 @@ import music
 import encryption
 import pillow
 import tools
+import sys
 
 bot = None
 
@@ -285,9 +286,11 @@ async def toggle_votes(message, mode: str, vote_name: str = None):
                         user = reddit.reddit.redditor(vote_name)
                 else:
                     if message.content.split()[1].startswith("u/"):
-                        user = reddit.reddit.redditor(message.content.split()[1][2:])
+                        user = reddit.reddit.redditor(
+                            message.content.split()[1][2:])
                     else:
-                        user = reddit.reddit.redditor(message.content.split()[1])
+                        user = reddit.reddit.redditor(
+                            message.content.split()[1])
 
                 vote_candidate, id = [user.name, user.icon_img], user.id
 
@@ -325,7 +328,8 @@ async def show_vote_result():
     elif vote_yes == vote_no:
         footer = f"{vote_yes} / {vote_no} -> TIEBREAKER"
 
-    embed = discord.Embed(title=f"Vote Results for Candidate {vote_candidate[0]}", color=EMBED_COLOUR)
+    embed = discord.Embed(
+        title=f"Vote Results for Candidate {vote_candidate[0]}", color=EMBED_COLOUR)
     for column in columns:
         embed.add_field(name='\u200b', value=column)
     embed.set_thumbnail(url=vote_candidate[1])
@@ -352,7 +356,8 @@ async def oxford_dic(message):
     fields = "definitions,examples"
 
     url = f"https://od-api.oxforddictionaries.com/api/v2/{endpoint}/{language_code}/{search_term}?fields={fields}"
-    r = requests.get(url, headers={"app_id": OXFORD_APP_ID, "app_key": OXFORD_APP_KEY})
+    r = requests.get(
+        url, headers={"app_id": OXFORD_APP_ID, "app_key": OXFORD_APP_KEY})
 
     print(json.dumps(r.json(), sort_keys=True, indent=4))
 
@@ -360,20 +365,26 @@ async def oxford_dic(message):
 
     if r.status_code == 404:
         url = f"https://od-api.oxforddictionaries.com/api/v2/lemmas/{language_code}/{search_term}?fields={fields}"
-        r = requests.get(url, headers={"app_id": OXFORD_APP_ID, "app_key": OXFORD_APP_KEY})
-        search_term = r.json()['results'][0]['lexicalEntries'][0]['inflectionOf'][0]['text']
+        r = requests.get(
+            url, headers={"app_id": OXFORD_APP_ID, "app_key": OXFORD_APP_KEY})
+        search_term = r.json()[
+            'results'][0]['lexicalEntries'][0]['inflectionOf'][0]['text']
 
         url = f"https://od-api.oxforddictionaries.com/api/v2/{endpoint}/{language_code}/{search_term}?fields={fields}"
-        r = requests.get(url, headers={"app_id": OXFORD_APP_ID, "app_key": OXFORD_APP_KEY})
+        r = requests.get(
+            url, headers={"app_id": OXFORD_APP_ID, "app_key": OXFORD_APP_KEY})
 
         print(r.json())
         await message.channel.send(r.json())
-        definition = r.json()['results'][0]["lexicalEntries"][0]['entries'][0]['senses'][0]['definitions'][0]
+        definition = r.json()[
+            'results'][0]["lexicalEntries"][0]['entries'][0]['senses'][0]['definitions'][0]
         await message.channel.send(r.status_code)
         await message.channel.send(f"{definition}")
     else:
-        definition = r.json()['results'][0]["lexicalEntries"][0]['entries'][0]['senses'][0]['definitions'][0]
-        example = r.json()['results'][0]["lexicalEntries"][0]['entries'][0]['senses'][0]['examples'][0]['text']
+        definition = r.json()[
+            'results'][0]["lexicalEntries"][0]['entries'][0]['senses'][0]['definitions'][0]
+        example = r.json()[
+            'results'][0]["lexicalEntries"][0]['entries'][0]['senses'][0]['examples'][0]['text']
         print(r.json())
         await message.channel.send(r.status_code)
         await message.channel.send(f"{definition}\n\n{example}")
@@ -425,7 +436,7 @@ async def handle_emoji(message, sub_cmd: str = None):
                     name = content[2].split(":")[-2]
                     url = await tools.extract_emoji(content[2])
                 else:
-                    name = content[2] 
+                    name = content[2]
 
                 if "http" in name:
                     await message.channel.send("You didn't specify a name for the emoji!")
@@ -434,7 +445,7 @@ async def handle_emoji(message, sub_cmd: str = None):
                 # Extracting url for the emoji based on the url/emoji given
                 if message.attachments:
                     url = message.attachments[0].url
-                
+
                 if len(content) == 4:
                     if 'http' in content[3] and "<>" in content[3]:
                         url = content[3][1:-1]
@@ -445,7 +456,7 @@ async def handle_emoji(message, sub_cmd: str = None):
                     else:
                         await message.channel.send("You didn't specify a url or emoji!")
                         return
-                
+
                 print(name, url)
                 # Emoji names have to be between 2 and 32 characters long
                 if len(name) > 32:
@@ -577,7 +588,8 @@ async def convert(message):
             await message.channel.send("Invalid currency codes! Check `h!currencies` for a list")
             return
 
-        val, cur1, cur2 = float(content[1].strip("\u202c")), content[2].upper(), content[3].upper()
+        val, cur1, cur2 = float(content[1].strip(
+            "\u202c")), content[2].upper(), content[3].upper()
 
         # Make a request to the api, handle possible errors, extracts and checks conversion rates for specific currency
         url = f'https://prime.exchangerate-api.com/v5/{EXCHANGERATE_API_KEY}/latest/{cur1}'
@@ -606,7 +618,8 @@ async def convert(message):
         # Created Embed and send it in the channel
         embed = discord.Embed(description=desc, title=f"Converting {currencies[cur1]} into {currencies[cur2]}",
                               color=EMBED_COLOUR)
-        embed.set_footer(text=f"{dt.utcnow().strftime('%d/%m/%Y %H:%M:%S')} UTC")
+        embed.set_footer(
+            text=f"{dt.utcnow().strftime('%d/%m/%Y %H:%M:%S')} UTC")
         await message.channel.send(embed=embed)
 
     except Exception as e:
@@ -623,11 +636,14 @@ async def currency_codes(message):
     # and sent into the channel
     for i in range(len(currency_keys)):
         if i <= 16:
-            columns[0] += str(f"**{currency_keys[i]}** - {currencies[str(currency_keys[i])]}\n")
+            columns[0] += str(
+                f"**{currency_keys[i]}** - {currencies[str(currency_keys[i])]}\n")
         elif 17 <= i <= 33:
-            columns[1] += str(f"**{currency_keys[i]}** - {currencies[str(currency_keys[i])]}\n")
+            columns[1] += str(
+                f"**{currency_keys[i]}** - {currencies[str(currency_keys[i])]}\n")
         else:
-            columns[2] += str(f"**{currency_keys[i]}** - {currencies[str(currency_keys[i])]}\n")
+            columns[2] += str(
+                f"**{currency_keys[i]}** - {currencies[str(currency_keys[i])]}\n")
 
     embed = discord.Embed(title=title, color=EMBED_COLOUR)
     for i in range(3):
@@ -681,7 +697,8 @@ async def server_icon(message):
         # (Resized) image gets added to the Embed and sent
         if int(img.size[0]) <= 512:
             await pillow.resize(f"files/{server.id}.png", 1024, f"files/{server.id}_resized.png")
-            file = discord.File(f"files/{server.id}_resized.png", filename="image.png")
+            file = discord.File(
+                f"files/{server.id}_resized.png", filename="image.png")
 
             embed.set_image(url="attachment://image.png")
             await message.channel.send(file=file, embed=embed)
@@ -701,12 +718,9 @@ async def server_icon(message):
 
 
 async def bye(message):
-    try:
-        if message.author.id == 258993932262834188:
-            await message.channel.send("Bai baaaaaaaai!!")
-            await bot.logout()
-    except Exception as e:
-        await tools.error_log(message, e)
+    if message.author.id == 258993932262834188:
+        await message.channel.send("Bai baaaaaaaai!!")
+        sys.exit()
 
 
 async def urban(message):
