@@ -139,9 +139,9 @@ async def resize_img(message, url=None, img_width=None):
         else:
             await resize_gif(message, f"files/unknown.{img_type}", f"files/unknown_resized.{img_type}", (width, width))
 
-        if 8000000 < os.stat(f"files/unknown_resized.{img_type}").st_size < 10000000:
+        if 8192000 < os.stat(f"files/unknown_resized.{img_type}").st_size < 10240000:
             await imgur(message, img_url)
-        elif os.stat(f"files/unknown_resized.{img_type}").st_size > 10000000:
+        elif os.stat(f"files/unknown_resized.{img_type}").st_size > 10240000:
             await message.channel.send("Your image is over 10MB big, try resizing it first.")
         else:
             with open(f"files/unknown_resized.{img_type}", "rb") as g:
@@ -304,7 +304,7 @@ async def imgur(message, url=None):
 
         await tools.download_url(img_url, f"files/imgur.{img_type}")
 
-        if os.stat(f"files/imgur.{img_type}").st_size > 10000000:
+        if os.stat(f"files/imgur.{img_type}").st_size > 10240000:
             await message.channel.send("Your image is over 10MB big, try resizing it first.")
         else:
             img = im.upload_from_path(f"files/imgur.{img_type}")

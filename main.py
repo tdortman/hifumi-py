@@ -472,23 +472,23 @@ async def handle_emoji(message, sub_cmd: str = None):
 
                 # Checks cases when the image is too big (256KB) and proceeds to resize them to 128x128 when needed
                 # Creates custom emoji with either the initial image or a resized version
-                if Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and (
+                if Path(f"emojis/{name}.{img_type}").stat().st_size > 262144 and (
                         img_type == "jpg" or img_type == "png"):
 
                     await pillow.resize(f"emojis/{name}.{img_type}", 128, f"emojis/{name}_resized.{img_type}")
 
-                    if Path(f"emojis/{name}_resized.{img_type}").stat().st_size > 256000:
+                    if Path(f"emojis/{name}_resized.{img_type}").stat().st_size > 262144:
                         await message.channel.send("Even after being resized to 128px your image is still too big.. ")
                         return
                     else:
                         with open(f"emojis/{name}_resized.{img_type}", "rb") as picture:
                             emoji = await server.create_custom_emoji(name=name, image=picture.read())
 
-                elif Path(f"emojis/{name}.{img_type}").stat().st_size > 256000 and img_type == "gif":
+                elif Path(f"emojis/{name}.{img_type}").stat().st_size > 262144 and img_type == "gif":
                     await pillow.resize_gif(message, f"emojis/{name}.{img_type}", f"emojis/{name}_resized.{img_type}",
                                             (128, 128))
 
-                    if Path(f"emojis/{name}_resized.{img_type}").stat().st_size > 256000:
+                    if Path(f"emojis/{name}_resized.{img_type}").stat().st_size > 262144:
                         await message.channel.send("Even after being resized to 128px your gif is still too big.. ")
                         return
                     else:
