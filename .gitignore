@@ -9,3 +9,6 @@ token.txt
 *.ppk
 nohup.out
 config.json
+.env
+temp
+.vscode
